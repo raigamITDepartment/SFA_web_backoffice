@@ -16,40 +16,119 @@ export const protectedRoutes: Routes = [
     {
         key: 'singleMenuItem',
         path: '/single-menu-view',
-        component: lazy(() => import('@/views/demo/SingleMenuView')),
+        component: lazy(() => import('@/views/MasterSettings/SingleMenuView')),
         authority: [],
     },
     {
-        key: 'collapseMenu.item1',
-        path: '/collapse-menu-item-view-1',
-        component: lazy(() => import('@/views/demo/CollapseMenuItemView1')),
+        key: 'MasterMenu.Demarcation',
+        path: '/Master-menu-Demarcation',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation')),
         authority: [],
     },
     {
-        key: 'collapseMenu.item2',
-        path: '/collapse-menu-item-view-2',
-        component: lazy(() => import('@/views/demo/CollapseMenuItemView2')),
+        key: 'MasterMenu.DistributorMapping',
+        path: '/Master-menu-DistributorMapping',
+        component: lazy(() => import('@/views/MasterSettings/DistributorMapping')),
         authority: [],
     },
     {
-        key: 'groupMenu.single',
-        path: '/group-single-menu-item-view',
-        component: lazy(() => import('@/views/demo/GroupSingleMenuItemView')),
-        authority: [],
-    },
-    {
-        key: 'groupMenu.collapse.item1',
-        path: '/group-collapse-menu-item-view-1',
-        component: lazy(
-            () => import('@/views/demo/GroupCollapseMenuItemView1'),
+        key: 'MasterMenu.collapse.FinalGeography',
+        path:  '/Master-menu-FinalGeography',
+        component: lazy(() => import('@/views/MasterSettings/FinalGeography'),
         ),
         authority: [],
     },
+
+   
+
+
+
+    {
+        key: 'UserMenu.collapse.ModifiyUser',
+        path:  '/User-menu-ModifiyUser',
+        component: lazy(() => import('@/views/UserModule/ModifiyUser'),
+        ),
+        authority: [],
+    },
+
+
+    {
+        key: 'UserMenu.collapse.UserGroup',
+        path:  '/User-menu-UserGroup',
+        component: lazy(() => import('@/views/UserModule/UserGroup'),
+        ),
+        authority: [],
+    },
+
+
+
+    {
+        key: 'SalesMenu.collapse.CategoryAdd',
+        path: '/Sales-menu-CategoryAdd',
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd')),
+        authority: [],
+    },
+   
+
+
+    {
+        key: 'SalesMenu.FreeIssue',
+        path: '/Sales-menu-FreeIssue',
+        component: lazy(() => import('@/views/SalesDetails/FreeIssue')),
+        authority: [],
+    },
+
+
+    {
+        key: 'SalesMenu.ItemAdd',
+        path:  '/Sales-menu-ItemAdd',
+        component: lazy(() => import('@/views/SalesDetails/ItemAdd')),
+        authority: [],
+    },
+
+    {
+        key: 'SalesMenu.ItemMaster',
+        path:'/Sales-menu-ItemMaster',
+        component: lazy(() => import('@/views/SalesDetails/ItemMaster')),
+        authority: [],
+    },
+
+
+    {
+        key: 'SalesMenu.ItemSequence',
+        path: '/Sales-menu-ItemSequence',
+        component: lazy(() => import('@/views/SalesDetails/ItemSequence')),
+        authority: [],
+    },
+
+
+    {
+        key: 'SalesMenu.PriceUpdate',
+        path: '/Sales-menu-PriceUpdate',
+        component: lazy(() => import('@/views/SalesDetails/PriceUpdate')),
+        authority: [],
+    },
+
+
+    {
+        key: 'SalesMenu.Target',
+        path: '/Sales-menu-Target',
+        component: lazy(() => import('@/views/SalesDetails/Target')),
+        authority: [],
+    },
+    {
+        key: 'SalesMenu.WorkingDay',
+        path:'/Sales-menu-WorkingDay',
+        component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
+        authority: [],
+    },
+
+
     {
         key: 'groupMenu.collapse.item2',
         path: '/group-collapse-menu-item-view-2',
         component: lazy(
-            () => import('@/views/demo/GroupCollapseMenuItemView2'),
+            () => import('@/views/MasterSettings/GroupCollapseMenuItemView2'),
         ),
         authority: [],
     },

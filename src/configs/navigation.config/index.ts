@@ -8,50 +8,87 @@ import type { NavigationTree } from '@/@types/navigation'
 
 const navigationConfig: NavigationTree[] = [
     {
-        key: 'home',
+        key: 'Dashboard',
         path: '/home',
-        title: 'Home',
+        title: 'Dashboard',
         translateKey: 'nav.home',
-        icon: 'home',
+        icon: 'groupCollapseMenu',
         type: NAV_ITEM_TYPE_ITEM,
         authority: [],
         subMenu: [],
     },
     /** Example purpose only, please remove */
     {
-        key: 'singleMenuItem',
+        key: 'UserModule',
         path: '/single-menu-view',
-        title: 'Single menu item',
+        title: 'User Module',
         translateKey: 'nav.singleMenuItem',
-        icon: 'singleMenu',
-        type: NAV_ITEM_TYPE_ITEM,
+        icon: 'usermodule',
+        type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
-        subMenu: [],
+        subMenu: [
+
+            {
+                key: 'ModifiyUser',
+                path: '/User-menu-ModifiyUser',
+                title: 'Add/Modifiy User',
+                translateKey: 'UserMenu.collapse.ModifiyUser',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+
+            {
+                key: 'UserAccess',
+                path:  '/User-menu-UserGroup',
+                title: 'User Access Group',
+                translateKey: 'UserMenu.collapse.UserGroup',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            }
+
+
+
+
+        ],
     },
     {
-        key: 'collapseMenu',
+        key: 'Master Settings',
         path: '',
-        title: 'Collapse Menu',
-        translateKey: 'nav.collapseMenu.collapseMenu',
+        title: 'Master Settings',
+        translateKey: 'nav.MasterMenu.MasterMenu',
         icon: 'collapseMenu',
         type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
         subMenu: [
             {
-                key: 'collapseMenu.item1',
-                path: '/collapse-menu-item-view-1',
-                title: 'Collapse menu item 1',
-                translateKey: 'nav.collapseMenu.item1',
+                key: 'Demarcation',
+                path: '/Master-menu-Demarcation',
+                title: 'Demarcation',
+                translateKey: 'nav.MasterMenu.Demarcation',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
                 subMenu: [],
             },
             {
-                key: 'collapseMenu.item2',
-                path: '/collapse-menu-item-view-2',
-                title: 'Collapse menu item 2',
-                translateKey: 'nav.collapseMenu.item2',
+                key: 'Distributor Mapping',
+                path: '/Master-menu-DistributorMapping',
+                title: 'Distributor Mapping',
+                translateKey: 'nav.MasterMenu.DistributorMapping',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+            {
+                key: 'Final Geography Mapping',
+                path: '/Master-menu-FinalGeography',
+                title: 'Final Geography Mapping',
+                translateKey: 'nav.MasterMenu.FinalGeography',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
@@ -59,6 +96,107 @@ const navigationConfig: NavigationTree[] = [
             },
         ],
     },
+
+   
+    {
+        key: 'Sales Details',
+        path: '',
+        title: 'Sales Details',
+        translateKey: 'nav.SalesMenu.SalesMenu',
+        icon: 'sales',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: [],
+        subMenu: [
+            {
+                key: 'CategoryAdd',
+                path: '/Sales-menu-CategoryAdd',
+                title: 'CategoryAdd',
+                translateKey: 'nav.SalesMenu.CategoryAdd',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+            {
+                key: 'FreeIssue',
+                path:  '/Sales-menu-FreeIssue',
+                title: 'Free Issue',
+                translateKey: 'nav.SalesMenu.FreeIssue',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+            {
+                key: 'ItemAdd',
+                path: '/Sales-menu-ItemAdd',
+                title: 'Item Add',
+                translateKey: 'nav.SalesMenu.ItemAdd',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+          
+            {
+                key: 'ItemMaster',
+                path: '/Sales-menu-ItemMaster',
+                title: 'Item Master',
+                translateKey: 'nav.SalesMenu.ItemMaster',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+            {
+                key: 'ItemSequence',
+                path: '/Sales-menu-ItemSequence',
+                title: 'Item Sequence',
+                translateKey: 'nav.SalesMenu.ItemSequence',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+        
+            {
+                key: 'PriceUpdate',
+                path: '/Sales-menu-PriceUpdate',
+                title: 'Price Update',
+                translateKey: 'nav.SalesMenu.PriceUpdate',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+        
+            {
+                key: 'Target',
+                path: '/Sales-menu-Target',
+                title: 'Target',
+                translateKey: 'nav.SalesMenu.Target',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+         
+
+
+
+
+
+
+
+        ],
+    },
+
+
+
+
+
+
+
     {
         key: 'groupMenu',
         path: '',
