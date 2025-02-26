@@ -71,22 +71,22 @@ const SignInForm = (props: SignInFormProps) => {
         <div className={className}>
             <Form onSubmit={handleSubmit(onSignIn)}>
                 <FormItem
-                    label="Email"
-                    invalid={Boolean(errors.email)}
-                    errorMessage={errors.email?.message}
+                    label="Username"
+                    // invalid={Boolean(errors.email)}
+                    // errorMessage={errors.email?.message}
                 >
-                    <Controller
-                        name="email"
+                    {/* <Controller
+                        name="username"
                         control={control}
-                        render={({ field }) => (
+                        render={({ field }) => ( */}
                             <Input
-                                type="email"
-                                placeholder="Email"
+                                type="text"
+                                placeholder="Username"
                                 autoComplete="off"
-                                {...field}
+                                // {...field}
                             />
-                        )}
-                    />
+                        {/* )}
+                    /> */}
                 </FormItem>
                 <FormItem
                     label="Password"
@@ -97,19 +97,19 @@ const SignInForm = (props: SignInFormProps) => {
                         errors.password?.message ? 'mb-8' : '',
                     )}
                 >
-                    <Controller
+                    {/* <Controller
                         name="password"
                         control={control}
                         rules={{ required: true }}
-                        render={({ field }) => (
+                        render={({ field }) => ( */}
                             <PasswordInput
                                 type="text"
                                 placeholder="Password"
                                 autoComplete="off"
-                                {...field}
+                                // {...field}
                             />
-                        )}
-                    />
+                        {/* )}
+                    /> */}
                 </FormItem>
                 {passwordHint}
                 <Button

@@ -28,11 +28,11 @@ export const SignInBase = ({
                     type="streamline"
                     mode={mode}
                     imgClass="mx-auto"
-                    logoWidth={60}
+                    logoWidth={200}
                 />
             </div>
             <div className="mb-10">
-                <h2 className="mb-2">Welcome back!</h2>
+                <h2 className="mb-2">Welcome!</h2>
                 <p className="font-semibold heading-text">
                     Please enter your credentials to sign in!
                 </p>
@@ -45,19 +45,19 @@ export const SignInBase = ({
             <SignInForm
                 disableSubmit={disableSubmit}
                 setMessage={setMessage}
-                passwordHint={
-                    <div className="mb-7 mt-2">
-                        <ActionLink
-                            to={forgetPasswordUrl}
-                            className="font-semibold heading-text mt-2 underline"
-                            themeColor={false}
-                        >
-                            Forgot password
-                        </ActionLink>
-                    </div>
-                }
+                // passwordHint={
+                //     <div className="mb-7 mt-2">
+                //         <ActionLink
+                //             to={forgetPasswordUrl}
+                //             className="font-semibold heading-text mt-2 underline"
+                //             themeColor={false}
+                //         >
+                //             Forgot password
+                //         </ActionLink>
+                //     </div>
+                // }
             />
-            <div className="mt-8">
+            {/* <div className="mt-8">
                 <div className="flex items-center gap-2 mb-6">
                     <div className="border-t border-gray-200 dark:border-gray-800 flex-1 mt-[1px]" />
                     <p className="font-semibold heading-text">
@@ -81,7 +81,7 @@ export const SignInBase = ({
                         Sign up
                     </ActionLink>
                 </div>
-            </div>
+            </div> */}
         </>
     )
 }
