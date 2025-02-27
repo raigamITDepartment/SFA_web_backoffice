@@ -31,7 +31,7 @@ export const SignUpBase = ({
             <div className="mb-8">
                 <h3 className="mb-1">Sign Up</h3>
                 <p className="font-semibold heading-text">
-                    And lets get started with your free trial
+                    Add Modified User
                 </p>
             </div>
             {message && (
@@ -39,7 +39,16 @@ export const SignUpBase = ({
                     <span className="break-all">{message}</span>
                 </Alert>
             )}
-            <SignUpForm disableSubmit={disableSubmit} setMessage={setMessage} />
+            <SignUpForm 
+                disableSubmit={disableSubmit} 
+                setMessage={setMessage} 
+                employeeCategory="defaultCategory" 
+                gender="defaultGender" 
+                region="defaultRegion" 
+                area="defaultArea" 
+                territory="defaultTerritory" 
+                range="defaultRange" 
+            />
             <div>
                 <div className="mt-6 text-center">
                     <span>Already have an account? </span>
