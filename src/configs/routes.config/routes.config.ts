@@ -22,7 +22,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'MasterMenu.Demarcation',
         path: '/Master-menu-Demarcation',
-        component: lazy(() => import('@/views/MasterSettings/Demarcation')),
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Demarcation')),
         authority: [],
     },
     {
