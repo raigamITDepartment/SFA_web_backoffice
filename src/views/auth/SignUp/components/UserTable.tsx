@@ -1,4 +1,3 @@
-
 import { useMemo, useState, useEffect } from 'react'
 import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
@@ -13,13 +12,31 @@ import {
     getSortedRowModel,
     flexRender,
 } from '@tanstack/react-table'
+import Pagination from '@/components/ui/Pagination'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import { data10 } from './data'
 import type { Person } from './data'
-import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
-import type { InputHTMLAttributes } from 'react'
-
-interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
+import type {
+    ColumnDef,
+    FilterFn,
+    ColumnFiltersState,
+} from '@tanstack/react-table'
+import type { InputHTMLAttributes, ReactNode, CSSProperties } from 'react'
+export interface GroupBase<Option> {
+    readonly options: readonly Option[];
+    readonly label?: string;
+}
+export interface CommonProps {
+    id?: string
+    className?: string
+    children?: ReactNode
+    style?: CSSProperties
+}
+interface DebouncedInputProps
+    extends Omit<
+        InputHTMLAttributes<HTMLInputElement>,
+        'onChange' | 'size' | 'prefix'
+    > {
     value: string | number
     onChange: (value: string | number) => void
     debounce?: number
@@ -45,7 +62,7 @@ function DebouncedInput({
         }, debounce)
 
         return () => clearTimeout(timeout)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value])
 
     return (
@@ -76,17 +93,18 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
+
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
 
     const columns = useMemo<ColumnDef<Person>[]>(
         () => [
-            { header: 'First Name', accessorKey: 'firstName' },
-            { header: 'Last Name', accessorKey: 'lastName' },
+            { header: 'Username', accessorKey: 'Username' },
+            { header: 'Role', accessorKey: 'Role' },
             { header: 'Email', accessorKey: 'email' },
         ],
-        []
+        [],
     )
 
     const [data] = useState(() => data10)
@@ -114,81 +132,149 @@ const Filtering = () => {
         debugHeaders: true,
         debugColumns: false,
     })
+    type Option = {
+        value: number
+        label: string
+    }
+
+    const onSelectChange = (value = 0) => {
+        table.setPageSize(Number(value))
+    }
+
+    const pageSizeOption = [
+        { value: 10, label: '10 / page' },
+        { value: 20, label: '20 / page' },
+        { value: 30, label: '30 / page' },
+        { value: 40, label: '40 / page' },
+        { value: 50, label: '50 / page' },
+    ]
+
+    const tableData = (): Person[] => {
+        const arr = []
+        for (let i = 0; i < 50; i++) {
+            arr.push({
+                id: i,
+                Username: `Maria ${i}`,
+                lastName: `Anders ${i}`,
+                email: `maria${i}@example.com`,
+                gender: i % 2 === 0 ? 'female' : 'male',
+                age: i,
+            })
+        }
+        return arr
+    }
+
+
+    const onPaginationChange = (page: number) => {
+        table.setPageIndex(page - 1)
+    }
+    
+    const totalData = tableData().length
 
     return (
-        <div className="table-container" >
+        <div className="table-container">
             <div className="card">
                 <div className="card-body">
                     <>
-            <DebouncedInput
-                value={globalFilter ?? ''}
-                className="p-2 font-lg shadow border border-block"
-                placeholder="Search all columns..."
-                onChange={(value) => setGlobalFilter(String(value))}
-            />
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                        header.column.getToggleSortingHandler(),
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
-                                                {
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                }
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                <TBody>
-                    {table.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id}>
-                                {row.getVisibleCells().map((cell) => {
+                        <DebouncedInput
+                            value={globalFilter ?? ''}
+                            className="p-2 font-lg shadow border border-block"
+                            placeholder="Search all columns..."
+                            onChange={(value) => setGlobalFilter(String(value))}
+                        />
+                        <Table>
+                            <THead>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <Tr key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => {
+                                            return (
+                                                <Th
+                                                    key={header.id}
+                                                    colSpan={header.colSpan}
+                                                >
+                                                    {header.isPlaceholder ? null : (
+                                                        <div
+                                                            {...{
+                                                                className:
+                                                                    header.column.getCanSort()
+                                                                        ? 'cursor-pointer select-none'
+                                                                        : '',
+                                                                onClick:
+                                                                    header.column.getToggleSortingHandler(),
+                                                            }}
+                                                        >
+                                                            {flexRender(
+                                                                header.column
+                                                                    .columnDef
+                                                                    .header,
+                                                                header.getContext(),
+                                                            )}
+                                                            {
+                                                                <Sorter
+                                                                    sort={header.column.getIsSorted()}
+                                                                />
+                                                            }
+                                                        </div>
+                                                    )}
+                                                </Th>
+                                            )
+                                        })}
+                                    </Tr>
+                                ))}
+                            </THead>
+                            <TBody>
+                                {table.getRowModel().rows.map((row) => {
                                     return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </Td>
+                                        <Tr key={row.id}>
+                                            {row
+                                                .getVisibleCells()
+                                                .map((cell) => {
+                                                    return (
+                                                        <Td key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column
+                                                                    .columnDef
+                                                                    .cell,
+                                                                cell.getContext(),
+                                                            )}
+                                                        </Td>
+                                                    )
+                                                })}
+                                        </Tr>
                                     )
                                 })}
-                            </Tr>
-                        )
-                    })}
-                </TBody>
-            </Table>
-        </>
+                            </TBody>
+                        </Table>
+                    </>
+                    <div className="flex items-center justify-between mt-4">
+                        <Pagination
+                            pageSize={table.getState().pagination.pageSize}
+                            currentPage={
+                                table.getState().pagination.pageIndex + 1
+                            }
+                            total={totalData}
+                         onChange={onPaginationChange}
+                        />
+
+                        <div style={{ minWidth: 130 }}>
+                            {/* <Select<Option>
+                                size="sm"
+                                isSearchable={false}
+                                value={pageSizeOption.filter(
+                                    (option) =>
+                                        option.value ===
+                                        table.getState().pagination.pageSize,
+                                )}
+                                options={pageSizeOption}
+                               // onChange={(option) =>
+                                    //onSelectChange(option?.value)
+                                }
+                            /> */}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     )
 }
 export default Filtering
-
