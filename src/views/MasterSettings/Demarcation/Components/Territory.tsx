@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import Tag from '@/components/ui/Tag'
+import Tag from '@/components/ui/Tag';
 
 import {
     useReactTable,
@@ -20,8 +20,8 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox'
-import type { ChangeEvent } from 'react'
+import Checkbox from '@/components/ui/Checkbox';
+import type { ChangeEvent } from 'react';
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -33,11 +33,14 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface Region {
+interface Territory {
     channelCode: string;
     subChannelCode: string;
     regionCode: string;
-    regionName: string;
+    areaCode: string;
+    range: string;
+    territoryCode: string;
+    territoryName: string;
     isActive: boolean;
 }
 
@@ -77,17 +80,19 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-
-const Region = () => {
+const Territory = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    const columns = useMemo<ColumnDef<Region>[]>(() => [
+    const columns = useMemo<ColumnDef<Territory>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Name', accessorKey: 'subChannelCode' },
+        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
         { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Region Name', accessorKey: 'regionName' },
+        { header: 'Area Code', accessorKey: 'areaCode' },
+        { header: 'Range', accessorKey: 'range' },
+        { header: 'Territory Code', accessorKey: 'territoryCode' },
+        { header: 'Territory Name', accessorKey: 'territoryName' },
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -109,26 +114,19 @@ const Region = () => {
                 </div>
             ),
         },
-    
     ], []);
 
-    const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
+    const [data] = useState<Territory[]>([
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T1', territoryName: 'Territory 1', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T2', territoryName: 'Territory 2', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T3', territoryName: 'Territory 3', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T4', territoryName: 'Territory 4', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T5', territoryName: 'Territory 5', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T6', territoryName: 'Territory 6', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T7', territoryName: 'Territory 7', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T8', territoryName: 'Territory 8', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T9', territoryName: 'Territory 9', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T10', territoryName: 'Territory 10', isActive: false },
     ]);
 
     const totalData = data.length;
@@ -159,21 +157,18 @@ const Region = () => {
     };
 
     const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e)
-    }
+        console.log(value, e);
+    };
 
-      // Implement edit and delete functionality in table here 
-      const handleEdit = (region: Region) => {
+    const handleEdit = (person: Territory) => {
         // Implement edit functionality here
-        console.log('Edit:', region);
+        console.log('Edit:', person);
     };
 
-    const handleDelete = (region: Region) => {
+    const handleDelete = (person: Territory) => {
         // Implement delete functionality here
-        console.log('Delete:', region);
+        console.log('Delete:', person);
     };
-
-
 
     return (
         <div>
@@ -181,16 +176,24 @@ const Region = () => {
                 <div className='flex flex-col rounded-xl bg-white'></div>
 
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Region Creation</h5>
+                    <h5 className='mb-2'>Territory Creation</h5>
                     <div className='my-2'>
                         <Select size="sm" placeholder="Select Channel" />
                     </div>
                     <div className='my-2'>
                         <Select size="sm" placeholder="Select Sub-Channel" />
                     </div>
-                    
                     <div className='my-2'>
-                        <Input size="sm" placeholder=" Region Name" />
+                        <Select size="sm" placeholder="Select Region" />
+                    </div>
+                    <div className='my-2'>
+                        <Select size="sm" placeholder="Select Area" />
+                    </div>
+                    <div className='my-2'>
+                        <Select size="sm" placeholder="Select Range" />
+                    </div>
+                    <div className='my-2'>
+                        <Input size="sm" placeholder="Territory Name" />
                     </div>
 
                     <div>
@@ -199,10 +202,7 @@ const Region = () => {
                         </Checkbox>
                     </div>
 
-
                     <Button variant="solid" block>Create</Button>
-
-
                 </Card>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
@@ -269,4 +269,4 @@ const Region = () => {
     );
 };
 
-export default Region;
+export default Territory;
