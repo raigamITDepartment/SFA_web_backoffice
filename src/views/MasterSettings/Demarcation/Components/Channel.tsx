@@ -5,6 +5,10 @@ import Table from '@/components/ui/Table';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 
+import { FaRegEdit } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
+import Tag from '@/components/ui/Tag'
+
 import {
     useReactTable,
     getCoreRowModel,
@@ -20,7 +24,7 @@ import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent } from 'react'
 
-
+// Table Components
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
 const pageSizeOptions = [
@@ -30,18 +34,19 @@ const pageSizeOptions = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ];
-
-interface Person {
-    channelId: string;
+// Channel Interface
+interface Channel {
+    channelCode: string;
     channelName: string;
+    isActive?: boolean;
 }
-
+// Debounced Input Props
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
     onChange: (value: string | number) => void;
     debounce?: number;
 }
-
+// Debounced Input
 function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...props }: DebouncedInputProps) {
     const [value, setValue] = useState(initialValue);
 
@@ -66,6 +71,7 @@ function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...prop
     );
 }
 
+// Fuzzy Filter
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     addMeta({ itemRank });
@@ -78,28 +84,53 @@ const Channel = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    const columns = useMemo<ColumnDef<Person>[]>(() => [
-        { header: 'Channel ID', accessorKey: 'channelId' },
+    // Columns
+    const columns = useMemo<ColumnDef<Channel>[]>(() => [
+        { header: 'Channel Code', accessorKey: 'channelCode' },
         { header: 'Channel Name', accessorKey: 'channelName' },
+        {
+            header: 'Is Active',
+            accessorKey: 'isActive',
+            cell: ({ row }) => (
+                <div className="mr-2 rtl:ml-2">
+                    <Tag className={row.original.isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
+                        {row.original.isActive ? "Active" : "Inactive"}
+                    </Tag>
+                </div>
+            ),
+        },
+        {
+            header: 'Action',
+            accessorKey: 'action',
+            cell: ({ row }) => (
+                <div className="flex ">
+                    <FaRegEdit onClick={() => handleEdit(row.original)} className="cursor-pointer mr-4 text-primary-deep text-lg" />
+                    <MdDeleteOutline onClick={() => handleDelete(row.original)} className="cursor-pointer text-red-600 text-xl" />
+                </div>
+            ),
+        },
     ], []);
 
-    const [data] = useState<Person[]>([
-        { channelId: '1', channelName: 'National Channel C' },
-        { channelId: '2', channelName: 'National Channel D' },
-        { channelId: '3', channelName: 'Bakery Channel' },
-        { channelId: '4', channelName: 'Ruchi Channel' },
-        { channelId: '1', channelName: 'National Channel C' },
-        { channelId: '2', channelName: 'National Channel D' },
-        { channelId: '3', channelName: 'Bakery Channel' },
-        { channelId: '4', channelName: 'Ruchi Channel' },
-        { channelId: '1', channelName: 'National Channel C' },
-        { channelId: '2', channelName: 'National Channel D' },
-        { channelId: '3', channelName: 'Bakery Channel' },
-        { channelId: '4', channelName: 'Ruchi Channel' },
+    const [data] = useState<Channel[]>([
+        { channelCode: '1', channelName: 'National Channel C', isActive: true },
+        { channelCode: '2', channelName: 'National Channel D', isActive: false },
+        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
+        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
+        { channelCode: '1', channelName: 'National Channel C', isActive: true },
+        { channelCode: '2', channelName: 'National Channel D', isActive: false },
+        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
+        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
+        { channelCode: '1', channelName: 'National Channel C', isActive: true },
+        { channelCode: '2', channelName: 'National Channel D', isActive: false },
+        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
+        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
     ]);
 
     const totalData = data.length;
 
+
+
+    // Table
     const table = useReactTable({
         data,
         columns,
@@ -115,19 +146,33 @@ const Channel = () => {
         initialState: { pagination: { pageSize: pageSize } },
     });
 
+    // Pagination
     const onPaginationChange = (page: number) => {
         table.setPageIndex(page - 1);
     };
 
+    // Page Size
     const onSelectChange = (value = 0) => {
         const newSize = Number(value);
         setPageSize(newSize);
         table.setPageSize(newSize);
     };
 
+    // Checkbox
     const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
         console.log(value, e)
     }
+
+    // Implement edit and delete functionality in table here 
+    const handleEdit = (channel: Channel) => {
+        // Implement edit functionality here
+        console.log('Edit:', channel);
+    };
+
+    const handleDelete = (channel: Channel) => {
+        // Implement delete functionality here
+        console.log('Delete:', channel);
+    };
 
 
     return (
@@ -156,7 +201,7 @@ const Channel = () => {
 
                 </Card>
 
-                <Card bordered={false} className='lg:w-2/3 xl:w-2/3'>
+                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
