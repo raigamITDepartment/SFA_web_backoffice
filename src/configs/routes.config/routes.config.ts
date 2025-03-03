@@ -46,7 +46,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'UserMenu.collapse.ModifiyUser',
         path:  '/User-menu-ModifiyUser',
-        component: lazy(() => import('@/views/UserModule/ModifiyUser'),
+        component: lazy(() => import('@/views/auth/SignUp/SignUp'),
         ),
         authority: [],
     },
