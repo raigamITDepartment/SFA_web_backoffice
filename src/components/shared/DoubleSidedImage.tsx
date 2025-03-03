@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import { THEME_ENUM } from '@/constants/theme.constant'
 import type { DetailedHTMLProps, ImgHTMLAttributes } from 'react'
 

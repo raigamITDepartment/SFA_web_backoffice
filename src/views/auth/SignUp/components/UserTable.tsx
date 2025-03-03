@@ -141,13 +141,13 @@ const Filtering = () => {
         table.setPageSize(Number(value))
     }
 
-    const pageSizeOption = [
+    const pageSizeOptions = [
         { value: 10, label: '10 / page' },
         { value: 20, label: '20 / page' },
         { value: 30, label: '30 / page' },
         { value: 40, label: '40 / page' },
         { value: 50, label: '50 / page' },
-    ]
+    ];
 
     const tableData = (): Person[] => {
         const arr = []
@@ -247,31 +247,22 @@ const Filtering = () => {
                         </Table>
                     </>
                     <div className="flex items-center justify-between mt-4">
-                        <Pagination
-                            pageSize={table.getState().pagination.pageSize}
-                            currentPage={
-                                table.getState().pagination.pageIndex + 1
-                            }
-                            total={totalData}
-                         onChange={onPaginationChange}
-                        />
-
-                        <div style={{ minWidth: 130 }}>
-                            {/* <Select<Option>
-                                size="sm"
-                                isSearchable={false}
-                                value={pageSizeOption.filter(
-                                    (option) =>
-                                        option.value ===
-                                        table.getState().pagination.pageSize,
-                                )}
-                                options={pageSizeOption}
-                               // onChange={(option) =>
-                                    //onSelectChange(option?.value)
-                                }
-                            /> */}
+                            <Pagination
+                                pageSize={table.getState().pagination.pageSize}
+                                currentPage={table.getState().pagination.pageIndex + 1}
+                                total={totalData}
+                                onChange={onPaginationChange}
+                            />
+                            <div style={{ minWidth: 130 }}>
+                                {/* <Select
+                                    size="sm"
+                                    isSearchable={false}
+                                    value={pageSizeOptions.find(option => option.value === pageSize)}
+                                    options={pageSizeOptions}
+                                    onChange={(option) => onSelectChange(option?.value)}
+                                /> */}
+                            </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import Logo from '@/components/template/Logo'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import appConfig from '@/configs/app.config'
 import { Link } from 'react-router-dom'
 import type { Mode } from '@/@types/theme'

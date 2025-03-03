@@ -6,9 +6,9 @@ import { DIR_RTL } from '@/constants/theme.constant'
 import withHeaderItem, { WithHeaderItemProps } from '@/utils/hoc/withHeaderItem'
 import navigationConfig from '@/configs/navigation.config'
 import appConfig from '@/configs/app.config'
-import { useThemeStore } from '@/store/themeStore'
-import { useRouteKeyStore } from '@/store/routeKeyStore'
-import { useSessionUser } from '@/store/authStore'
+import { useThemeStore } from '@/Store/themeStore'
+import { useRouteKeyStore } from '@/Store/routeKeyStore'
+import { useSessionUser } from '@/Store/authStore'
 
 const VerticalMenuContent = lazy(
     () => import('@/components/template/VerticalMenuContent'),

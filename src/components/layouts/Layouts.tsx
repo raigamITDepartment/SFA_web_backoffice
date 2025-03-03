@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import Loading from '@/components/shared/Loading'
 import type { CommonProps } from '@/@types/common'
 import { useAuth } from '@/auth'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import PostLoginLayout from './PostLoginLayout'
 import PreLoginLayout from './PreLoginLayout'
 

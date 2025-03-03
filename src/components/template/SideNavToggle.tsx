@@ -1,5 +1,5 @@
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import useResponsive from '@/utils/hooks/useResponsive'
 import NavToggle from '@/components/shared/NavToggle'
 import type { CommonProps } from '@/@types/common'

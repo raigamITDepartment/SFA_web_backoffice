@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
-import { useRouteKeyStore } from '@/store/routeKeyStore'
+import { useRouteKeyStore } from '@/Store/routeKeyStore'
 import { useLocation } from 'react-router-dom'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import type { LayoutType } from '@/@types/theme'
 import type { ComponentType } from 'react'
 
