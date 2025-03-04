@@ -38,7 +38,6 @@ interface Route {
     subChannelCode: string;
     regionCode: string;
     areaCode: string;
-    range: string;
     territoryCode: string;
     routeCode: string;
     routeName: string;
@@ -91,7 +90,6 @@ const Route = () => {
         { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
         { header: 'Region Code', accessorKey: 'regionCode' },
         { header: 'Area Code', accessorKey: 'areaCode' },
-        { header: 'Range', accessorKey: 'range' },
         { header: 'Territory Code', accessorKey: 'territoryCode' },
         { header: 'Route Code', accessorKey: 'routeCode' },
         { header: 'Route Name', accessorKey: 'routeName' },
@@ -119,16 +117,16 @@ const Route = () => {
     ], []);
 
     const [data] = useState<Route[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T1', routeCode: 'R1', routeName: 'Route 1', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T2', routeCode: 'R2', routeName: 'Route 2', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T3', routeCode: 'R3', routeName: 'Route 3', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T4', routeCode: 'R4', routeName: 'Route 4', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T5', routeCode: 'R5', routeName: 'Route 5', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T6', routeCode: 'R6', routeName: 'Route 6', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T7', routeCode: 'R7', routeName: 'Route 7', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T8', routeCode: 'R8', routeName: 'Route 8', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T9', routeCode: 'R9', routeName: 'Route 9', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T10', routeCode: 'R10', routeName: 'Route 10', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T1', routeCode: 'R1', routeName: 'Route 1', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T2', routeCode: 'R2', routeName: 'Route 2', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T3', routeCode: 'R3', routeName: 'Route 3', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T4', routeCode: 'R4', routeName: 'Route 4', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T5', routeCode: 'R5', routeName: 'Route 5', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T6', routeCode: 'R6', routeName: 'Route 6', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T7', routeCode: 'R7', routeName: 'Route 7', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T8', routeCode: 'R8', routeName: 'Route 8', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T9', routeCode: 'R9', routeName: 'Route 9', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T10', routeCode: 'R10', routeName: 'Route 10', isActive: false },
     ]);
 
     const totalData = data.length;
@@ -175,7 +173,7 @@ const Route = () => {
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <div className='flex flex-col rounded-xl bg-white'></div>
+                {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
 
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Route Creation</h5>
@@ -192,10 +190,10 @@ const Route = () => {
                         <Select size="sm" placeholder="Select Area" />
                     </div>
                     <div className='my-2'>
-                        <Select size="sm" placeholder="Select Range" />
+                        <Select size="sm" placeholder="Select Territory" />
                     </div>
                     <div className='my-2'>
-                        <Select size="sm" placeholder="Select Territory" />
+                        <Input size="sm" placeholder="Route Code" />
                     </div>
                     <div className='my-2'>
                         <Input size="sm" placeholder="Route Name" />
