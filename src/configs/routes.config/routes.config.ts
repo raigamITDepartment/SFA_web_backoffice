@@ -28,7 +28,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'MasterMenu.DistributorMapping',
         path: '/Master-menu-DistributorMapping',
-        component: lazy(() => import('@/views/MasterSettings/DistributorMapping')),
+        component: lazy(() => import('@/views/MasterSettings/DistributorMapping/DistributorMapping')),
         authority: [],
     },
     {

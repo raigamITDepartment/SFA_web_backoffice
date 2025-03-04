@@ -23,7 +23,6 @@ const Default = () => {
                     <TabNav value="tab5">Territory</TabNav>
                     <TabNav value="tab6">Route</TabNav>
                     <TabNav value="tab7">Agency</TabNav>
-                    <TabNav value="tab8">Final</TabNav>
                 </TabList>
                 <div className="py-3">
 
@@ -31,35 +30,35 @@ const Default = () => {
                     <TabContent value="tab1"> 
                             <Channel/>
                     </TabContent>
+
                     {/* Sub-Channel Creation */}
                     <TabContent value="tab2">
                             <SubChannel/>
                     </TabContent>
+
                     {/* Region Creation */}
                     <TabContent value="tab3">
                             <Region/>
                     </TabContent>
+
                     {/* Area Creation */}
                     <TabContent value="tab4">
                         <Area/>
                     </TabContent>
+
                     {/* Territory Creation */}
                     <TabContent value="tab5">
                         <Territory/>
                     </TabContent>
+
                     {/* Route Creation */}
                     <TabContent value="tab6">
                         <Route/>
                     </TabContent>
+
+                    {/* Agency Creation */}
                     <TabContent value="tab7">
                         <Agency/>
-                    </TabContent>
-                    <TabContent value="tab8">
-                        <p>
-                            In C++ its harder to shoot yourself in the foot, but
-                            when you do, you blow off your whole leg. (Bjarne
-                            Stroustrup)
-                        </p>
                     </TabContent>
                 </div>
             </Tabs>

@@ -4,10 +4,10 @@ import Select from '@/components/ui/Select';
 import Table from '@/components/ui/Table';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
-
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import Tag from '@/components/ui/Tag'
+import Tag from '@/components/ui/Tag';
+import Alert from '@/components/ui/Alert';
 
 import {
     useReactTable,
@@ -21,10 +21,9 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox'
-import type { ChangeEvent } from 'react'
+import Checkbox from '@/components/ui/Checkbox';
+import type { ChangeEvent } from 'react';
 
-// Table Components
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
 const pageSizeOptions = [
@@ -34,19 +33,19 @@ const pageSizeOptions = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ];
-// Channel Interface
+
 interface Channel {
     channelCode: string;
     channelName: string;
     isActive?: boolean;
 }
-// Debounced Input Props
+
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
     onChange: (value: string | number) => void;
     debounce?: number;
 }
-// Debounced Input
+
 function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...props }: DebouncedInputProps) {
     const [value, setValue] = useState(initialValue);
 
@@ -71,20 +70,20 @@ function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...prop
     );
 }
 
-// Fuzzy Filter
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     addMeta({ itemRank });
     return itemRank.passed;
 };
 
-
 const Channel = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
+    const [error, setError] = useState<string | null>(null);
+    const [country, setCountry] = useState<string | null>(null);
+    const [channelName, setChannelName] = useState<string>('');
 
-    // Columns
     const columns = useMemo<ColumnDef<Channel>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
         { header: 'Channel Name', accessorKey: 'channelName' },
@@ -128,9 +127,6 @@ const Channel = () => {
 
     const totalData = data.length;
 
-
-
-    // Table
     const table = useReactTable({
         data,
         columns,
@@ -146,24 +142,20 @@ const Channel = () => {
         initialState: { pagination: { pageSize: pageSize } },
     });
 
-    // Pagination
     const onPaginationChange = (page: number) => {
         table.setPageIndex(page - 1);
     };
 
-    // Page Size
     const onSelectChange = (value = 0) => {
         const newSize = Number(value);
         setPageSize(newSize);
         table.setPageSize(newSize);
     };
 
-    // Checkbox
     const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e)
-    }
+        console.log(value, e);
+    };
 
-    // Implement edit and delete functionality in table here 
     const handleEdit = (channel: Channel) => {
         // Implement edit functionality here
         console.log('Edit:', channel);
@@ -174,31 +166,42 @@ const Channel = () => {
         console.log('Delete:', channel);
     };
 
+    const handleCreate = () => {
+        if (!country || !channelName) {
+            setError('You can\'t create a channel without filling both "Select Country" and "Channel Name".');
+            return;
+        }
+        // Implement create functionality here
+        setError(null);
+        console.log('Create channel:', { country, channelName });
+    };
+
+    const countryOptions = [
+        { value: 'AI', label: 'All Island' },
+    ];
 
     return (
         <div>
+            {error && (
+                <Alert showIcon className="mb-4" type="danger">
+                    {error}
+                </Alert>
+            )}
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <div className='flex flex-col rounded-xl bg-white'></div>
-
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Channel Creation</h5>
                     <div className='my-2'>
-                        <Select size="sm" placeholder="Select Country" />
+                        <Select size="sm" placeholder="Select Country" options={countryOptions} onChange={(option) => setCountry(option?.value || null)} />
                     </div>
                     <div className='my-2'>
-                        <Input size="sm" placeholder="Channel Name" />
+                        <Input size="sm" placeholder="Channel Name" value={channelName} onChange={(e) => setChannelName(e.target.value)} />
                     </div>
-
                     <div>
                         <Checkbox defaultChecked onChange={onCheck} className='mt-3 mb-4'>
                             Active
                         </Checkbox>
                     </div>
-
-
-                    <Button variant="solid" block>Create</Button>
-
-
+                    <Button variant="solid" block onClick={handleCreate}>Create</Button>
                 </Card>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>

@@ -177,7 +177,7 @@ const Area = () => {
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <div className='flex flex-col rounded-xl bg-white'></div>
+                {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
 
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Area Creation</h5>
