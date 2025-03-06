@@ -6,7 +6,9 @@ import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import Tag from '@/components/ui/Tag'
+import Tag from '@/components/ui/Tag';
+import { useForm, Controller } from 'react-hook-form';
+import { FormItem, Form } from '@/components/ui/Form';
 
 import {
     useReactTable,
@@ -20,9 +22,14 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox'
-import type { ChangeEvent } from 'react'
+import Checkbox from '@/components/ui/Checkbox';
+import type { ChangeEvent } from 'react';
 
+type FormSchema = {
+    channel: string;
+    subChannelName: string;
+    isActive: boolean;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -78,11 +85,11 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-
-const Subchannel = () => {
+const SubChannel = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
+    const [error, setError] = useState<string | null>(null);
 
     const columns = useMemo<ColumnDef<SubChannel>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -147,10 +154,9 @@ const Subchannel = () => {
     };
 
     const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e)
-    }
+        console.log(value, e);
+    };
 
-    // Implement edit and delete functionality in table here 
     const handleEdit = (channel: SubChannel) => {
         // Implement edit functionality here
         console.log('Edit:', channel);
@@ -161,32 +167,104 @@ const Subchannel = () => {
         console.log('Delete:', channel);
     };
 
+    const {
+        handleSubmit,
+        formState: { errors },
+        control,
+    } = useForm<FormSchema>({
+        defaultValues: {
+            channel: '',
+            subChannelName: '',
+            isActive: true, // Set default value to true
+        },
+    });
 
+    const onSubmit = async (values: FormSchema) => {
+        await new Promise((r) => setTimeout(r, 500));
+        alert(JSON.stringify(values, null, 2));
+    };
 
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
-
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Sub-Channel Creation</h5>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Channel" />
-                    </div>
-                    <div className='my-2'>
-                        <Input size="sm" placeholder="Sub-Channel Name" />
-                    </div>
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
+                        >
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={[
+                                            { label: 'National Channel', value: 'National Channel' },
+                                            { label: 'Bakery Channel', value: 'Bakery Channel' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.subChannelName)}
+                            errorMessage={errors.subChannelName?.message}
+                        >
+                            <Controller
+                                name="subChannelName"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Sub-Channel Name"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
 
-                    <div>
-                        <Checkbox defaultChecked onChange={onCheck} className='mt-3 mb-4'>
-                            Active
-                        </Checkbox>
-                    </div>
+                        <FormItem>
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({ field }) =>
+                                    <Checkbox {...field} checked={field.value}>
+                                        IsActive
+                                    </Checkbox>
+                                }
+                            />
+                        </FormItem>
 
-
-                    <Button variant="solid" block>Create</Button>
-
-
+                        <FormItem>
+                            <Button variant="solid" block type="submit">Create</Button>
+                        </FormItem>
+                    </Form>
                 </Card>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
@@ -253,4 +331,4 @@ const Subchannel = () => {
     );
 };
 
-export default Subchannel;
+export default SubChannel;
