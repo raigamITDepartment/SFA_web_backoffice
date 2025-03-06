@@ -7,7 +7,9 @@ import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
-import Alert from '@/components/ui/Alert';
+import InputGroup from '@/components/ui/InputGroup';
+import { useForm, Controller } from 'react-hook-form';
+import { FormItem, Form } from '@/components/ui/Form';
 
 import {
     useReactTable,
@@ -23,6 +25,12 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+
+type FormSchema = {
+    country: string;
+    channelName: string;
+    isActive: boolean;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -167,41 +175,107 @@ const Channel = () => {
     };
 
     const handleCreate = () => {
-        if (!country || !channelName) {
-            setError('You can\'t create a channel without filling both "Select Country" and "Channel Name".');
-            return;
-        }
-        // Implement create functionality here
         setError(null);
         console.log('Create channel:', { country, channelName });
     };
 
-    const countryOptions = [
-        { value: 'AI', label: 'All Island' },
-    ];
+    const {
+        handleSubmit,
+        formState: { errors },
+        control,
+    } = useForm<FormSchema>({
+        defaultValues: {
+            country: '',
+            channelName: '',
+            isActive: false,
+        },
+    });
+
+    const onSubmit = async (values: FormSchema) => {
+        await new Promise((r) => setTimeout(r, 500));
+        alert(JSON.stringify(values, null, 2));
+    };
 
     return (
         <div>
-            {error && (
-                <Alert showIcon className="mb-4" type="danger">
-                    {error}
-                </Alert>
-            )}
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Channel Creation</h5>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Country" options={countryOptions} onChange={(option) => setCountry(option?.value || null)} />
-                    </div>
-                    <div className='my-2'>
-                        <Input size="sm" placeholder="Channel Name" value={channelName} onChange={(e) => setChannelName(e.target.value)} />
-                    </div>
-                    <div>
-                        <Checkbox defaultChecked onChange={onCheck} className='mt-3 mb-4'>
-                            Active
-                        </Checkbox>
-                    </div>
-                    <Button variant="solid" block onClick={handleCreate}>Create</Button>
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem
+                            invalid={Boolean(errors.country)}
+                            errorMessage={errors.country?.message}
+                        >
+                            <Controller
+                                name="country"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Country"
+                                        options={[
+                                            { label: 'All Island', value: 'All Island' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.channelName)}
+                            errorMessage={errors.channelName?.message}
+                        >
+                            <Controller
+                                name="channelName"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Channel Name"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+
+                        <FormItem>
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({ field }) =>
+                                    <Checkbox {...field} checked={field.value}>
+                                        IsActive
+                                    </Checkbox>
+                                }
+                            />
+                        </FormItem>
+
+                        <FormItem>
+                            <Button variant="solid" block type="submit">Create</Button>
+                        </FormItem>
+                    </Form>
                 </Card>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
