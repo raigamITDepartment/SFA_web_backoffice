@@ -28,7 +28,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'MasterMenu.DistributorMapping',
         path: '/Master-menu-DistributorMapping',
-        component: lazy(() => import('@/views/MasterSettings/DistributorMapping')),
+        component: lazy(() => import('@/views/MasterSettings/DistributorMapping/DistributorMapping')),
         authority: [],
     },
     {
@@ -117,11 +117,25 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'SalesMenu.Agstock',
+        path:'/Sales-menu-Agstock',
+        component: lazy(() => import('@/views/SalesDetails/Agstock')),
+        authority: [],
+    },
+
+    {
+        key: 'SalesMenu.Marketreturn',
+        path:'/Sales-menu-Marketreturn',
+        component: lazy(() => import('@/views/SalesDetails/Marketreturn')),
+        authority: [],
+    },
+    {
         key: 'SalesMenu.WorkingDay',
         path:'/Sales-menu-WorkingDay',
         component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
         authority: [],
     },
+
 
 
     {

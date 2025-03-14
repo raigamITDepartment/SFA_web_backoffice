@@ -23,6 +23,7 @@ import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent } from 'react'
 
+
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
 const pageSizeOptions = [
@@ -33,11 +34,12 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface Region {
+interface Area {
     channelCode: string;
     subChannelCode: string;
     regionCode: string;
-    regionName: string;
+    areaCode: string;
+    areaName: string;
     isActive: boolean;
 }
 
@@ -78,16 +80,17 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 
-const Region = () => {
+const Area = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    const columns = useMemo<ColumnDef<Region>[]>(() => [
+    const columns = useMemo<ColumnDef<Area>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Name', accessorKey: 'subChannelCode' },
+        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
         { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Region Name', accessorKey: 'regionName' },
+        { header: 'Area Code', accessorKey: 'areaCode' },
+        { header: 'Area Name', accessorKey: 'areaName' },
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -109,26 +112,22 @@ const Region = () => {
                 </div>
             ),
         },
-    
     ], []);
 
-    const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
+    const [data] = useState<Area[]>([
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', areaName: 'Sabaragamuwa', isActive: true },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', areaName: 'Southern', isActive: false },
+        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', areaName: 'North-West', isActive: true },
+        { channelCode: '2', subChannelCode: 'R2B', regionCode: 'R2B', areaCode: 'A2', areaName: 'Central', isActive: false },
+        { channelCode: '2', subChannelCode: 'R2B', regionCode: 'R2B', areaCode: 'A2', areaName: 'Eastern', isActive: true },
+        { channelCode: '2', subChannelCode: 'R2B', regionCode: 'R2B', areaCode: 'A2', areaName: 'Western', isActive: false },
+        { channelCode: '3', subChannelCode: 'R3C', regionCode: 'R3C', areaCode: 'A3', areaName: 'Northern', isActive: true },
+        { channelCode: '3', subChannelCode: 'R3C', regionCode: 'R3C', areaCode: 'A3', areaName: 'Uva', isActive: false },
+        { channelCode: '3', subChannelCode: 'R3C', regionCode: 'R3C', areaCode: 'A3', areaName: 'North Central', isActive: true },
+        { channelCode: '4', subChannelCode: 'R4D', regionCode: 'R4D', areaCode: 'A4', areaName: 'Sabaragamuwa', isActive: false },
+        { channelCode: '4', subChannelCode: 'R4D', regionCode: 'R4D', areaCode: 'A4', areaName: 'Southern', isActive: true },
+        { channelCode: '4', subChannelCode: 'R4D', regionCode: 'R4D', areaCode: 'A4', areaName: 'North-West', isActive: false },
+
     ]);
 
     const totalData = data.length;
@@ -162,15 +161,15 @@ const Region = () => {
         console.log(value, e)
     }
 
-      // Implement edit and delete functionality in table here 
-      const handleEdit = (region: Region) => {
+    // Implement edit and delete functionality in table here 
+    const handleEdit = (area: Area) => {
         // Implement edit functionality here
-        console.log('Edit:', region);
+        console.log('Edit:', area);
     };
 
-    const handleDelete = (region: Region) => {
+    const handleDelete = (area: Area) => {
         // Implement delete functionality here
-        console.log('Delete:', region);
+        console.log('Delete:', area);
     };
 
 
@@ -181,16 +180,18 @@ const Region = () => {
                 {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
 
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Region Creation</h5>
+                    <h5 className='mb-2'>Area Creation</h5>
                     <div className='my-2'>
                         <Select size="sm" placeholder="Select Channel" />
                     </div>
                     <div className='my-2'>
                         <Select size="sm" placeholder="Select Sub-Channel" />
                     </div>
-                    
                     <div className='my-2'>
-                        <Input size="sm" placeholder=" Region Name" />
+                        <Select size="sm" placeholder="Select Region" />
+                    </div>
+                    <div className='my-2'>
+                        <Input size="sm" placeholder="Area Name" />
                     </div>
 
                     <div>
@@ -269,4 +270,4 @@ const Region = () => {
     );
 };
 
-export default Region;
+export default Area;

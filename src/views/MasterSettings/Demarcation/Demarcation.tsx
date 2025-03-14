@@ -2,6 +2,11 @@
 import Tabs from '@/components/ui/Tabs'
 import Channel from './Components/Channel'
 import Region from './Components/Region'
+import SubChannel from './Components/SubChannel'
+import Area from './Components/Area'
+import Territory from './Components/Territory'
+import Route from './Components/Route'
+import Agency from './Components/Agency'
 
 
 const { TabNav, TabList, TabContent } = Tabs
@@ -12,57 +17,48 @@ const Default = () => {
             <Tabs defaultValue="tab1">
                 <TabList>
                     <TabNav value="tab1">Channel</TabNav>
-                    <TabNav value="tab2">Region</TabNav>
-                    <TabNav value="tab3">Area</TabNav>
-                    <TabNav value="tab4">Territory</TabNav>
-                    <TabNav value="tab5">Route</TabNav>
-                    <TabNav value="tab6">Agency</TabNav>
-                    <TabNav value="tab7">Final</TabNav>
+                    <TabNav value="tab2">Sub-Channel</TabNav>
+                    <TabNav value="tab3">Region</TabNav>
+                    <TabNav value="tab4">Area</TabNav>
+                    <TabNav value="tab5">Territory</TabNav>
+                    <TabNav value="tab6">Route</TabNav>
+                    <TabNav value="tab7">Agency</TabNav>
                 </TabList>
-                <div className="p-4">
+                <div className="py-3">
 
                     {/* Channel Creation */}
                     <TabContent value="tab1"> 
                             <Channel/>
                     </TabContent>
 
+                    {/* Sub-Channel Creation */}
                     <TabContent value="tab2">
+                            <SubChannel/>
+                    </TabContent>
+
+                    {/* Region Creation */}
+                    <TabContent value="tab3">
                             <Region/>
                     </TabContent>
-                    <TabContent value="tab3">
-                        <p>
-                            In C++ its harder to shoot yourself in the foot, but
-                            when you do, you blow off your whole leg. (Bjarne
-                            Stroustrup)
-                        </p>
-                    </TabContent>
+
+                    {/* Area Creation */}
                     <TabContent value="tab4">
-                        <p>
-                            In C++ its harder to shoot yourself in the foot, but
-                            when you do, you blow off your whole leg. (Bjarne
-                            Stroustrup)
-                        </p>
+                        <Area/>
                     </TabContent>
+
+                    {/* Territory Creation */}
                     <TabContent value="tab5">
-                        <p>
-                            In C++ its harder to shoot yourself in the foot, but
-                            when you do, you blow off your whole leg. (Bjarne
-                            Stroustrup)
-                        </p>
+                        <Territory/>
                     </TabContent>
+
+                    {/* Route Creation */}
                     <TabContent value="tab6">
-                        <p>
-                            In C++ its harder to shoot yourself in the foot, but
-                            when you do, you blow off your whole leg. (Bjarne
-                            Stroustrup)
-                        </p>
+                        <Route/>
                     </TabContent>
+
+                    {/* Agency Creation */}
                     <TabContent value="tab7">
-                        <p>
-                            In C++ its harder to shoot yourself in the foot, but
-                            when you do, you blow off your whole leg. (Bjarne
-                            Stroustrup)
-                        </p>
+                        <Agency/>
                     </TabContent>
                 </div>
             </Tabs>

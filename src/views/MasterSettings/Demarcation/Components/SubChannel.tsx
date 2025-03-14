@@ -23,6 +23,7 @@ import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent } from 'react'
 
+
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
 const pageSizeOptions = [
@@ -33,12 +34,12 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface Region {
+interface SubChannel {
     channelCode: string;
+    channelName: string;
     subChannelCode: string;
-    regionCode: string;
-    regionName: string;
-    isActive: boolean;
+    subChannelName: string;
+    isActive?: boolean;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -78,16 +79,16 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 
-const Region = () => {
+const Subchannel = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    const columns = useMemo<ColumnDef<Region>[]>(() => [
+    const columns = useMemo<ColumnDef<SubChannel>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Name', accessorKey: 'subChannelCode' },
-        { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Region Name', accessorKey: 'regionName' },
+        { header: 'Channel Name', accessorKey: 'channelName' },
+        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
+        { header: 'Sub-Channel Name', accessorKey: 'subChannelName' },
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -109,26 +110,13 @@ const Region = () => {
                 </div>
             ),
         },
-    
     ], []);
 
-    const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
+    const [data] = useState<SubChannel[]>([
+        { channelCode: '1', channelName: 'National Channel', subChannelCode: 'R1A', subChannelName: 'National C', isActive: true },
+        { channelCode: '1', channelName: 'National Channel', subChannelCode: 'R2A', subChannelName: 'National D', isActive: false },
+        { channelCode: '2', channelName: 'Bakery Channel', subChannelCode: 'R3A', subChannelName: 'Horeka', isActive: true },
+        { channelCode: '2', channelName: 'Bakery Channel', subChannelCode: 'R4A', subChannelName: 'Bakery', isActive: false },
     ]);
 
     const totalData = data.length;
@@ -162,15 +150,15 @@ const Region = () => {
         console.log(value, e)
     }
 
-      // Implement edit and delete functionality in table here 
-      const handleEdit = (region: Region) => {
+    // Implement edit and delete functionality in table here 
+    const handleEdit = (channel: SubChannel) => {
         // Implement edit functionality here
-        console.log('Edit:', region);
+        console.log('Edit:', channel);
     };
 
-    const handleDelete = (region: Region) => {
+    const handleDelete = (channel: SubChannel) => {
         // Implement delete functionality here
-        console.log('Delete:', region);
+        console.log('Delete:', channel);
     };
 
 
@@ -181,16 +169,12 @@ const Region = () => {
                 {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
 
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Region Creation</h5>
+                    <h5 className='mb-2'>Sub-Channel Creation</h5>
                     <div className='my-2'>
                         <Select size="sm" placeholder="Select Channel" />
                     </div>
                     <div className='my-2'>
-                        <Select size="sm" placeholder="Select Sub-Channel" />
-                    </div>
-                    
-                    <div className='my-2'>
-                        <Input size="sm" placeholder=" Region Name" />
+                        <Input size="sm" placeholder="Sub-Channel Name" />
                     </div>
 
                     <div>
@@ -213,7 +197,7 @@ const Region = () => {
                             placeholder="Search all columns..."
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
-                        <Table className='overflow-auto'>
+                        <Table>
                             <THead>
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <Tr key={headerGroup.id}>
@@ -269,4 +253,4 @@ const Region = () => {
     );
 };
 
-export default Region;
+export default Subchannel;

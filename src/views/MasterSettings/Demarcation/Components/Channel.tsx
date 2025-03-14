@@ -4,6 +4,12 @@ import Select from '@/components/ui/Select';
 import Table from '@/components/ui/Table';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
+import { FaRegEdit } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
+import Tag from '@/components/ui/Tag';
+import InputGroup from '@/components/ui/InputGroup';
+import { useForm, Controller } from 'react-hook-form';
+import { FormItem, Form } from '@/components/ui/Form';
 
 import {
     useReactTable,
@@ -17,9 +23,14 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox'
-import type { ChangeEvent } from 'react'
+import Checkbox from '@/components/ui/Checkbox';
+import type { ChangeEvent } from 'react';
 
+type FormSchema = {
+    country: string;
+    channelName: string;
+    isActive: boolean;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -31,9 +42,10 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface Person {
-    channelId: string;
+interface Channel {
+    channelCode: string;
     channelName: string;
+    isActive?: boolean;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -72,30 +84,53 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-
 const Channel = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
+    const [error, setError] = useState<string | null>(null);
+    const [country, setCountry] = useState<string | null>(null);
+    const [channelName, setChannelName] = useState<string>('');
 
-    const columns = useMemo<ColumnDef<Person>[]>(() => [
-        { header: 'Channel ID', accessorKey: 'channelId' },
+    const columns = useMemo<ColumnDef<Channel>[]>(() => [
+        { header: 'Channel Code', accessorKey: 'channelCode' },
         { header: 'Channel Name', accessorKey: 'channelName' },
+        {
+            header: 'Is Active',
+            accessorKey: 'isActive',
+            cell: ({ row }) => (
+                <div className="mr-2 rtl:ml-2">
+                    <Tag className={row.original.isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
+                        {row.original.isActive ? "Active" : "Inactive"}
+                    </Tag>
+                </div>
+            ),
+        },
+        {
+            header: 'Action',
+            accessorKey: 'action',
+            cell: ({ row }) => (
+                <div className="flex ">
+                    <FaRegEdit onClick={() => handleEdit(row.original)} className="cursor-pointer mr-4 text-primary-deep text-lg" />
+                    <MdDeleteOutline onClick={() => handleDelete(row.original)} className="cursor-pointer text-red-600 text-xl" />
+                </div>
+            ),
+        },
     ], []);
 
-    const [data] = useState<Person[]>([
-        { channelId: '1', channelName: 'National Channel C' },
-        { channelId: '2', channelName: 'National Channel D' },
-        { channelId: '3', channelName: 'Bakery Channel' },
-        { channelId: '4', channelName: 'Ruchi Channel' },
-        { channelId: '1', channelName: 'National Channel C' },
-        { channelId: '2', channelName: 'National Channel D' },
-        { channelId: '3', channelName: 'Bakery Channel' },
-        { channelId: '4', channelName: 'Ruchi Channel' },
-        { channelId: '1', channelName: 'National Channel C' },
-        { channelId: '2', channelName: 'National Channel D' },
-        { channelId: '3', channelName: 'Bakery Channel' },
-        { channelId: '4', channelName: 'Ruchi Channel' },
+    const [data] = useState<Channel[]>([
+        { channelCode: '1', channelName: 'National Channel C', isActive: true },
+        { channelCode: '2', channelName: 'National Channel D', isActive: false },
+        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
+        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
+        { channelCode: '1', channelName: 'National Channel C', isActive: true },
+        { channelCode: '2', channelName: 'National Channel D', isActive: false },
+        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
+        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
+        { channelCode: '1', channelName: 'National Channel C', isActive: true },
+        { channelCode: '2', channelName: 'National Channel D', isActive: false },
+        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
+        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
     ]);
 
     const totalData = data.length;
@@ -126,37 +161,124 @@ const Channel = () => {
     };
 
     const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e)
-    }
+        console.log(value, e);
+    };
 
+    const handleEdit = (channel: Channel) => {
+        // Implement edit functionality here
+        console.log('Edit:', channel);
+    };
+
+    const handleDelete = (channel: Channel) => {
+        // Implement delete functionality here
+        console.log('Delete:', channel);
+    };
+
+    const handleCreate = () => {
+        setError(null);
+        console.log('Create channel:', { country, channelName });
+    };
+
+    const {
+        handleSubmit,
+        formState: { errors },
+        control,
+    } = useForm<FormSchema>({
+        defaultValues: {
+            country: '',
+            channelName: '',
+            isActive: false,
+        },
+    });
+
+    const onSubmit = async (values: FormSchema) => {
+        await new Promise((r) => setTimeout(r, 500));
+        alert(JSON.stringify(values, null, 2));
+    };
 
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <div className='flex flex-col rounded-xl bg-white'></div>
-
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Channel Creation</h5>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Country" />
-                    </div>
-                    <div className='my-2'>
-                        <Input size="sm" placeholder="Channel Name" />
-                    </div>
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem
+                            invalid={Boolean(errors.country)}
+                            errorMessage={errors.country?.message}
+                        >
+                            <Controller
+                                name="country"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Country"
+                                        options={[
+                                            { label: 'All Island', value: 'All Island' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.channelName)}
+                            errorMessage={errors.channelName?.message}
+                        >
+                            <Controller
+                                name="channelName"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Channel Name"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
 
-                    <div>
-                        <Checkbox defaultChecked onChange={onCheck} className='mt-3 mb-4'>
-                            Active
-                        </Checkbox>
-                    </div>
+                        <FormItem>
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({ field }) =>
+                                    <Checkbox {...field} checked={field.value}>
+                                        IsActive
+                                    </Checkbox>
+                                }
+                            />
+                        </FormItem>
 
-
-                    <Button variant="solid" block>Create</Button>
-
-
+                        <FormItem>
+                            <Button variant="solid" block type="submit">Create</Button>
+                        </FormItem>
+                    </Form>
                 </Card>
 
-                <Card bordered={false} className='lg:w-2/3 xl:w-2/3'>
+                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
