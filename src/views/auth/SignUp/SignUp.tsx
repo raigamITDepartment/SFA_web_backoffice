@@ -3,7 +3,7 @@ import Alert from '@/components/ui/Alert'
 import SignUpForm from './components/SignUpForm'
 import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import UserTable from './components/UserTable'
 
 type SignUpProps = {

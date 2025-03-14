@@ -3,7 +3,7 @@ import Avatar from '@/components/ui/Avatar'
 import Dropdown from '@/components/ui/Dropdown'
 import classNames from 'classnames'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
-import { useLocaleStore } from '@/store/localeStore'
+import { useLocaleStore } from '@/Store/localeStore'
 import { HiCheck } from 'react-icons/hi'
 import type { CommonProps } from '@/@types/common'
 
