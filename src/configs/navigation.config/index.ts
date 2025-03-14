@@ -18,43 +18,7 @@ const navigationConfig: NavigationTree[] = [
         subMenu: [],
     },
     /** Example purpose only, please remove */
-    {
-        key: 'UserModule',
-        path: '/single-menu-view',
-        title: 'User Module',
-        translateKey: 'nav.singleMenuItem',
-        icon: 'usermodule',
-        type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: [],
-        subMenu: [
-
-            {
-                key: 'ModifiyUser',
-                path: '/User-menu-ModifiyUser',
-                title: 'Add/Modifiy User',
-                translateKey: 'UserMenu.collapse.ModifiyUser',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-
-            {
-                key: 'UserAccess',
-                path:  '/User-menu-UserGroup',
-                title: 'User Access Group',
-                translateKey: 'UserMenu.collapse.UserGroup',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            }
-
-
-
-
-        ],
-    },
+   
     {
         key: 'Master Settings',
         path: '',
@@ -170,11 +134,24 @@ const navigationConfig: NavigationTree[] = [
                 subMenu: [],
             },
         
+            
+             
             {
-                key: 'Target',
-                path: '/Sales-menu-Target',
-                title: 'Target',
-                translateKey: 'nav.SalesMenu.Target',
+                key: 'Agancy Stock',
+                path: '/Sales-menu-Agstock',
+                title: 'Stock',
+                translateKey: 'nav.SalesMenu.Agstock',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+            
+            {
+                key: 'Marketeturn',
+                path: '/Sales-menu-Marketreturn',
+                title: 'Market Return',
+                translateKey: 'nav.SalesMenu.Marketreturn',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
@@ -193,60 +170,242 @@ const navigationConfig: NavigationTree[] = [
 
 
 
+    {
+        key: 'Reports',
+        path: '',
+        title: 'Reports',
+        translateKey: 'nav.Reports.Reports',
+        icon: 'report',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: [],
+        subMenu: [
+            {
+                key: 'BookingReport',
+                path: '/Sales-menu-BookingReport',
+                title: 'Booking Sales Report',
+                translateKey: 'nav.Reports.BookingReport',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+              
+            },
+            {
+                key: 'ActualReport',
+                path:  '/Sales-menu-acutalReport',
+                title: 'Actual Sales Report',
+                translateKey: 'nav.Reports.ActualReport',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+             },
+
+
+             {
+                key: 'AchItemWise)',
+                path:  '/Sales-menu-AchItemWise',
+                title: 'Achievement(Item Wise)',
+                translateKey: 'nav.Reports.AchItemWise',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+             },
+
+             {
+                key: 'AchProductwise',
+                path:  '/Sales-menu-AchProductwise',
+                title: 'Achievement(Product Wise)',
+                translateKey: 'nav.Reports.AchProductwise',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+             }
+             ,
+
+             {
+                key: 'BAReport',
+                path:  '/Sales-menu-BAReport',
+                title: 'Booking & Actual Sales Report',
+                translateKey: 'nav.Reports.BAReport',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+             },
+
+             {
+                key: 'TvsAReport',
+                path:  '/Sales-menu-TvsAReport',
+                title: 'Target vs Actual Sales Report',
+                translateKey: 'nav.Reports.TvsAReport',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+             },
+
+        
+             {
+                key: 'Invoices',
+                path:  '/Sales-menu-Invoices',
+                title: 'Invoices',
+                translateKey: 'nav.Reports.Invoices',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+             }
+
+
+
+        ]
+      
+
+    },
+
+
+    {
+        key: 'HRModule',
+        path: '',
+        title: 'HR Module',
+        translateKey: 'nav.HRModule.HRModule',
+        icon: 'HR',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: [],
+        subMenu: [
+            {
+                key: 'GPSMonitoring',
+                path: '/Sales-menu-GPSMonitoring',
+                title: 'GPS Monitoring',
+                translateKey: 'nav.Reports.GPSMonitoring',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+              
+            },
+
+            {
+                key: 'Time Attendance',
+                path: '/Sales-menu-TimeAttendance',
+                title: 'Time Attendance',
+                translateKey: 'nav.Reports.TimeAttendance',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+              
+            },
+
+        ]
+    },
+
+    {
+        key: 'OutletModule',
+        path: '',
+        title: 'Outlet Module',
+        translateKey: 'nav.OutletModule.OutletModule',
+        icon: 'Outlet',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: [],
+        subMenu: [
+            {
+                key: 'Outlet',
+                path: '/Sales-menu-Outlet',
+                title: 'Customer (Outlet) ',
+                translateKey: 'nav.OutletModule.Outlet',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+              
+            },
+
+            {
+                key: 'OutletReport',
+                path: '/Sales-menu-OutletReport',
+                title: ' Active and close Outlet Report',
+                translateKey: 'nav.OutletModule.OutletReport',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+              
+            },
+
+        ]
+    },
+
 
 
 
 
     {
-        key: 'groupMenu',
+        key: 'AdminModule',
         path: '',
-        title: 'Group Menu',
+        title: 'Admin Module',
         translateKey: 'nav.groupMenu.groupMenu',
         icon: 'groupMenu',
         type: NAV_ITEM_TYPE_TITLE,
         authority: [],
         subMenu: [
+
             {
-                key: 'groupMenu.single',
-                path: '/group-single-menu-item-view',
-                title: 'Group single menu item',
-                translateKey: 'nav.groupMenu.single',
-                icon: 'groupSingleMenu',
-                type: NAV_ITEM_TYPE_ITEM,
+                key: 'UserModule',
+                path: '/single-menu-view',
+                title: 'User Module',
+                translateKey: 'nav.singleMenuItem',
+                icon: 'usermodule',
+                type: NAV_ITEM_TYPE_COLLAPSE,
                 authority: [],
-                subMenu: [],
+                subMenu: [
+        
+                    {
+                        key: 'ModifiyUser',
+                        path: '/User-menu-ModifiyUser',
+                        title: 'Add/Modifiy User',
+                        translateKey: 'UserMenu.collapse.ModifiyUser',
+                        icon: '',
+                        type: NAV_ITEM_TYPE_ITEM,
+                        authority: [],
+                        subMenu: [],
+                    },
+        
+                    
+        
+        
+        
+        
+                ],
             },
+
             {
-                key: 'groupMenu.collapse',
+                key: 'MarketResearch',
                 path: '',
-                title: 'Group collapse menu',
-                translateKey: 'nav.groupMenu.collapse.collapse',
-                icon: 'groupCollapseMenu',
+                title: 'Market Research',
+                translateKey: 'nav.HRModule.HRModule',
+                icon: 'research',
                 type: NAV_ITEM_TYPE_COLLAPSE,
                 authority: [],
                 subMenu: [
                     {
-                        key: 'groupMenu.collapse.item1',
-                        path: '/group-collapse-menu-item-view-1',
-                        title: 'Menu item 1',
-                        translateKey: 'nav.groupMenu.collapse.item1',
+                        key: 'Survey',
+                        path: '/Sales-menu-Survey',
+                        title: 'Survey',
+                        translateKey: 'nav.Reports.Survey',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],
                         subMenu: [],
+                      
                     },
-                    {
-                        key: 'groupMenu.collapse.item2',
-                        path: '/group-collapse-menu-item-view-2',
-                        title: 'Menu item 2',
-                        translateKey: 'nav.groupMenu.collapse.item2',
-                        icon: '',
-                        type: NAV_ITEM_TYPE_ITEM,
-                        authority: [],
-                        subMenu: [],
-                    },
-                ],
+                ]
             },
+        
+          
         ],
     },
 ]

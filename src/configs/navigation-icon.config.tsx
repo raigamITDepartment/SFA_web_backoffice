@@ -7,9 +7,15 @@ import {
     PiBagSimpleDuotone,
     PiStackSimpleBold,
     PiUserSquareFill,
-    PiShoppingBagOpenThin
+    PiShoppingBagOpenThin,
+    PiReadCvLogoFill,
+    PiAddressBookTabsThin,
+    PiShoppingCartFill,
+    PiReceiptXBold
 } from 'react-icons/pi'
 import type { JSX } from 'react'
+import { report } from 'process'
+import { Outlet } from 'react-router-dom'
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -22,7 +28,11 @@ const navigationIcon: NavigationIcons = {
     dashboard:< PiStackSimpleBold/>,
     groupMenu: <PiBagSimpleDuotone />,
     usermodule: <PiUserSquareFill />,
-    sales:<PiShoppingBagOpenThin/>
+    sales:<PiShoppingBagOpenThin/>,
+    report:<PiReadCvLogoFill/>,
+    HR:<PiAddressBookTabsThin/>,
+    Outlet:<PiShoppingCartFill/>,
+    research:<PiReceiptXBold/>
 }
 
 export default navigationIcon
