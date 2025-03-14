@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { THEME_ENUM } from '@/constants/theme.constant'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import type { Mode } from '@/@types/theme'
 
 function useDarkMode(): [

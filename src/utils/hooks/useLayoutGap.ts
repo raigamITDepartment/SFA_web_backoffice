@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import {
     HEADER_HEIGHT,
     LAYOUT_COLLAPSIBLE_SIDE,

@@ -1,7 +1,7 @@
 import classNames from '@/utils/classNames'
 import { TbCheck } from 'react-icons/tb'
 import presetThemeSchemaConfig from '@/configs/preset-theme-schema.config'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 
 const ThemeSwitcher = () => {
     const schema = useThemeStore((state) => state.themeSchema)

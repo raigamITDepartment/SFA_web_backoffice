@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import presetThemeSchemaConfig from '@/configs/preset-theme-schema.config'
 
 export type ThemeVariables = Record<

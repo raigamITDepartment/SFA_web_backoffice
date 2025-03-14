@@ -1,6 +1,6 @@
 import HorizontalMenuContent from './HorizontalMenuContent'
-import { useRouteKeyStore } from '@/store/routeKeyStore'
-import { useSessionUser } from '@/store/authStore'
+import { useRouteKeyStore } from '@/Store/routeKeyStore'
+import { useSessionUser } from '@/Store/authStore'
 import appConfig from '@/configs/app.config'
 import navigationConfig from '@/configs/navigation.config'
 

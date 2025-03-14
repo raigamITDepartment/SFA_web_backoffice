@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import Segment from '@/components/ui/Segment'
-import { useThemeStore } from '@/store/themeStore'
+import { useThemeStore } from '@/Store/themeStore'
 import {
     LAYOUT_COLLAPSIBLE_SIDE,
     LAYOUT_STACKED_SIDE,
