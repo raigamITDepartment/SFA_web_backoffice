@@ -6,7 +6,9 @@ import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import Tag from '@/components/ui/Tag'
+import Tag from '@/components/ui/Tag';
+import { useForm, Controller } from 'react-hook-form';
+import { FormItem, Form } from '@/components/ui/Form';
 
 import {
     useReactTable,
@@ -20,8 +22,15 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox'
-import type { ChangeEvent } from 'react'
+import Checkbox from '@/components/ui/Checkbox';
+import type { ChangeEvent } from 'react';
+
+type FormSchema = {
+    channel: string;
+    subChannel: string;
+    regionName: string;
+    isActive: boolean;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -77,15 +86,15 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-
 const Region = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
+    const [error, setError] = useState<string | null>(null);
 
     const columns = useMemo<ColumnDef<Region>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Name', accessorKey: 'subChannelCode' },
+        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
         { header: 'Region Code', accessorKey: 'regionCode' },
         { header: 'Region Name', accessorKey: 'regionName' },
         {
@@ -109,14 +118,9 @@ const Region = () => {
                 </div>
             ),
         },
-    
     ], []);
 
     const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
         { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
         { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
         { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
@@ -159,11 +163,10 @@ const Region = () => {
     };
 
     const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e)
-    }
+        console.log(value, e);
+    };
 
-      // Implement edit and delete functionality in table here 
-      const handleEdit = (region: Region) => {
+    const handleEdit = (region: Region) => {
         // Implement edit functionality here
         console.log('Edit:', region);
     };
@@ -173,36 +176,136 @@ const Region = () => {
         console.log('Delete:', region);
     };
 
+    const {
+        handleSubmit,
+        formState: { errors },
+        control,
+    } = useForm<FormSchema>({
+        defaultValues: {
+            channel: '',
+            subChannel: '',
+            regionName: '',
+            isActive: true, // Set default value to true
+        },
+    });
 
+    const onSubmit = async (values: FormSchema) => {
+        await new Promise((r) => setTimeout(r, 500));
+        alert(JSON.stringify(values, null, 2));
+    };
 
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
-
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Region Creation</h5>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Channel" />
-                    </div>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Sub-Channel" />
-                    </div>
-                    
-                    <div className='my-2'>
-                        <Input size="sm" placeholder=" Region Name" />
-                    </div>
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
+                        >
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={[
+                                            { label: 'National Channel', value: 'National Channel' },
+                                            { label: 'Bakery Channel', value: 'Bakery Channel' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.subChannel)}
+                            errorMessage={errors.subChannel?.message}
+                        >
+                            <Controller
+                                name="subChannel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Sub-Channel"
+                                        options={[
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' },
+                                            { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.regionName)}
+                            errorMessage={errors.regionName?.message}
+                        >
+                            <Controller
+                                name="regionName"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Region Name"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
 
-                    <div>
-                        <Checkbox defaultChecked onChange={onCheck} className='mt-3 mb-4'>
-                            Active
-                        </Checkbox>
-                    </div>
+                        <FormItem>
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({ field }) =>
+                                    <Checkbox {...field} checked={field.value}>
+                                        IsActive
+                                    </Checkbox>
+                                }
+                            />
+                        </FormItem>
 
-
-                    <Button variant="solid" block>Create</Button>
-
-
+                        <FormItem>
+                            <Button variant="solid" block type="submit">Create</Button>
+                        </FormItem>
+                    </Form>
                 </Card>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
@@ -213,7 +316,7 @@ const Region = () => {
                             placeholder="Search all columns..."
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
-                        <Table className='overflow-auto'>
+                        <Table>
                             <THead>
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <Tr key={headerGroup.id}>

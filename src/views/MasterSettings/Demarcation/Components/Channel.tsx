@@ -187,7 +187,7 @@ const Channel = () => {
         defaultValues: {
             country: '',
             channelName: '',
-            isActive: false,
+            isActive: true, // Set default value to true
         },
     });
 
