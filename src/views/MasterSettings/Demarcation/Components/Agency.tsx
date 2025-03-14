@@ -446,7 +446,7 @@ const Agency = () => {
                     </Form>
                 </Card>
 
-                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
+                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 h-1/2 overflow-auto'>
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
