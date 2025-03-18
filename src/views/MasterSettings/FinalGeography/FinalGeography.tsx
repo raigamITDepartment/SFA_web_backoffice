@@ -142,7 +142,19 @@ const FinalGeography = () => {
     const [data, setData] = useState<FinalGeography[]>([
         { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T1', territoryName: 'Territory 1', agencyName: 'Agency 1', isActive: true, updatedDateTime: '2025-03-17 10:00:00' },
         { channelCode: '2', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T2', territoryName: 'Territory 2', agencyName: 'Agency 2', isActive: false, updatedDateTime: '2025-03-17 10:00:00' },
-        // Add more sample data as needed
+        { channelCode: '3', channelName: 'Channel 2', subChannelCode: 'R2B', subChannelName: 'Sub-channel 2', regionCode: 'R2B', regionName: 'Region 2', areaCode: 'A2', areaName: 'Area 2', territoryId: 'T3', territoryName: 'Territory 3', agencyName: 'Agency 3', isActive: true, updatedDateTime: '2025-03-18 11:00:00' },
+        { channelCode: '4', channelName: 'Channel 2', subChannelCode: 'R2B', subChannelName: 'Sub-channel 2', regionCode: 'R2B', regionName: 'Region 2', areaCode: 'A2', areaName: 'Area 2', territoryId: 'T4', territoryName: 'Territory 4', agencyName: 'Agency 4', isActive: false, updatedDateTime: '2025-03-18 11:00:00' },
+        { channelCode: '5', channelName: 'Channel 3', subChannelCode: 'R3C', subChannelName: 'Sub-channel 3', regionCode: 'R3C', regionName: 'Region 3', areaCode: 'A3', areaName: 'Area 3', territoryId: 'T5', territoryName: 'Territory 5', agencyName: 'Agency 5', isActive: true, updatedDateTime: '2025-03-19 12:00:00' },
+        { channelCode: '6', channelName: 'Channel 3', subChannelCode: 'R3C', subChannelName: 'Sub-channel 3', regionCode: 'R3C', regionName: 'Region 3', areaCode: 'A3', areaName: 'Area 3', territoryId: 'T6', territoryName: 'Territory 6', agencyName: 'Agency 6', isActive: false, updatedDateTime: '2025-03-19 12:00:00' },
+        { channelCode: '7', channelName: 'Channel 4', subChannelCode: 'R4D', subChannelName: 'Sub-channel 4', regionCode: 'R4D', regionName: 'Region 4', areaCode: 'A4', areaName: 'Area 4', territoryId: 'T7', territoryName: 'Territory 7', agencyName: 'Agency 7', isActive: true, updatedDateTime: '2025-03-20 13:00:00' },
+        { channelCode: '8', channelName: 'Channel 4', subChannelCode: 'R4D', subChannelName: 'Sub-channel 4', regionCode: 'R4D', regionName: 'Region 4', areaCode: 'A4', areaName: 'Area 4', territoryId: 'T8', territoryName: 'Territory 8', agencyName: 'Agency 8', isActive: false, updatedDateTime: '2025-03-20 13:00:00' },
+        { channelCode: '9', channelName: 'Channel 5', subChannelCode: 'R5E', subChannelName: 'Sub-channel 5', regionCode: 'R5E', regionName: 'Region 5', areaCode: 'A5', areaName: 'Area 5', territoryId: 'T9', territoryName: 'Territory 9', agencyName: 'Agency 9', isActive: true, updatedDateTime: '2025-03-21 14:00:00' },
+        { channelCode: '10', channelName: 'Channel 5', subChannelCode: 'R5E', subChannelName: 'Sub-channel 5', regionCode: 'R5E', regionName: 'Region 5', areaCode: 'A5', areaName: 'Area 5', territoryId: 'T10', territoryName: 'Territory 10', agencyName: 'Agency 10', isActive: false, updatedDateTime: '2025-03-21 14:00:00' },
+        { channelCode: '11', channelName: 'Channel 6', subChannelCode: 'R6F', subChannelName: 'Sub-channel 6', regionCode: 'R6F', regionName: 'Region 6', areaCode: 'A6', areaName: 'Area 6', territoryId: 'T11', territoryName: 'Territory 11', agencyName: 'Agency 11', isActive: true, updatedDateTime: '2025-03-22 15:00:00' },
+        { channelCode: '12', channelName: 'Channel 6', subChannelCode: 'R6F', subChannelName: 'Sub-channel 6', regionCode: 'R6F', regionName: 'Region 6', areaCode: 'A6', areaName: 'Area 6', territoryId: 'T12', territoryName: 'Territory 12', agencyName: 'Agency 12', isActive: false, updatedDateTime: '2025-03-22 15:00:00' },
+        { channelCode: '13', channelName: 'Channel 7', subChannelCode: 'R7G', subChannelName: 'Sub-channel 7', regionCode: 'R7G', regionName: 'Region 7', areaCode: 'A7', areaName: 'Area 7', territoryId: 'T13', territoryName: 'Territory 13', agencyName: 'Agency 13', isActive: true, updatedDateTime: '2025-03-23 16:00:00' },
+        { channelCode: '14', channelName: 'Channel 7', subChannelCode: 'R7G', subChannelName: 'Sub-channel 7', regionCode: 'R7G', regionName: 'Region 7', areaCode: 'A7', areaName: 'Area 7', territoryId: 'T14', territoryName: 'Territory 14', agencyName: 'Agency 14', isActive: false, updatedDateTime: '2025-03-23 16:00:00' },
+        { channelCode: '15', channelName: 'Channel 8', subChannelCode: 'R8H', subChannelName: 'Sub-channel 8', regionCode: 'R8H', regionName: 'Region 8', areaCode: 'A8', areaName: 'Area 8', territoryId: 'T15', territoryName: 'Territory 15', agencyName: 'Agency 15', isActive: true, updatedDateTime: '2025-03-24 17:00:00' },
     ]);
 
     const totalData = data.length;
@@ -223,7 +235,7 @@ const FinalGeography = () => {
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <Card bordered={false} className='w-full h-full overflow-auto'>
+                <Card bordered={false} className='w-full h-1/2 overflow-auto'>
                     <h5 className='mb-2'>Final Geography</h5>
                     <div>
                         <DebouncedInput
@@ -389,7 +401,7 @@ const FinalGeography = () => {
                                 control={control}
                                 render={({ field }) =>
                                     <Select
-                                        size="sm"
+                                        size="sm" 
                                         placeholder="Select Agency"
                                         options={[
                                             { label: 'Agency 1', value: 'Agency 1' },
