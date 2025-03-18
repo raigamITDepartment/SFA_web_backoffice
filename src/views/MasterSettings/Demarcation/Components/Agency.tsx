@@ -7,6 +7,8 @@ import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
+import { useForm, Controller } from 'react-hook-form';
+import { FormItem, Form } from '@/components/ui/Form';
 
 import {
     useReactTable,
@@ -22,6 +24,17 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+
+type FormSchema = {
+    channel: string;
+    subChannel: string;
+    region: string;
+    area: string;
+    territory: string;
+    route: string;
+    agencyName: string;
+    isActive: boolean;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -85,6 +98,7 @@ const Agency = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
+    const [error, setError] = useState<string | null>(null);
 
     const columns = useMemo<ColumnDef<Agency>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -172,48 +186,267 @@ const Agency = () => {
         console.log('Delete:', agency);
     };
 
+    const {
+        handleSubmit,
+        formState: { errors },
+        control,
+    } = useForm<FormSchema>({
+        defaultValues: {
+            channel: '',
+            subChannel: '',
+            region: '',
+            area: '',
+            territory: '',
+            route: '',
+            agencyName: '',
+            isActive: true, // Set default value to true
+        },
+    });
+
+    const onSubmit = async (values: FormSchema) => {
+        await new Promise((r) => setTimeout(r, 500));
+        alert(JSON.stringify(values, null, 2));
+    };
+
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                {/* <div className='flex flex-col rounded-xl bg-white'></div> */}
-
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Agency Creation</h5>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Channel" />
-                    </div>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Sub-Channel" />
-                    </div>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Region" />
-                    </div>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Area" />
-                    </div>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Territory" />
-                    </div>
-                    <div className='my-2'>
-                        <Select size="sm" placeholder="Select Route" />
-                    </div>
-                    <div className='my-2'>
-                        <Input size="sm" placeholder="Agency Code" />
-                    </div>
-                    <div className='my-2'>
-                        <Input size="sm" placeholder="Agency Name" />
-                    </div>
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
+                        >
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={[
+                                            { label: 'National Channel', value: 'National Channel' },
+                                            { label: 'Bakery Channel', value: 'Bakery Channel' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.subChannel)}
+                            errorMessage={errors.subChannel?.message}
+                        >
+                            <Controller
+                                name="subChannel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Sub-Channel"
+                                        options={[
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' },
+                                            { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.region)}
+                            errorMessage={errors.region?.message}
+                        >
+                            <Controller
+                                name="region"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Region"
+                                        options={[
+                                            { label: 'Region 1', value: 'Region 1' },
+                                            { label: 'Region 2', value: 'Region 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.area)}
+                            errorMessage={errors.area?.message}
+                        >
+                            <Controller
+                                name="area"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Area"
+                                        options={[
+                                            { label: 'Area 1', value: 'Area 1' },
+                                            { label: 'Area 2', value: 'Area 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.territory)}
+                            errorMessage={errors.territory?.message}
+                        >
+                            <Controller
+                                name="territory"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Territory"
+                                        options={[
+                                            { label: 'Territory 1', value: 'Territory 1' },
+                                            { label: 'Territory 2', value: 'Territory 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.route)}
+                            errorMessage={errors.route?.message}
+                        >
+                            <Controller
+                                name="route"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Route"
+                                        options={[
+                                            { label: 'Route 1', value: 'Route 1' },
+                                            { label: 'Route 2', value: 'Route 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.agencyName)}
+                            errorMessage={errors.agencyName?.message}
+                        >
+                            <Controller
+                                name="agencyName"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Agency Name"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
 
-                    <div>
-                        <Checkbox defaultChecked onChange={onCheck} className='mt-3 mb-4'>
-                            Active
-                        </Checkbox>
-                    </div>
+                        <FormItem>
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({ field }) =>
+                                    <Checkbox {...field} checked={field.value}>
+                                        IsActive
+                                    </Checkbox>
+                                }
+                            />
+                        </FormItem>
 
-                    <Button variant="solid" block>Create</Button>
+                        <FormItem>
+                            <Button variant="solid" block type="submit">Create</Button>
+                        </FormItem>
+                    </Form>
                 </Card>
 
-                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
+                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 h-1/2 overflow-auto'>
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
@@ -221,7 +454,7 @@ const Agency = () => {
                             placeholder="Search all columns..."
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
-                        <Table className='overflow-auto'>
+                        <Table>
                             <THead>
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <Tr key={headerGroup.id}>

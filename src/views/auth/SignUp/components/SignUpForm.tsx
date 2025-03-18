@@ -98,6 +98,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             label="User name"
                             invalid={Boolean(errors.userName)}
                             errorMessage={errors.userName?.message}
+                            
                         >
                             <Controller
                                 name="userName"
