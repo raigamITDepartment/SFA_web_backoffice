@@ -31,7 +31,6 @@ type FormSchema = {
     region: string;
     area: string;
     territory: string;
-    route: string;
     agencyName: string;
     isActive: boolean;
 };
@@ -102,7 +101,6 @@ const FinalGeography = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
-    const [error, setError] = useState<string | null>(null);
     const [editData, setEditData] = useState<FinalGeography | null>(null);
 
     const columns = useMemo<ColumnDef<FinalGeography>[]>(() => [
@@ -141,16 +139,10 @@ const FinalGeography = () => {
         { header: 'Updated Date & Time', accessorKey: 'updatedDateTime' },
     ], []);
 
-    const [data] = useState<FinalGeography[]>([
+    const [data, setData] = useState<FinalGeography[]>([
         { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T1', territoryName: 'Territory 1', agencyName: 'Agency 1', isActive: true, updatedDateTime: '2025-03-17 10:00:00' },
         { channelCode: '2', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T2', territoryName: 'Territory 2', agencyName: 'Agency 2', isActive: false, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T3', territoryName: 'Territory 3', agencyName: 'Agency 3', isActive: true, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T4', territoryName: 'Territory 4', agencyName: 'Agency 4', isActive: false, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '2', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T5', territoryName: 'Territory 5', agencyName: 'Agency 5', isActive: true, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T6', territoryName: 'Territory 6', agencyName: 'Agency 6', isActive: false, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T7', territoryName: 'Territory 7', agencyName: 'Agency 8', isActive: false, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '1', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T9', territoryName: 'Territory 9', agencyName: 'Agency 9', isActive: true, updatedDateTime: '2025-03-17 10:00:00' },
-        { channelCode: '2', channelName: 'Channel 1', subChannelCode: 'R1A', subChannelName: 'Sub-channel 1', regionCode: 'R1A', regionName: 'Region 1', areaCode: 'A1', areaName: 'Area 1', territoryId: 'T10', territoryName: 'Territory 10', agencyName: 'Agency 10', isActive: false, updatedDateTime: '2025-03-17 10:00:00' },
+        // Add more sample data as needed
     ]);
 
     const totalData = data.length;
@@ -180,23 +172,19 @@ const FinalGeography = () => {
         table.setPageSize(newSize);
     };
 
-    const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e);
-    };
-
     const handleEdit = (finalGeography: FinalGeography) => {
         setEditData(finalGeography);
     };
 
     const handleDelete = (finalGeography: FinalGeography) => {
-        // Implement delete functionality here
-        console.log('Delete:', finalGeography);
+        setData(data.filter(item => item.territoryId !== finalGeography.territoryId));
     };
 
     const {
         handleSubmit,
         formState: { errors },
         control,
+        reset,
     } = useForm<FormSchema>({
         defaultValues: {
             channel: '',
@@ -205,21 +193,38 @@ const FinalGeography = () => {
             area: '',
             territory: '',
             agencyName: '',
-            isActive: true, // Set default value to true
+            isActive: true,
         },
     });
 
     const onSubmit = async (values: FormSchema) => {
-        await new Promise((r) => setTimeout(r, 500));
-        alert(JSON.stringify(values, null, 2));
+        if (editData) {
+            // Update existing entry
+            setData(data.map(item => (item.territoryId === editData.territoryId ? { ...item, ...values } : item)));
+        } else {
+            // Create new entry
+            const newEntry = {
+                ...values,
+                territoryId: `T${data.length + 1}`, // Generate a new territory ID
+                updatedDateTime: new Date().toISOString(),
+            };
+            setData([...data, newEntry]);
+        }
+        reset();
+        setEditData(null);
     };
+
+    useEffect(() => {
+        if (editData) {
+            reset(editData);
+        }
+    }, [editData, reset]);
 
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-
                 <Card bordered={false} className='w-full h-full overflow-auto'>
-                <h5 className='mb-2'>Final Geography</h5>
+                    <h5 className='mb-2'>Final Geography</h5>
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
@@ -282,8 +287,136 @@ const FinalGeography = () => {
             {editData && (
                 <Card bordered={false} className='w-full mt-4'>
                     <h5 className='mb-2'>Update Final Geography</h5>
-                    
-                    <p>Edit data for: {editData.channelName}</p>
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem invalid={Boolean(errors.channel)} errorMessage={errors.channel?.message}>
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={[
+                                            { label: 'Channel 1', value: 'Channel 1' },
+                                            { label: 'Channel 2', value: 'Channel 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{ required: 'Channel is required' }}
+                            />
+                        </FormItem>
+                        <FormItem invalid={Boolean(errors.subChannel)} errorMessage={errors.subChannel?.message}>
+                            <Controller
+                                name="subChannel"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Sub-channel"
+                                        options={[
+                                            { label: 'Sub-channel 1', value: 'Sub-channel 1' },
+                                            { label: 'Sub-channel 2', value: 'Sub-channel 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{ required: 'Sub-channel is required' }}
+                            />
+                        </FormItem>
+                        <FormItem invalid={Boolean(errors.region)} errorMessage={errors.region?.message}>
+                            <Controller
+                                name="region"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Region"
+                                        options={[
+                                            { label: 'Region 1', value: 'Region 1' },
+                                            { label: 'Region 2', value: 'Region 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{ required: 'Region is required' }}
+                            />
+                        </FormItem>
+                        <FormItem invalid={Boolean(errors.area)} errorMessage={errors.area?.message}>
+                            <Controller
+                                name="area"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Area"
+                                        options={[
+                                            { label: 'Area 1', value: 'Area 1' },
+                                            { label: 'Area 2', value: 'Area 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{ required: 'Area is required' }}
+                            />
+                        </FormItem>
+                        <FormItem invalid={Boolean(errors.territory)} errorMessage={errors.territory?.message}>
+                            <Controller
+                                name="territory"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Territory"
+                                        options={[
+                                            { label: 'Territory 1', value: 'Territory 1' },
+                                            { label: 'Territory 2', value: 'Territory 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{ required: 'Territory is required' }}
+                            />
+                        </FormItem>
+                        <FormItem invalid={Boolean(errors.agencyName)} errorMessage={errors.agencyName?.message}>
+                            <Controller
+                                name="agencyName"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Agency"
+                                        options={[
+                                            { label: 'Agency 1', value: 'Agency 1' },
+                                            { label: 'Agency 2', value: 'Agency 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{ required: 'Agency is required' }}
+                            />
+                        </FormItem>
+                        <FormItem>
+                            <Controller
+                                name="isActive"
+                                control={control}
+                                render={({ field }) =>
+                                    <Checkbox {...field} checked={field.value}>
+                                        Is Active
+                                    </Checkbox>
+                                }
+                            />
+                        </FormItem>
+                        <FormItem>
+                            <Button variant="solid" block type="submit">{editData ? 'Update' : 'Create'}</Button>
+                        </FormItem>
+                    </Form>
                 </Card>
             )}
         </div>
