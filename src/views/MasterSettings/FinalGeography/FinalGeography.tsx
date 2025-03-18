@@ -281,8 +281,8 @@ const FinalGeography = () => {
             </div>
             {editData && (
                 <Card bordered={false} className='w-full mt-4'>
-                    <h5 className='mb-2'>Edit Final Geography</h5>
-                    {/* Add your form fields here to edit the data */}
+                    <h5 className='mb-2'>Update Final Geography</h5>
+                    
                     <p>Edit data for: {editData.channelName}</p>
                 </Card>
             )}
