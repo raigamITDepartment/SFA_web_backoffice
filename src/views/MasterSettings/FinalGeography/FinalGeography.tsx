@@ -404,7 +404,7 @@ const FinalGeography = () => {
                                         size="sm" 
                                         placeholder="Select Agency"
                                         options={[
-                                            { label: 'Agency 1', value: 'Agency 1' },
+                                            { label: 'Agency 1', value: 'Agency 1' } as any,
                                             { label: 'Agency 2', value: 'Agency 2' },
                                         ]}
                                         value={field.value}
