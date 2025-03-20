@@ -202,7 +202,7 @@ const SubChannel = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' },
+                                            { label: 'National Channel', value: 'National Channel' }as any,
                                             { label: 'Bakery Channel', value: 'Bakery Channel' },
                                         ]}
                                         value={field.value}

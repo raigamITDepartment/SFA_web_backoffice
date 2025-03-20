@@ -212,7 +212,7 @@ const Region = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' },
+                                            { label: 'National Channel', value: 'National Channel' }as any,
                                             
                                         ]}
                                         value={field.value}
@@ -243,7 +243,7 @@ const Region = () => {
                                         size="sm"
                                         placeholder="Select Sub-Channel"
                                         options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' },
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
                                             { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                         ]}
                                         value={field.value}
