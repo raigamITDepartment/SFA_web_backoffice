@@ -214,7 +214,7 @@ const Channel = () => {
                                         size="sm"
                                         placeholder="Select Country"
                                         options={[
-                                            { label: 'All Island', value: 'All Island' },
+                                            { label: 'All Island', value: 'All Island' }as any,
                                         ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}

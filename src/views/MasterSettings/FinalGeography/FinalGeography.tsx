@@ -309,7 +309,7 @@ const FinalGeography = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'Channel 1', value: 'Channel 1' },
+                                            { label: 'Channel 1', value: 'Channel 1' }as any,
                                             { label: 'Channel 2', value: 'Channel 2' },
                                         ]}
                                         value={field.value}
@@ -328,7 +328,7 @@ const FinalGeography = () => {
                                         size="sm"
                                         placeholder="Select Sub-channel"
                                         options={[
-                                            { label: 'Sub-channel 1', value: 'Sub-channel 1' },
+                                            { label: 'Sub-channel 1', value: 'Sub-channel 1' } as any,
                                             { label: 'Sub-channel 2', value: 'Sub-channel 2' },
                                         ]}
                                         value={field.value}
@@ -347,7 +347,7 @@ const FinalGeography = () => {
                                         size="sm"
                                         placeholder="Select Region"
                                         options={[
-                                            { label: 'Region 1', value: 'Region 1' },
+                                            { label: 'Region 1', value: 'Region 1' }as any,
                                             { label: 'Region 2', value: 'Region 2' },
                                         ]}
                                         value={field.value}
@@ -366,7 +366,7 @@ const FinalGeography = () => {
                                         size="sm"
                                         placeholder="Select Area"
                                         options={[
-                                            { label: 'Area 1', value: 'Area 1' },
+                                            { label: 'Area 1', value: 'Area 1' }as any,
                                             { label: 'Area 2', value: 'Area 2' },
                                         ]}
                                         value={field.value}
@@ -385,7 +385,7 @@ const FinalGeography = () => {
                                         size="sm"
                                         placeholder="Select Territory"
                                         options={[
-                                            { label: 'Territory 1', value: 'Territory 1' },
+                                            { label: 'Territory 1', value: 'Territory 1' }as any,
                                             { label: 'Territory 2', value: 'Territory 2' },
                                         ]}
                                         value={field.value}
