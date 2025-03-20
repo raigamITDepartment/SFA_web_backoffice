@@ -2,10 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path';
 import dynamicImport from 'vite-plugin-dynamic-import'
+import commonjs from 'vite-plugin-commonjs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), dynamicImport()],
+  plugins: [react(), dynamicImport(), commonjs()],
   assetsInclude: ['**/*.md'],
   resolve: {
     alias: {
@@ -24,4 +25,5 @@ export default defineConfig({
   build: {
     outDir: 'build'
   }
+
 })

@@ -6,21 +6,7 @@ import PasswordInput from '@/components/shared/PasswordInput'
 import classNames from '@/utils/classNames'
 import { useAuth } from '@/auth'
 import { useAppSelector, useAppDispatch } from '@/Store/Hooks'
-import { 
-    
-    
-    getBioEnabled,
-    setUserName as setAsyncUserName,
-    setPassword as setAsyncPassword,
-    setRememberMe as setAsyncRememberMe,
-    getRememberMe as getAsyncRememberMe,
-    getUserName as getAsyncUserName,
-    getPassword as getAsyncPassword,
-    setToken as setAsyncToken,
-    getToken as getAsyncToken,
 
-
-} from '../../../../services/AsyncStoreService'
 //import { loginUser } from '../../../../actions/UserAction'
 import { useNavigate } from 'react-router-dom'
 import { useForm, Controller, useFormContext } from 'react-hook-form'
@@ -28,7 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
-import type { NavigationProp } from '@react-navigation/native'
+
 import type { ReactNode } from 'react'
 import { Navigation } from 'yet-another-react-lightbox/*'
 
@@ -36,7 +22,7 @@ interface SignInFormProps extends CommonProps {
     disableSubmit?: boolean
     passwordHint?: string | ReactNode
     setMessage?: (message: string) => void
-    navigation: NavigationProp<any, any>;
+   
 }
 
 
@@ -45,11 +31,9 @@ type SignInFormSchema = {
     email: string
     password: string
 }
-const [loginButtonPressed, setLoginButtonPressed] = useState(false);
-const userLoginResponse = useAppSelector((state) => state.login.user);
-const [verifiedByUserNameAndPassword, setVerifiedByUserNameAndPassword,] = useState(false);
 
-const dispatch = useAppDispatch();
+
+
 
 const validationSchema: ZodType<SignInFormSchema> = z.object({
     email: z
@@ -61,7 +45,7 @@ const validationSchema: ZodType<SignInFormSchema> = z.object({
 })
 
 const SignInForm = (props: SignInFormProps) => {
-    const { setError } = useFormContext(); // Add this line to get setError from the form context
+   
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
 
     const { disableSubmit = false, className, setMessage, passwordHint } = props
@@ -97,49 +81,7 @@ const SignInForm = (props: SignInFormProps) => {
     }
 
 
-    useEffect(() => {verifyUserNameAndPassword(); }, []);
-
-    const verifyUserNameAndPassword = async () => {
-        setVerifiedByUserNameAndPassword(true);
-        const un = await getAsyncUserName();
-        const ps = await getAsyncPassword();
-        const bioEnabled = (await getBioEnabled()) === "Y" ? true : false;
-        if (bioEnabled && un && ps) {
-         // dispatch(loginUser({ userName: un, password: ps, userTypeId: 2 }));
-        }
-      };
     
-      useEffect(() => {
-        if (userLoginResponse && userLoginResponse.loginType !== "SIGN_UP") {
-          console.log(userLoginResponse);
-    
-          if (userLoginResponse.data && userLoginResponse.data.token) {
-            if (loginButtonPressed) {
-                props.navigation.navigate("Home");
-              setAsyncPassword(userLoginResponse.data.password);
-              setAsyncRememberMe(userLoginResponse.data.rememberMe ? "Y" : "N");
-              setAsyncToken(userLoginResponse.data.token);
-              props.navigation.navigate("Home");
-
-            } else {
-              if (userLoginResponse.data.termConditionAccept === true) {
-                props.navigation.navigate("Home");
-              } else {
-                props.navigation.navigate("Home");
-              }
-            }
-          } else if (userLoginResponse.error && userLoginResponse.error.length > 0) {
-            if (loginButtonPressed) {
-              let loginError = {
-                type: "fieldValidation",
-                message: "Login error",
-              };
-              setError("fieldValidation", loginError);
-            }
-          }
-          setLoginButtonPressed(false);
-        }
-      }, [userLoginResponse]);
 
     return (
         <div className={className}>
