@@ -65,7 +65,11 @@ export const protectedRoutes: Routes = [
     {
         key: 'SalesMenu.collapse.CategoryAdd',
         path: '/Sales-menu-CategoryAdd',
+<<<<<<< HEAD
         component: lazy(() => import('@/views/SalesDetails/Category Add/CategoryAdd')),
+=======
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd/CategoryAdd')),
+>>>>>>> 7162216ccba590f7a092315db699fa98ed89f616
         authority: [],
     },
    
