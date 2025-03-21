@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Table from '@/components/ui/Table';
@@ -26,9 +26,10 @@ import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
 
 type FormSchema = {
-    channel: string;
-    subChannel: string;
-    regionName: string;
+
+    SubCategoryCode: string;
+    SubCategoryName: string;
+    MainCategory: string;
     isActive: boolean;
 };
 
@@ -42,11 +43,10 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface Region {
-    channelCode: string;
-    subChannelCode: string;
-    regionCode: string;
-    regionName: string;
+interface SubCategory {
+    SubCategoryCode: string;
+    SubCategoryName: string;
+    MainCategory: string;
     isActive: boolean;
 }
 
@@ -86,17 +86,17 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-const Region = () => {
+const SubCategoryComponent = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
-    const [error, setError] = useState<string | null>(null);
+    // const [error, setError] = useState<string | null>(null);
 
-    const columns = useMemo<ColumnDef<Region>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-        { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Region Name', accessorKey: 'regionName' },
+    const columns = useMemo<ColumnDef<SubCategory>[]>(() => [
+        { header: 'Sub Category Code', accessorKey: 'SubCategoryCode' },
+        { header: 'Sub CategoryCode Name', accessorKey: 'SubCategoryName' },
+        { header: 'Main Category', accessorKey: 'MainCategory' },
+    
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -120,19 +120,11 @@ const Region = () => {
         },
     ], []);
 
-    const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
+    const [data] = useState<SubCategory[]>([
+        { SubCategoryCode: '1', SubCategoryName: 'R1A', MainCategory: 'SOYA' ,isActive: true },
+        
+        { SubCategoryCode: '1', SubCategoryName: 'R1A', MainCategory: 'SOYA' , isActive: true },
+    
     ]);
 
     const totalData = data.length;
@@ -162,18 +154,18 @@ const Region = () => {
         table.setPageSize(newSize);
     };
 
-    const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e);
-    };
+    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
+    //     console.log(value, e);
+    // };
 
-    const handleEdit = (region: Region) => {
+    const handleEdit = (area: SubCategory) => {
         // Implement edit functionality here
-        console.log('Edit:', region);
+        console.log('Edit:', area);
     };
 
-    const handleDelete = (region: Region) => {
+    const handleDelete = (area: SubCategory) => {
         // Implement delete functionality here
-        console.log('Delete:', region);
+        console.log('Delete:', area);
     };
 
     const {
@@ -182,9 +174,10 @@ const Region = () => {
         control,
     } = useForm<FormSchema>({
         defaultValues: {
-            channel: '',
-            subChannel: '',
-            regionName: '',
+            SubCategoryCode: '',
+            SubCategoryName: '',
+            MainCategory: '' ,   
+          
             isActive: true, // Set default value to true
         },
     });
@@ -198,22 +191,22 @@ const Region = () => {
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Region Creation</h5>
+                    <h5 className='mb-2'>Sub Category Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
+                            invalid={Boolean(errors.SubCategoryCode)}
+                            errorMessage={errors.SubCategoryCode?.message}
                         >
                             <Controller
-                                name="channel"
+                                name="SubCategoryCode"
                                 control={control}
                                 render={({ field }) =>
                                     <Select
                                         size="sm"
-                                        placeholder="Select Channel"
+                                        placeholder="Select main category"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' }as any,
-                                            
+                                            { label: 'Soya', value: 'Soya' } as any,
+                                            { label: 'Dewani1', value: 'Dewani1' } as any,
                                         ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}
@@ -231,49 +224,19 @@ const Region = () => {
                                 }}
                             />
                         </FormItem>
+                      
                         <FormItem
-                            invalid={Boolean(errors.subChannel)}
-                            errorMessage={errors.subChannel?.message}
+                            invalid={Boolean(errors.SubCategoryName)}
+                            errorMessage={errors.SubCategoryName?.message}
                         >
                             <Controller
-                                name="subChannel"
-                                control={control}
-                                render={({ field }) =>
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub-Channel"
-                                        options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
-                                            { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.regionName)}
-                            errorMessage={errors.regionName?.message}
-                        >
-                            <Controller
-                                name="regionName"
+                                name="SubCategoryName"
                                 control={control}
                                 render={({ field }) =>
                                     <Input
                                         type="text"
                                         autoComplete="off"
-                                        placeholder="Region Name"
+                                        placeholder="SubCategory Name"
                                         {...field}
                                     />
                                 }
@@ -372,4 +335,4 @@ const Region = () => {
     );
 };
 
-export default Region;
+export default SubCategoryComponent;

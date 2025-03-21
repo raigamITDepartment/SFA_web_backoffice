@@ -199,7 +199,7 @@ const DistributorAgencyMapping = () => {
                                         size="sm"
                                         placeholder="Select Distributor"
                                         options={[
-                                            { label: 'Distributor 1', value: 'Distributor 1' },
+                                            { label: 'Distributor 1', value: 'Distributor 1' }as any,
                                             { label: 'Distributor 2', value: 'Distributor 2' },
                                             { label: 'Distributor 3', value: 'Distributor 3' },
                                             { label: 'Distributor 4', value: 'Distributor 4' },
@@ -233,7 +233,7 @@ const DistributorAgencyMapping = () => {
                                         size="sm"
                                         placeholder="Select Agency"
                                         options={[
-                                            { label: 'Agency 1', value: 'Agency 1' },
+                                            { label: 'Agency 1', value: 'Agency 1' }as any,
                                             { label: 'Agency 2', value: 'Agency 2' },
                                             { label: 'Agency 3', value: 'Agency 3' },
                                             { label: 'Agency 4', value: 'Agency 4' },

@@ -34,7 +34,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'MasterMenu.collapse.FinalGeography',
         path:  '/Master-menu-FinalGeography',
-        component: lazy(() => import('@/views/MasterSettings/FinalGeography'),
+        component: lazy(() => import('@/views/MasterSettings/FinalGeography/FinalGeography'),
         ),
         authority: [],
     },
@@ -65,7 +65,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'SalesMenu.collapse.CategoryAdd',
         path: '/Sales-menu-CategoryAdd',
-        component: lazy(() => import('@/views/SalesDetails/CategoryAdd')),
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd/CategoryAdd')),
         authority: [],
     },
    

@@ -226,7 +226,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' },
+                                            { label: 'National Channel', value: 'National Channel' }as any,
                                             { label: 'Bakery Channel', value: 'Bakery Channel' },
                                         ]}
                                         value={field.value}
@@ -257,7 +257,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Sub-Channel"
                                         options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' },
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
                                             { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                         ]}
                                         value={field.value}
@@ -288,7 +288,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Region"
                                         options={[
-                                            { label: 'Region 1', value: 'Region 1' },
+                                            { label: 'Region 1', value: 'Region 1' }as any,
                                             { label: 'Region 2', value: 'Region 2' },
                                         ]}
                                         value={field.value}
@@ -319,7 +319,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Area"
                                         options={[
-                                            { label: 'Area 1', value: 'Area 1' },
+                                            { label: 'Area 1', value: 'Area 1' }as any,
                                             { label: 'Area 2', value: 'Area 2' },
                                         ]}
                                         value={field.value}
@@ -350,7 +350,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Territory"
                                         options={[
-                                            { label: 'Territory 1', value: 'Territory 1' },
+                                            { label: 'Territory 1', value: 'Territory 1' }as any,
                                             { label: 'Territory 2', value: 'Territory 2' },
                                         ]}
                                         value={field.value}
@@ -381,7 +381,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Route"
                                         options={[
-                                            { label: 'Route 1', value: 'Route 1' },
+                                            { label: 'Route 1', value: 'Route 1' }as any,
                                             { label: 'Route 2', value: 'Route 2' },
                                         ]}
                                         value={field.value}
