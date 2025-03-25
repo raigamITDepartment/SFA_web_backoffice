@@ -133,7 +133,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'OutletModule.Customers',
         path:'/Outlet-Module-Customers',
-        component: lazy(() => import('@/views/OutletModule/Customers')),
+        component: lazy(() => import('@/views/OutletModule/Customers/Customers')),
         authority: [],
     },
 
