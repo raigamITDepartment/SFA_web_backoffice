@@ -92,10 +92,10 @@ const navigationConfig: NavigationTree[] = [
                 subMenu: [],
             },
             {
-                key: 'ItemAdd',
-                path: '/Sales-menu-ItemAdd',
-                title: 'Item Add',
-                translateKey: 'nav.SalesMenu.ItemAdd',
+                key: 'ItemMaster',
+                path: '/Sales-menu-ItemMaster',
+                title: 'Item Master',
+                translateKey: 'nav.SalesMenu.ItemMaster',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
@@ -103,10 +103,10 @@ const navigationConfig: NavigationTree[] = [
             },
           
             {
-                key: 'ItemMaster',
-                path: '/Sales-menu-ItemMaster',
-                title: 'Item Master',
-                translateKey: 'nav.SalesMenu.ItemMaster',
+                key: 'ItemAdd',
+                path: '/Sales-menu-ItemAdd',
+                title: 'Item Add',
+                translateKey: 'nav.SalesMenu.ItemAdd',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
@@ -313,10 +313,10 @@ const navigationConfig: NavigationTree[] = [
         authority: [],
         subMenu: [
             {
-                key: 'Outlet',
-                path: '/Sales-menu-Outlet',
+                key: 'Customers',
+                path: '/Outlet-Module-Customers',
                 title: 'Customer (Outlet) ',
-                translateKey: 'nav.OutletModule.Outlet',
+                translateKey: 'nav.OutletModule.Customers',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
@@ -326,9 +326,21 @@ const navigationConfig: NavigationTree[] = [
 
             {
                 key: 'OutletReport',
-                path: '/Sales-menu-OutletReport',
+                path: '/Outlet-Module-OutletReport',
                 title: ' Active and close Outlet Report',
                 translateKey: 'nav.OutletModule.OutletReport',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+              
+            },
+
+            {
+                key: 'Route',
+                path: '/Outlet-Module-Route',
+                title: 'Route',
+                translateKey: 'nav.OutletModule.Route',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],

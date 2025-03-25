@@ -27,7 +27,7 @@ import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
 
 type FormSchema = {
-    MainCategoryName: string;
+    SubsubCategoryName: string;
     isActive: boolean;
 };
 
@@ -41,9 +41,9 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface MainCategory {
-    MainCategoryCode: string;
-    MainCategoryName: string;
+interface SubsubCategory {
+    SubsubCategoryCode: string;
+    SubsubCategoryName: string;
     isActive?: boolean;
 }
 
@@ -83,15 +83,15 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-const MainCategory = () => {
+const SubsubCategory = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
     const [channelName, setChannelName] = useState<string>('');
-    const columns = useMemo<ColumnDef<MainCategory>[]>(() => [
-        { header: 'MainCategory Code', accessorKey: 'MainCategoryCode' },
-        { header: 'MainCategory Name', accessorKey: 'MainCategoryName' },
+    const columns = useMemo<ColumnDef<SubsubCategory>[]>(() => [
+        { header: 'SubsubCategory Code', accessorKey: 'SubsubCategoryCode' },
+        { header: 'SubsubCategory Name', accessorKey: 'SubsubCategoryName' },
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -115,11 +115,10 @@ const MainCategory = () => {
         },
     ], []);
 
-    const [data] = useState<MainCategory[]>([
-        { MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true },
-        { MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false },
-        { MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true },
-    
+    const [data, setData] = useState<SubsubCategory[]>([
+        { SubsubCategoryCode: '1', SubsubCategoryName: 'Soya', isActive: true },
+        { SubsubCategoryCode: '2', SubsubCategoryName: 'Dewani 1', isActive: false },
+        { SubsubCategoryCode: '3', SubsubCategoryName: 'Aryaa', isActive: true },
     ]);
 
     const totalData = data.length;
@@ -153,19 +152,19 @@ const MainCategory = () => {
         console.log(value, e);
     };
 
-    const handleEdit = (MainCategory: MainCategory) => {
+    const handleEdit = (SubsubCategory: SubsubCategory) => {
         // Implement edit functionality here
-        console.log('Edit:', MainCategory);
+        console.log('Edit:', SubsubCategory);
     };
 
-    const handleDelete = (MainCategory: MainCategory) => {
+    const handleDelete = (SubsubCategory: SubsubCategory) => {
         // Implement delete functionality here
-        console.log('Delete:', MainCategory);
+        console.log('Delete:', SubsubCategory);
     };
 
     const handleCreate = () => {
         setError(null);
-        console.log('Create category:', { MainCategoryName: channelName });
+        console.log('Create category:', { SubsubCategoryName: channelName });
     };
 
     const {
@@ -175,7 +174,7 @@ const MainCategory = () => {
     } = useForm<FormSchema>({
         defaultValues: {
          
-            MainCategoryName: '',
+            SubsubCategoryName: '',
             isActive: true, // Set default value to true
         },
     });
@@ -193,11 +192,11 @@ const MainCategory = () => {
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         
                         <FormItem
-                            invalid={Boolean(errors.MainCategoryName)}
-                            errorMessage={errors.MainCategoryName?.message}
+                            invalid={Boolean(errors.SubsubCategoryName)}
+                            errorMessage={errors.SubsubCategoryName?.message}
                         >
                             <Controller
-                                name="MainCategoryName"
+                                name="SubsubCategoryName"
                                 control={control}
                                 rules={{ required: 'Required' }}
                                 render={({ field }) => (
@@ -293,4 +292,4 @@ const MainCategory = () => {
     );
 };
 
-export default MainCategory;
+export default SubsubCategory;
