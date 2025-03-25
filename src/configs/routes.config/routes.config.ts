@@ -111,9 +111,9 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'SalesMenu.Agstock',
-        path:'/Sales-menu-Agstock',
-        component: lazy(() => import('@/views/SalesDetails/Agstock')),
+        key: 'SalesMenu.Stock',
+        path:'/Sales-menu-Stock',
+        component: lazy(() => import('@/views/SalesDetails/Stock/ProductList')),
         authority: [],
     },
 
