@@ -80,24 +80,18 @@ export const protectedRoutes: Routes = [
 
 
     {
-        key: 'SalesMenu.ItemAdd',
-        path:  '/Sales-menu-ItemAdd',
-        component: lazy(() => import('@/views/SalesDetails/ItemAdd')),
-        authority: [],
-    },
-
-    {
         key: 'SalesMenu.ItemMaster',
-        path:'/Sales-menu-ItemMaster',
-        component: lazy(() => import('@/views/SalesDetails/ItemMaster')),
+        path:  '/Sales-menu-ItemMaster',
+        component: lazy(() => import('@/views/SalesDetails/products/ProductList'),),
         authority: [],
     },
 
+  
 
     {
-        key: 'SalesMenu.ItemSequence',
-        path: '/Sales-menu-ItemSequence',
-        component: lazy(() => import('@/views/SalesDetails/ItemSequence')),
+        key: 'SalesMenu.ItemAdd',
+        path: '/Sales-menu-ItemAdd',
+        component: lazy(() => import('@/views/SalesDetails/products/ProductCreate')),
         authority: [],
     },
 
@@ -136,7 +130,25 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
 
+    {
+        key: 'OutletModule.Customers',
+        path:'/Outlet-Module-Customers',
+        component: lazy(() => import('@/views/OutletModule/Customers')),
+        authority: [],
+    },
 
+    {
+        key: 'OutletModule.OutletReport',
+        path:'/Outlet-Module-OutletReport',
+        component: lazy(() => import('@/views/OutletModule/OutletReport')),
+        authority: [],
+    },
+    {
+        key: 'OutletModule.Route',
+        path:'/Outlet-Module-Route',
+        component: lazy(() => import('@/views/OutletModule/Route')),
+        authority: [],
+    },
 
     {
         key: 'groupMenu.collapse.item2',
