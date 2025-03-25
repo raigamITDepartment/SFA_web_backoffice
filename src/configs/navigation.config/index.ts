@@ -138,9 +138,9 @@ const navigationConfig: NavigationTree[] = [
              
             {
                 key: 'Agancy Stock',
-                path: '/Sales-menu-Agstock',
+                path: '/Sales-menu-Stock',
                 title: 'Stock',
-                translateKey: 'nav.SalesMenu.Agstock',
+                translateKey: 'nav.SalesMenu.Stock',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
