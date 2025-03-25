@@ -130,7 +130,25 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
 
+    {
+        key: 'OutletModule.Customers',
+        path:'/Outlet-Module-Customers',
+        component: lazy(() => import('@/views/OutletModule/Customers')),
+        authority: [],
+    },
 
+    {
+        key: 'OutletModule.OutletReport',
+        path:'/Outlet-Module-OutletReport',
+        component: lazy(() => import('@/views/OutletModule/OutletReport')),
+        authority: [],
+    },
+    {
+        key: 'OutletModule.Route',
+        path:'/Outlet-Module-Route',
+        component: lazy(() => import('@/views/OutletModule/Route')),
+        authority: [],
+    },
 
     {
         key: 'groupMenu.collapse.item2',
