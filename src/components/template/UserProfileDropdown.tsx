@@ -18,10 +18,10 @@ const dropdownItemList: DropdownList[] = []
 const _UserDropdown = () => {
     const { avatar, userName, email } = useSessionUser((state) => state.user)
 
-    const { signOut } = useAuth()
+   const { signOut } = useAuth()
 
     const handleSignOut = () => {
-        signOut()
+       signOut()
     }
 
     const avatarProps = {

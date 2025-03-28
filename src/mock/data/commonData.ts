@@ -509,7 +509,8 @@ export const searchQueryPoolData = [
     },
     {
         key: 'concepts.ai.chat',
-        path: `${CONCEPTS_PREFIX_PATH}/ai/chat`,
+        //path: `${CONCEPTS_PREFIX_PATH}/ai/chat`,
+        path: `${CONCEPTS_PREFIX_PATH}/Sales-menu-CategoryAdd`,
         title: 'Chat',
         icon: 'aiChat',
         category: 'AI',
@@ -517,7 +518,7 @@ export const searchQueryPoolData = [
     },
     {
         key: 'concepts.ai.image',
-        path: `${CONCEPTS_PREFIX_PATH}/ai/image`,
+        path:  `${CONCEPTS_PREFIX_PATH} /Sales-menu-FreeIssue`,
         title: 'Image',
         icon: 'aiImage',
         category: 'AI',
@@ -597,7 +598,7 @@ export const searchQueryPoolData = [
     },
     {
         key: 'concepts.products.productList',
-        path: `${CONCEPTS_PREFIX_PATH}/products/product-list`,
+        path: `${CONCEPTS_PREFIX_PATH}/SalesDetails/products/product-list`,
         title: 'Product List',
         icon: 'productList',
         category: 'Products',
@@ -605,7 +606,7 @@ export const searchQueryPoolData = [
     },
     {
         key: 'concepts.products.productEdit',
-        path: `${CONCEPTS_PREFIX_PATH}/products/product-edit/12`,
+        path: `${CONCEPTS_PREFIX_PATH}/SalesDetails/products/product-edit/12`,
         title: 'Product Edit',
         icon: 'productEdit',
         category: 'Products',

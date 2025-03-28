@@ -114,6 +114,73 @@ const ProductListTable = () => {
                     )
                 },
             },
+
+            {
+                header: 'Damaged',
+                accessorKey: 'Damaged',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.Damaged}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Required Qty',
+                accessorKey: 'Rqty',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.Rqty}
+                        </span>
+                    )
+                },
+            },
+       
+            {
+                header: 'Invoice Actual',
+                accessorKey: 'Iactual',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.Iactual}
+                        </span>
+                    )
+                },
+            },
+            
+
+            {
+                header: 'Company Invoice Accepted',
+                accessorKey: 'CIAccepted',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.CIAccepted}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Company Invoice Pending',
+                accessorKey: 'CIPeding',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.CIPeding}
+                        </span>
+                    )
+                },
+            },
+          
+
+
             {
                 header: 'Sales',
                 accessorKey: 'status',
