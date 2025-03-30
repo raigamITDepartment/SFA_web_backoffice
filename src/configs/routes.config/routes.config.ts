@@ -158,5 +158,11 @@ export const protectedRoutes: Routes = [
         ),
         authority: [],
     },
+    {
+        key: 'createProduct',
+        path: '/create-product',
+        component: lazy(() => import('@/views/SalesDetails/products/ProductCreate/ProductCreate')),
+        authority: [],
+    },
     ...othersRoute,
 ]
