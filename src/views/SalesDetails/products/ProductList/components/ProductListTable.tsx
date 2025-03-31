@@ -78,7 +78,7 @@ const ProductListTable = () => {
     }
 
     const handleEdit = (product: Product) => {
-        navigate(`/concepts/products/product-edit/${product.id}`)
+        navigate(`/SalesDetails/products/product-edit/${product.id}`)
     }
 
     const handleConfirmDelete = () => {

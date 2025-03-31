@@ -48,6 +48,25 @@ const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
                         )}
                     />
                 </FormItem>
+
+                <FormItem
+                    label="SPA code"
+                    invalid={Boolean(errors.productCode)}
+                    errorMessage={errors.productCode?.message}
+                >
+                    <Controller
+                        name="productCode"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                type="text"
+                                autoComplete="off"
+                                placeholder="Product Code"
+                                {...field}
+                            />
+                        )}
+                    />
+                </FormItem>
             </div>
             <FormItem
                 label="Description"

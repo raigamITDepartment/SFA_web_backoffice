@@ -59,7 +59,7 @@ function AuthProvider({ children }: AuthProviderProps) {
 
     const handleSignIn = (tokens: Token, user?: User) => {
         setToken(tokens.accessToken)
-        setSessionSignedIn(true)
+        //setSessionSignedIn(true)
 
         if (user) {
             setUser(user)
@@ -69,14 +69,14 @@ function AuthProvider({ children }: AuthProviderProps) {
     const handleSignOut = () => {
         setToken('')
         setUser({})
-        setSessionSignedIn(false)
+       // setSessionSignedIn(false)
     }
 
     const signIn = async (values: SignInCredential): AuthResult => {
         try {
             const resp = await apiSignIn(values)
             if (resp) {
-                handleSignIn({ accessToken: resp.token }, resp.user)
+               handleSignIn({ accessToken: resp.token }, resp.user)
                 redirect()
                 return {
                     status: 'success',
@@ -125,7 +125,7 @@ function AuthProvider({ children }: AuthProviderProps) {
             await apiSignOut()
         } finally {
             handleSignOut()
-            navigatorRef.current?.navigate(appConfig.unAuthenticatedEntryPath)
+           // navigatorRef.current?.navigate(appConfig.unAuthenticatedEntryPath)
         }
     }
     const oAuthSignIn = (

@@ -3,7 +3,9 @@ import {
     NAV_ITEM_TYPE_ITEM,
     NAV_ITEM_TYPE_COLLAPSE,
 } from '@/constants/navigation.constant'
-
+import Masternavigationconfig from './Master.navigation.config'
+import Salesnavigationconfig from './Sales.navigation.config'
+import Outletnavigationconfig from './Outlet.navigation.config'
 import type { NavigationTree } from '@/@types/navigation'
 
 const navigationConfig: NavigationTree[] = [
@@ -19,154 +21,11 @@ const navigationConfig: NavigationTree[] = [
     },
     /** Example purpose only, please remove */
    
-    {
-        key: 'Master Settings',
-        path: '',
-        title: 'Master Settings',
-        translateKey: 'nav.MasterMenu.MasterMenu',
-        icon: 'collapseMenu',
-        type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: [],
-        subMenu: [
-            {
-                key: 'Demarcation',
-                path: '/Master-menu-Demarcation',
-                title: 'Demarcation',
-                translateKey: 'nav.MasterMenu.Demarcation',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            {
-                key: 'Distributor Mapping',
-                path: '/Master-menu-DistributorMapping',
-                title: 'Distributor Mapping',
-                translateKey: 'nav.MasterMenu.DistributorMapping',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            {
-                key: 'Final Geography Mapping',
-                path: '/Master-menu-FinalGeography',
-                title: 'Final Geography Mapping',
-                translateKey: 'nav.MasterMenu.FinalGeography',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-        ],
-    },
 
+   ...Masternavigationconfig,
+   ...Salesnavigationconfig,
+   ...Outletnavigationconfig,
    
-    {
-        key: 'Sales Details',
-        path: '',
-        title: 'Sales Details',
-        translateKey: 'nav.SalesMenu.SalesMenu',
-        icon: 'sales',
-        type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: [],
-        subMenu: [
-            {
-                key: 'CategoryAdd',
-                path: '/Sales-menu-CategoryAdd',
-                title: 'CategoryAdd',
-                translateKey: 'nav.SalesMenu.CategoryAdd',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            {
-                key: 'FreeIssue',
-                path:  '/Sales-menu-FreeIssue',
-                title: 'Free Issue',
-                translateKey: 'nav.SalesMenu.FreeIssue',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            {
-                key: 'ItemMaster',
-                path: '/Sales-menu-ItemMaster',
-                title: 'Item Master',
-                translateKey: 'nav.SalesMenu.ItemMaster',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-          
-            {
-                key: 'ItemAdd',
-                path: '/Sales-menu-ItemAdd',
-                title: 'Item Add',
-                translateKey: 'nav.SalesMenu.ItemAdd',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            {
-                key: 'ItemSequence',
-                path: '/Sales-menu-ItemSequence',
-                title: 'Item Sequence',
-                translateKey: 'nav.SalesMenu.ItemSequence',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-        
-            {
-                key: 'PriceUpdate',
-                path: '/Sales-menu-PriceUpdate',
-                title: 'Price Update',
-                translateKey: 'nav.SalesMenu.PriceUpdate',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-        
-            
-             
-            {
-                key: 'Agancy Stock',
-                path: '/Sales-menu-Stock',
-                title: 'Stock',
-                translateKey: 'nav.SalesMenu.Stock',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            
-            {
-                key: 'Marketeturn',
-                path: '/Sales-menu-Marketreturn',
-                title: 'Market Return',
-                translateKey: 'nav.SalesMenu.Marketreturn',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-         
-
-
-
-
-
-
-
-        ],
-    },
 
 
 
@@ -303,53 +162,7 @@ const navigationConfig: NavigationTree[] = [
         ]
     },
 
-    {
-        key: 'OutletModule',
-        path: '',
-        title: 'Outlet Module',
-        translateKey: 'nav.OutletModule.OutletModule',
-        icon: 'Outlet',
-        type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: [],
-        subMenu: [
-            {
-                key: 'Customers',
-                path: '/Outlet-Module-Customers',
-                title: 'Customer (Outlet) ',
-                translateKey: 'nav.OutletModule.Customers',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-              
-            },
-
-            {
-                key: 'OutletReport',
-                path: '/Outlet-Module-OutletReport',
-                title: ' Active and close Outlet Report',
-                translateKey: 'nav.OutletModule.OutletReport',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-              
-            },
-
-            {
-                key: 'Route',
-                path: '/Outlet-Module-Route',
-                title: 'Route',
-                translateKey: 'nav.OutletModule.Route',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-              
-            },
-
-        ]
-    },
+    
 
 
 
