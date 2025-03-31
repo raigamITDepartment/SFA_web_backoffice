@@ -26,7 +26,7 @@ const CustomerListActionTools = () => {
             <Button
                 variant="solid"
                 icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('/concepts/customers/customer-create')}
+                onClick={() => navigate('src\views\MasterSettings\FinalGeography\FinalGeography.tsx')}
             >
                 Add new
             </Button>
