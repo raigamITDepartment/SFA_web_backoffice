@@ -19,7 +19,7 @@ const ProductListActionTools = () => {
             <Button
                 variant="solid"
                 icon={<TbPlus className="text-xl" />}
-                onClick={() => navigate('/SalesDetails/Salesmenu/ItemAdd')}
+                onClick={() => navigate('/create-product')}
             >
                 Add products
             </Button>
