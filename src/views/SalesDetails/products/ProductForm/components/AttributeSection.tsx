@@ -31,7 +31,7 @@ const tags: Options = [
 const AttributeSection = ({ control, errors }: AttributeSectionProps) => {
     return (
         <Card>
-            <h4 className="mb-6">Attribute</h4>
+            <h4 className="mb-6">Brand</h4>
             <FormItem
                 label="Category"
                 invalid={Boolean(errors.category)}
@@ -51,51 +51,47 @@ const AttributeSection = ({ control, errors }: AttributeSectionProps) => {
                     )}
                 />
             </FormItem>
+
             <FormItem
-                label="Tags"
-                extra={
-                    <Tooltip
-                        title="You add as many tags as you want to a product"
-                        className="text-center"
-                    >
-                        <HiOutlineQuestionMarkCircle className="text-base mx-1" />
-                    </Tooltip>
-                }
+                label="Sub Category"
+                invalid={Boolean(errors.category)}
+                errorMessage={errors.category?.message}
             >
                 <Controller
-                    name="tags"
+                    name="category"
                     control={control}
                     render={({ field }) => (
                         <Select
-                            isMulti
-                            isClearable
-                            value={field.value}
-                            placeholder="Add tags for product..."
-                            componentAs={CreatableSelect}
-                            options={tags}
-                            onChange={(option) => field.onChange(option)}
+                            options={categories}
+                            value={categories.filter(
+                                (category) => category.value === field.value,
+                            )}
+                            onChange={(option) => field.onChange(option?.value)}
                         />
                     )}
                 />
             </FormItem>
+
             <FormItem
-                label="Brand"
-                invalid={Boolean(errors.brand)}
-                errorMessage={errors.brand?.message}
+                label="Sub-sub Category"
+                invalid={Boolean(errors.category)}
+                errorMessage={errors.category?.message}
             >
                 <Controller
-                    name="brand"
+                    name="category"
                     control={control}
                     render={({ field }) => (
-                        <Input
-                            type="text"
-                            autoComplete="off"
-                            placeholder="Product brand"
-                            {...field}
+                        <Select
+                            options={categories}
+                            value={categories.filter(
+                                (category) => category.value === field.value,
+                            )}
+                            onChange={(option) => field.onChange(option?.value)}
                         />
                     )}
                 />
             </FormItem>
+         
         </Card>
     )
 }
