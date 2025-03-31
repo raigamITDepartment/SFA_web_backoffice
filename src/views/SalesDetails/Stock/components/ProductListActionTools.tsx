@@ -16,13 +16,7 @@ const ProductListActionTools = () => {
                     Export
                 </Button>
             </CSVLink>
-            <Button
-                variant="solid"
-                icon={<TbPlus className="text-xl" />}
-                onClick={() => navigate('/create-product')}
-            >
-                Add products
-            </Button>
+          
         </div>
     )
 }

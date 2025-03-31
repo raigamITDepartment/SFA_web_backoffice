@@ -31,36 +31,7 @@ const ProductColumn = ({ row }: { row: Product }) => {
     )
 }
 
-const ActionColumn = ({
-    onEdit,
-    onDelete,
-}: {
-    onEdit: () => void
-    onDelete: () => void
-}) => {
-    return (
-        <div className="flex items-center justify-end gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="Delete">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onDelete}
-                >
-                    <TbTrash />
-                </div>
-            </Tooltip>
-        </div>
-    )
-}
+
 
 const ProductListTable = () => {
     const navigate = useNavigate()
@@ -72,14 +43,7 @@ const ProductListTable = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleDelete = (product: Product) => {
-        setDeleteConfirmationOpen(true)
-        setToDeleteId(product.id)
-    }
-
-    const handleEdit = (product: Product) => {
-        navigate(`/SalesDetails/products/product-edit/${product.id}`)
-    }
+  
 
     const handleConfirmDelete = () => {
         const newProductList = productList.filter((product) => {
@@ -150,6 +114,73 @@ const ProductListTable = () => {
                     )
                 },
             },
+
+            {
+                header: 'Damaged',
+                accessorKey: 'Damaged',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.Damaged}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Required Qty',
+                accessorKey: 'Rqty',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.Rqty}
+                        </span>
+                    )
+                },
+            },
+       
+            {
+                header: 'Invoice Actual',
+                accessorKey: 'Iactual',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.Iactual}
+                        </span>
+                    )
+                },
+            },
+            
+
+            {
+                header: 'Company Invoice Accepted',
+                accessorKey: 'CIAccepted',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.CIAccepted}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Company Invoice Pending',
+                accessorKey: 'CIPeding',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="font-bold heading-text">
+                            {row.CIPeding}
+                        </span>
+                    )
+                },
+            },
+          
+
+
             {
                 header: 'Sales',
                 accessorKey: 'status',
@@ -180,16 +211,7 @@ const ProductListTable = () => {
                     )
                 },
             },
-            {
-                header: '',
-                id: 'action',
-                cell: (props) => (
-                    <ActionColumn
-                        onEdit={() => handleEdit(props.row.original)}
-                        onDelete={() => handleDelete(props.row.original)}
-                    />
-                ),
-            },
+         
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [],

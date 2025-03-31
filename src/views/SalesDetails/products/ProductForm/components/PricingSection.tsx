@@ -55,52 +55,7 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
                 </FormItem>
             </div>
             <div className="md:flex gap-4">
-                <FormItem
-                    label="Bulk discount price"
-                    invalid={Boolean(errors.bulkDiscountPrice)}
-                    errorMessage={errors.bulkDiscountPrice?.message}
-                    className="w-full"
-                >
-                    <Controller
-                        name="bulkDiscountPrice"
-                        control={control}
-                        render={({ field }) => (
-                            <NumericInput
-                                thousandSeparator
-                                type="text"
-                                inputPrefix="$"
-                                autoComplete="off"
-                                placeholder="0.00"
-                                value={field.value}
-                                onChange={field.onChange}
-                            />
-                        )}
-                    />
-                </FormItem>
-                <FormItem
-                    label="Tax rate(%)"
-                    invalid={Boolean(errors.taxRate)}
-                    errorMessage={errors.taxRate?.message}
-                    className="w-full"
-                >
-                    <Controller
-                        name="taxRate"
-                        control={control}
-                        render={({ field }) => (
-                            <NumericInput
-                                type="text"
-                                autoComplete="off"
-                                placeholder="0"
-                                value={field.value}
-                                isAllowed={(values) => {
-                                    const { floatValue } = values
-                                    return (floatValue || 0) <= 100
-                                }}
-                                onChange={field.onChange}
-                            />
-                        )}
-                    />
-                </FormItem>
+                
             </div>
         </Card>
     )
