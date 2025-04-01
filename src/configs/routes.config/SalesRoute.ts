@@ -71,7 +71,7 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.PriceUpdate',
    path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
-        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductCreate')),
+        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm')),
         authority: [],
     },
 
