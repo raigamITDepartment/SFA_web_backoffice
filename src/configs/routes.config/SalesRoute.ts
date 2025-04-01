@@ -32,7 +32,7 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.ItemMaster',
         path: `${SALES_PREFIX_PATH} /Salesmenu/ItemMaster`,
-        component: lazy(() => import('@/views/SalesDetails/products/ProductList'),),
+        component: lazy(() => import('@/views/SalesDetails/Products/ProductList'),),
         authority: [],
     },
 
@@ -41,7 +41,7 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.ItemAdd',
       path: `${SALES_PREFIX_PATH} /Salesmenu/ItemAdd`,
-        component: lazy(() => import('@/views/SalesDetails/products/ProductCreate')),
+        component: lazy(() => import('@/views/SalesDetails/Products/ProductCreate')),
         authority: [],
     },
 // {
@@ -71,7 +71,7 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.PriceUpdate',
    path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
-        component: lazy(() => import('@/views/SalesDetails/PriceUpdate')),
+        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductCreate')),
         authority: [],
     },
 

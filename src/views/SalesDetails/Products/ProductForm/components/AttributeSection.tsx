@@ -23,7 +23,15 @@ const categories: Options = [
     { label: 'Watches', value: 'watches' },
 ]
 
-const tags: Options = [
+
+const Subcategories: Options = [
+    { label: 'Ravan', value: 'bags' },
+    { label: 'Cloths', value: 'cloths' },
+    { label: 'Devices', value: 'devices' },
+    { label: 'Shoes', value: 'shoes' },
+    { label: 'Watches', value: 'watches' },
+]
+const SubSubcategories: Options = [
     { label: 'trend', value: 'trend' },
     { label: 'unisex', value: 'unisex' },
 ]
@@ -54,17 +62,17 @@ const AttributeSection = ({ control, errors }: AttributeSectionProps) => {
 
             <FormItem
                 label="Sub Category"
-                invalid={Boolean(errors.category)}
-                errorMessage={errors.category?.message}
+                invalid={Boolean(errors.Subcategory)}
+                errorMessage={errors.Subcategory?.message}
             >
                 <Controller
-                    name="category"
+                    name="Subcategory"
                     control={control}
                     render={({ field }) => (
                         <Select
-                            options={categories}
-                            value={categories.filter(
-                                (category) => category.value === field.value,
+                            options={Subcategories}
+                            value={Subcategories.filter(
+                                (Subcategory) => Subcategory.value === field.value,
                             )}
                             onChange={(option) => field.onChange(option?.value)}
                         />
@@ -74,17 +82,17 @@ const AttributeSection = ({ control, errors }: AttributeSectionProps) => {
 
             <FormItem
                 label="Sub-sub Category"
-                invalid={Boolean(errors.category)}
-                errorMessage={errors.category?.message}
+                invalid={Boolean(errors.SubSubcategory)}
+                errorMessage={errors.SubSubcategory?.message}
             >
                 <Controller
-                    name="category"
+                    name="SubSubcategory"
                     control={control}
                     render={({ field }) => (
                         <Select
-                            options={categories}
-                            value={categories.filter(
-                                (category) => category.value === field.value,
+                            options={SubSubcategories}
+                            value={SubSubcategories.filter(
+                                (SubSubcategory) => SubSubcategory.value === field.value,
                             )}
                             onChange={(option) => field.onChange(option?.value)}
                         />

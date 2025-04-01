@@ -9,7 +9,7 @@ type PricingSectionProps = FormSectionBaseProps
 const PricingSection = ({ control, errors }: PricingSectionProps) => {
     return (
         <Card>
-            <h4 className="mb-6">Pricing</h4>
+            <h4 className="mb-6">New Pricing</h4>
             <div>
                 <FormItem
                     label="Price"
@@ -55,7 +55,29 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
                 </FormItem>
             </div>
             <div className="md:flex gap-4">
-                
+                <FormItem
+                    label="price Effective Date"
+                    invalid={Boolean(errors.bulkDiscountPrice)}
+                    errorMessage={errors.bulkDiscountPrice?.message}
+                    className="w-full"
+                >
+                    <Controller
+                        name="bulkDiscountPrice"
+                        control={control}
+                        render={({ field }) => (
+                            <NumericInput
+                                thousandSeparator
+                                type="text"
+                                inputPrefix="$"
+                                autoComplete="off"
+                                placeholder="0.00"
+                                value={field.value}
+                                onChange={field.onChange}
+                            />
+                        )}
+                    />
+                </FormItem>
+               
             </div>
         </Card>
     )
