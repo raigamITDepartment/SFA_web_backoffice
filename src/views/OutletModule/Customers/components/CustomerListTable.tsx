@@ -92,12 +92,28 @@ const CustomerListTable = () => {
                 },
             },
             {
-                header: 'Email',
-                accessorKey: 'email',
+                header: 'ID',
+                accessorKey: 'id',
+            },
+            // {
+            //     header: 'location',
+            //     accessorKey: 'personalInfo.location',
+            // },
+            {
+                header: 'Address 1',
+                accessorKey: 'address1',
             },
             {
-                header: 'location',
-                accessorKey: 'personalInfo.location',
+                header: 'Address 2',
+                accessorKey: 'address2',
+            },
+            {
+                header: 'Address 3',
+                accessorKey: 'address3',
+            },
+            {
+                header: 'Mobile Number',
+                accessorKey: 'mobileNumber',
             },
             {
                 header: 'Status',
@@ -113,13 +129,13 @@ const CustomerListTable = () => {
                     )
                 },
             },
-            {
-                header: 'Spent',
-                accessorKey: 'totalSpending',
-                cell: (props) => {
-                    return <span>${props.row.original.totalSpending}</span>
-                },
-            },
+            // {
+            //     header: 'Spent',
+            //     accessorKey: 'totalSpending',
+            //     cell: (props) => {
+            //         return <span>${props.row.original.totalSpending}</span>
+            //     },
+            // },
             {
                 header: '',
                 id: 'action',
