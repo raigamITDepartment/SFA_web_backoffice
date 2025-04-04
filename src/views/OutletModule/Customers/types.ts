@@ -64,4 +64,5 @@ export type Customer = {
     paymentMethod: PaymentMethod[]
     subscription: Subscription[]
     totalSpending: number
+    isApproved: boolean;
 }

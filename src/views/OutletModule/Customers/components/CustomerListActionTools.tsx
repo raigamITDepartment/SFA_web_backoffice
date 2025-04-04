@@ -14,20 +14,17 @@ const CustomerListActionTools = () => {
             <CSVLink
                 className="w-full"
                 filename="customerList.csv"
-                data={customerList}
-            >
+                data={customerList}>
                 <Button
                     icon={<TbCloudDownload className="text-xl" />}
-                    className="w-full"
-                >
+                    className="w-full">
                     Download
                 </Button>
             </CSVLink>
             <Button
                 variant="solid"
                 icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('src\views\MasterSettings\FinalGeography\FinalGeography.tsx  ')}
-            >
+                onClick={() => navigate('src\views\MasterSettings\FinalGeography\FinalGeography.tsx  ')}>
                 Add new
             </Button>
         </div>

@@ -18,7 +18,7 @@ const CustomerList = () => {
                         <CustomersListTableTools />
                         <CustomerListTable />
                     </div>
-                </AdaptiveCard>
+                </AdaptiveCard> 
             </Container>
             <CustomerListSelected />
         </>

@@ -92,13 +92,22 @@ const CustomerListTable = () => {
                 },
             },
             {
-                header: 'ID',
-                accessorKey: 'id',
+                header: 'Outlet ID',
+                accessorKey: 'outletId',
             },
-            // {
-            //     header: 'location',
-            //     accessorKey: 'personalInfo.location',
-            // },
+            {
+                header: 'Category',
+                accessorKey: 'category',
+            },
+            {
+                header: 'Route',
+                accessorKey: 'route',
+            },
+            {
+                header: 'Range',
+                accessorKey: 'range',
+            },
+            
             {
                 header: 'Address 1',
                 accessorKey: 'address1',
@@ -112,8 +121,54 @@ const CustomerListTable = () => {
                 accessorKey: 'address3',
             },
             {
+                header: 'Owner Name',
+                accessorKey: 'ownerName',
+            },
+            {
                 header: 'Mobile Number',
                 accessorKey: 'mobileNumber',
+            },
+            {
+                header: 'Open Time',
+                accessorKey: 'openTime',
+            },
+            {
+                header: 'Close Time',
+                accessorKey: 'closeTime',
+            },
+            {
+                header: 'Latitude',
+                accessorKey: 'latitude',
+            },
+            {
+                header: 'Longitude',
+                accessorKey: 'longitude',
+            },
+            {
+                header: 'Outlet Sequence',
+                accessorKey: 'outletSequence',
+            },
+            {
+                header: 'Is Approved',
+                accessorKey: 'isApproved',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <div className="flex items-center">
+                            <Tag
+                                className={
+                                    row.isApproved
+                                        ? 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900'
+                                        : 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900'
+                                }
+                            >
+                                <span className="capitalize">
+                                    {row.isApproved ? 'Approved' : 'Not Approved'}
+                                </span>
+                            </Tag>
+                        </div>
+                    )
+                },
             },
             {
                 header: 'Status',
@@ -129,13 +184,6 @@ const CustomerListTable = () => {
                     )
                 },
             },
-            // {
-            //     header: 'Spent',
-            //     accessorKey: 'totalSpending',
-            //     cell: (props) => {
-            //         return <span>${props.row.original.totalSpending}</span>
-            //     },
-            // },
             {
                 header: '',
                 id: 'action',
