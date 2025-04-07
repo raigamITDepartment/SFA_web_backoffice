@@ -34,6 +34,14 @@ const OutletRoute: Routes = [
         ),
         authority: [],
     },
+    {
+        key: 'OutletModule.editOutlet',
+        path: '/Outlet-Module-editOutlet',
+        component: lazy(
+            () => import('@/views/OutletModule/CreateCustomer/CustomerEdit'),
+        ),
+        authority: [],
+    },
 
 ]
 

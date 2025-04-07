@@ -24,7 +24,7 @@ const CustomerListActionTools = () => {
             <Button
                 variant="solid"
                 icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('src\views\MasterSettings\FinalGeography\FinalGeography.tsx  ')}>
+                onClick={() => navigate('/Outlet-Module-editOutlet')}>
                 Add new
             </Button>
         </div>

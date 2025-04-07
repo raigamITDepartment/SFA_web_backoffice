@@ -74,7 +74,7 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
     const handleEdit = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-edit/${customer.id}`)
+        navigate(`/Outlet-Module-editOutlet`)
     }
 
     const handleViewDetails = (customer: Customer) => {
@@ -185,7 +185,7 @@ const CustomerListTable = () => {
                 },
             },
             {
-                header: '',
+                header: '',                                      
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn

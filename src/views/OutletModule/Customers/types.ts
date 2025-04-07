@@ -66,3 +66,4 @@ export type Customer = {
     totalSpending: number
     isApproved: boolean;
 }
+
