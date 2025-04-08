@@ -19,7 +19,7 @@ export interface Meta {
 export type Route = {
     key: string
     path: string
-    component: LazyExoticComponent<<T extends Meta>(props: T) => JSX.Element>
+    component: LazyExoticComponent<(props: any) => JSX.Element> // Allow components with any props
     authority: string[]
     meta?: Meta
 }

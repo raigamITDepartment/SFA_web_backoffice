@@ -4,6 +4,7 @@ import othersRoute from './othersRoute'
 import MasterRoute from './MasterRoute'
 import OutletRoute from './OutletRoute'
 import SalesRoute from './SalesRoute'
+import UserModule from './UserRoute'
 import type { Routes } from '@/@types/routes'
 
 export const publicRoutes: Routes = [...authRoute]
@@ -37,4 +38,5 @@ export const protectedRoutes: Routes = [
     ...SalesRoute,
     ... MasterRoute,
     ...othersRoute,
+    ...UserModule,
 ]
