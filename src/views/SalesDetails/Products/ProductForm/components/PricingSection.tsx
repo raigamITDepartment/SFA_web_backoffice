@@ -1,6 +1,7 @@
 import Card from '@/components/ui/Card'
 import { FormItem } from '@/components/ui/Form'
-import NumericInput from '@/components/shared/NumericInput'
+
+import Input from '@/components/ui/Input'
 import { Controller } from 'react-hook-form'
 import type { FormSectionBaseProps } from '../types'
 
@@ -20,10 +21,10 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
                         name="price"
                         control={control}
                         render={({ field }) => (
-                            <NumericInput
-                                thousandSeparator
-                                type="text"
-                                inputPrefix="$"
+                            <Input
+                                type="number"
+                                inputMode="numeric"
+                                prefix="$"
                                 autoComplete="off"
                                 placeholder="0.00"
                                 value={field.value}
@@ -41,18 +42,25 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
                         name="costPerItem"
                         control={control}
                         render={({ field }) => (
-                            <NumericInput
-                                thousandSeparator
-                                type="text"
-                                inputPrefix="$"
-                                autoComplete="off"
-                                placeholder="0.00"
-                                value={field.value}
-                                onChange={field.onChange}
-                            />
+                            <Input
+                            type="number"
+                            inputMode="numeric"
+                            prefix="$"
+                            autoComplete="off"
+                            placeholder="0.00"
+                            value={field.value}
+                            onChange={field.onChange}
+                        />
                         )}
                     />
                 </FormItem>
+
+               
+
+
+
+
+
             </div>
             <div className="md:flex gap-4">
                 

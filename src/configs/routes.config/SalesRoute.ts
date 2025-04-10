@@ -32,7 +32,7 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.ItemMaster',
         path: `${SALES_PREFIX_PATH} /Salesmenu/ItemMaster`,
-        component: lazy(() => import('@/views/SalesDetails/products/ProductList'),),
+        component: lazy(() => import('@/views/SalesDetails/Products/ProductList'),),
         authority: [],
     },
 
@@ -41,37 +41,21 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.ItemAdd',
       path: `${SALES_PREFIX_PATH} /Salesmenu/ItemAdd`,
-        component: lazy(() => import('@/views/SalesDetails/products/ProductCreate')),
+        component: lazy(() => import('@/views/SalesDetails/Products/ProductCreate')),
         authority: [],
     },
-// {
-//         key:  'SalesMenu.ItemAdd',
-//         path:  `${CONCEPTS_PREFIX_PATH}/Sales-menu-`,
-//         component: lazy(
-//             () => import('@/views/SalesDetails/products/ProductCreate'),
-//         ),
-//         authority: [ADMIN, USER],
-//         meta: {
-//             header: {
-//                 title: 'Create product',
-//                 description:
-//                     'Quickly add products to your inventory. Enter key details, manage stock, and set availability.',
-//                 contained: true,
-//             },
-//             footer: false,
-//         },
-//     },
-        {
+
+    {
             key: 'SalesMenu.ItemSequence',
             path: `${SALES_PREFIX_PATH} /Salesmenu/ItemSequence`,
             component: lazy(() => import('@/views/SalesDetails/ItemSequence')),
             authority: [],
-        },
+     },
 
     {
         key: 'SalesMenu.PriceUpdate',
-   path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
-        component: lazy(() => import('@/views/SalesDetails/PriceUpdate')),
+        path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
+        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm')),
         authority: [],
     },
 
@@ -79,7 +63,7 @@ const SalesRoute: Routes = [
   
     {
         key: 'SalesMenu.Stock',
-            path: `${SALES_PREFIX_PATH} /Salesmenu/Stock`,
+        path: `${SALES_PREFIX_PATH} /Salesmenu/Stock`,
         component: lazy(() => import('@/views/SalesDetails/Stock/ProductList')),
         authority: [],
     },

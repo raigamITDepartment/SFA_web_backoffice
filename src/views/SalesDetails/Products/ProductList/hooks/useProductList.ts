@@ -1,4 +1,4 @@
-import { apiGetProductList } from './../../../../../services/ProductService'
+import { apiGetProductList } from '../../../../../services/ProductService'
 import useSWR from 'swr'
 import { useProductListStore } from '../store/productListStore'
 import type { GetProductListResponse } from '../types'

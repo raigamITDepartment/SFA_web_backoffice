@@ -15,7 +15,7 @@ const Salesnavigationconfig: NavigationTree[] = [
         title: 'Sales Details',
         translateKey: 'nav.SalesMenu.SalesMenu',
         icon: 'sales',
-        type: NAV_ITEM_TYPE_TITLE,
+        type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [ADMIN, USER],
         meta: {
             horizontalMenu: {

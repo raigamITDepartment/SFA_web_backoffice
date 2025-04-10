@@ -6,6 +6,7 @@ import GeneralSection from './components/GeneralSection'
 import PricingSection from './components/PricingSection'
 import ImageSection from './components/ImageSection'
 import AttributeSection from './components/AttributeSection'
+import MeasurementSection from './components/MeasurementSection'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,20 +23,14 @@ type ProductFormProps = {
 
 const validationSchema: ZodType<ProductFormSchema> = z.object({
     name: z.string().min(1, { message: 'Product name required!' }),
-    productCode: z.string().min(1, { message: 'Produc code required!' }),
-    description: z.string().min(1, { message: 'Produc description required!' }),
-    price: z.union([z.string(), z.number()], {
-        errorMap: () => ({ message: 'Price required!' }),
-    }),
-    taxRate: z.union([z.string(), z.number()], {
-        errorMap: () => ({ message: 'Tax rate required!' }),
-    }),
-    costPerItem: z.union([z.string(), z.number()], {
-        errorMap: () => ({ message: 'Cost required!' }),
-    }),
-    bulkDiscountPrice: z.union([z.string(), z.number()], {
-        errorMap: () => ({ message: 'Bulk discount price required!' }),
-    }),
+    productCode: z.string().min(1, { message: 'Product code required!' }),
+    SPAcode: z.string().min(1, { message: 'SPA code required!' }),
+    description: z.string().min(1, { message: 'Product description required!' }),
+
+    price: z.string().min(1, { message: 'Price required!' }),
+ 
+    costPerItem: z.string().min(1, { message: 'Cost required!' }),
+
     imgList: z
         .array(
             z.object({
@@ -46,6 +41,12 @@ const validationSchema: ZodType<ProductFormSchema> = z.object({
         )
         .min(1, { message: 'At least 1 image required!' }),
     category: z.string().min(1, { message: 'Product category required!' }),
+    Subcategory: z.string().min(1, { message: 'Subcategory required!' }),
+    SubSubcategory: z.string().min(1, { message: 'SubSubcategory required!' }),
+    Size: z.string().min(1, { message: 'Size required!' }),
+    Volume: z.string().min(1, { message: 'Volume required!' }),
+    UnitValue: z.string().min(1, { message: 'Unit value required!' }),
+    UOM: z.string().min(1, { message: 'UOM required!' }),
 })
 
 const ProductForm = (props: ProductFormProps) => {
@@ -91,6 +92,7 @@ const ProductForm = (props: ProductFormProps) => {
                     <div className="gap-4 flex flex-col flex-auto">
                         <GeneralSection control={control} errors={errors} />
                         <PricingSection control={control} errors={errors} />
+                        <MeasurementSection control={control} errors={errors} />
                     </div>
                     <div className="lg:min-w-[440px] 2xl:w-[500px] gap-4 flex flex-col">
                         <ImageSection control={control} errors={errors} />
