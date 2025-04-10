@@ -9,7 +9,7 @@ const OutletRoute: Routes = [
     {
         key: 'OutletModule.Customers',
         path:'/Outlet-Module-Customers',
-        component: lazy(() => import('@/views/OutletModule/Customers')),
+        component: lazy(() => import('@/views/OutletModule/Customers/Customers')),
         authority: [],
     },
 
@@ -31,6 +31,14 @@ const OutletRoute: Routes = [
         path: '/group-collapse-menu-item-view-2',
         component: lazy(
             () => import('@/views/MasterSettings/GroupCollapseMenuItemView2'),
+        ),
+        authority: [],
+    },
+    {
+        key: 'OutletModule.editOutlet',
+        path: '/Outlet-Module-editOutlet',
+        component: lazy(
+            () => import('@/views/OutletModule/CreateCustomer/CustomerEdit'),
         ),
         authority: [],
     },
