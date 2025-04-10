@@ -11,7 +11,9 @@
     "prettier:fix": "npm run prettier -- --write",
     "lint": "npx eslint",
     "lint:fix": "npm run lint -- --fix",
-    "format": "npm run prettier:fix && npm run lint:fix"
+    "format": "npm run prettier:fix && npm run lint:fix",
+     "start": "serve -s build -l 8080"
+
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.2",
@@ -63,6 +65,7 @@
     "react-simple-maps": "4.0.0-beta.6",
     "react-syntax-highlighter": "^15.6.1",
     "react-tooltip": "^5.28.0",
+    "serve": "^14.2.4",
     "simplebar-react": "^3.3.0",
     "swr": "^2.3.0",
     "tailwind-merge": "^2.5.2",
