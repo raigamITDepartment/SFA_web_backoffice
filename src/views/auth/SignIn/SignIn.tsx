@@ -13,7 +13,7 @@ type SignInProps = {
 }
 
 export const SignInBase = ({
-    //signUpUrl = '/sign-up',
+     signUpUrl = '/sign-up',
     forgetPasswordUrl = '/forgot-password',
     disableSubmit,
 }: SignInProps) => {

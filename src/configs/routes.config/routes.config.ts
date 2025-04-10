@@ -4,6 +4,7 @@ import othersRoute from './othersRoute'
 import MasterRoute from './MasterRoute'
 import OutletRoute from './OutletRoute'
 import SalesRoute from './SalesRoute'
+import UserModule from './UserRoute'
 import type { Routes } from '@/@types/routes'
 
 export const publicRoutes: Routes = [...authRoute]
@@ -29,7 +30,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'createProduct',
         path: '/create-product',
-        component: lazy(() => import('@/views/SalesDetails/products/ProductCreate/ProductCreate')),
+        component: lazy(() => import('@/views/SalesDetails/Products/ProductCreate/ProductCreate')),
         authority: [],
     },
 
@@ -37,4 +38,5 @@ export const protectedRoutes: Routes = [
     ...SalesRoute,
     ... MasterRoute,
     ...othersRoute,
+    ...UserModule,
 ]

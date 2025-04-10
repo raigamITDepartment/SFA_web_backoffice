@@ -48,45 +48,8 @@ const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
                         )}
                     />
                 </FormItem>
-
-                <FormItem
-                    label="SPA code"
-                    invalid={Boolean(errors.productCode)}
-                    errorMessage={errors.productCode?.message}
-                >
-                    <Controller
-                        name="productCode"
-                        control={control}
-                        render={({ field }) => (
-                            <Input
-                                type="text"
-                                autoComplete="off"
-                                placeholder="Product Code"
-                                {...field}
-                            />
-                        )}
-                    />
-                </FormItem>
             </div>
-            <FormItem
-                label="Description"
-                invalid={Boolean(errors.description)}
-                errorMessage={errors.description?.message}
-            >
-                <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                        <RichTextEditor
-                            content={field.value}
-                            invalid={Boolean(errors.description)}
-                            onChange={({ html }) => {
-                                field.onChange(html)
-                            }}
-                        />
-                    )}
-                />
-            </FormItem>
+         
         </Card>
     )
 }
