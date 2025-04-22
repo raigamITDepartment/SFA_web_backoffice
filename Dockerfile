@@ -1,29 +1,27 @@
-# Use Node.js for building the React app
-FROM node:18-alpine AS build
+# Use Node.js 18 LTS as the base image
+FROM node:18
+WORKDIR /app
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the package files
+# Copy package.json and install dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the application source
+# Copy application code
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Use Nginx to serve the built app
-FROM nginx:1.23.1-alpine
 
-# Copy the built app from the builder stage
-COPY --from=build /app/build /usr/share/nginx/html
+RUN npm install -g serve
+# Install serve globally
 
-# Expose port 8080 for Cloud Run
+# Expose the default port for React
+ENV PORT=8080
 EXPOSE 8080
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["npx", "serve", "-s", "build", "-l", "8080"]
