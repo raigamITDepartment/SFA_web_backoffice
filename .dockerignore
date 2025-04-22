@@ -1,0 +1,21 @@
+# Dependency directories
+node_modules
+bower_components
+
+# Production build
+build
+
+# Logs
+npm-debug.log
+
+# Environment variables
+.env
+
+# Docker-related files
+.dockerignore
+Dockerfile
+
+# IDE and editor-specific files
+*.idea
+*.vscode
+*.swp
