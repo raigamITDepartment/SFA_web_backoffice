@@ -4,6 +4,17 @@ import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
 const dashboardsRoute: Routes = [
+
+
+       {
+        key: 'home',
+        path: '/home',
+       
+        component: lazy(() => import('@/views/Home')),
+        authority: [],
+    },
+
+
     {
         key: 'dashboard.ecommerce',
         path: `${DASHBOARDS_PREFIX_PATH}/ecommerce`,
