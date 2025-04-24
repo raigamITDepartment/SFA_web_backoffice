@@ -28,7 +28,7 @@ interface SignInFormProps extends CommonProps {
 
 
 type SignInFormSchema = {
-    email: string
+    userName: string
     password: string
 }
 
@@ -36,9 +36,9 @@ type SignInFormSchema = {
 
 
 const validationSchema: ZodType<SignInFormSchema> = z.object({
-    email: z
-        .string({ required_error: 'Please enter your email' })
-        .min(1, { message: 'Please enter your email' }),
+    userName: z
+        .string({ required_error: 'Please enter your User Name' })
+        .min(1, { message: 'Please enter your User Name' }),
     password: z
         .string({ required_error: 'Please enter your password' })
         .min(1, { message: 'Please enter your password' }),
@@ -50,27 +50,42 @@ const SignInForm = (props: SignInFormProps) => {
 
     const { disableSubmit = false, className, setMessage, passwordHint } = props
 
-    const {
-        handleSubmit,
-        formState: { errors },
+    const {handleSubmit,formState: { errors },
         control,
     } = useForm<SignInFormSchema>({
         defaultValues: {
-            email: 'admin-01@ecme.com',
-            password: '123Qwe',
+            userName: '',
+            password: '',
         },
         resolver: zodResolver(validationSchema),
     })
 
+
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     try {
+    //         const signupData = { username, password };
+    //         const response = await apiSignup(signupData);
+    //         console.log('Signup successful:', response);
+    //         // Redirect or show success message
+    //     } catch (err) {
+    //         console.error('Signup failed:', err);
+    //         setError('Signup failed. Please try again.');
+    //     }
+    // };
+
+
+
+    
     const { signIn } = useAuth()
 
     const onSignIn = async (values: SignInFormSchema) => {
-        const { email, password } = values
+        const {  userName, password } = values
 
         if (!disableSubmit) {
             setSubmitting(true)
 
-            const result = await signIn({ email, password })
+            const result = await signIn({ userName, password })
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
@@ -88,11 +103,11 @@ const SignInForm = (props: SignInFormProps) => {
             <Form onSubmit={handleSubmit(onSignIn)}>
                 <FormItem
                     label="Username"
-                     invalid={Boolean(errors.email)}
-                    errorMessage={errors.email?.message}
+                     invalid={Boolean(errors.userName)}
+                    errorMessage={errors.userName?.message}
                 >
                     <Controller
-                        name="email"
+                        name="userName"
                         control={control}
                         render={({ field }) => (
                             <Input

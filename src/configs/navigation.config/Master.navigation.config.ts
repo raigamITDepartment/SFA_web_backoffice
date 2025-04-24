@@ -51,4 +51,4 @@ const Masternavigationconfig: NavigationTree[] = [
         ],
     },
 ]
-            export default Masternavigationconfig
+export default Masternavigationconfig

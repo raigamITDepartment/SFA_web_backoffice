@@ -1,7 +1,9 @@
+import {AuthService_URL} from './Config'
+
 export const apiPrefix = '/api'
 
 const endpointConfig = {
-    signIn: '/sign-in',
+    signIn: `${AuthService_URL}/api/v1/auth/login`, 
     signOut: '/sign-out',
     signUp: '/sign-up',
     forgotPassword: '/forgot-password',
