@@ -81,6 +81,13 @@ const SalesRoute: Routes = [
         authority: [],
     },
 
+    {
+        key: 'SalesMenu.Report',
+        path:`${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
+        component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
+        authority: [],
+    },
+
 ]
 
 export default SalesRoute

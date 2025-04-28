@@ -112,7 +112,27 @@ const Salesnavigationconfig: NavigationTree[] = [
             },
          
 
+            {
+                key: 'Working',
+                path: `${SALES_PREFIX_PATH} /Salesmenu/WorkingDay`,
+                title: 'WorkingDay',
+                translateKey: 'nav.SalesMenu.WorkingDay',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
 
+            {
+                key: 'Invoice',
+                path: `${SALES_PREFIX_PATH} /Salesmenu/Invoice`,
+                title: 'Invoice',
+                translateKey: 'nav.SalesMenu.Invoice',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
 
 
 
