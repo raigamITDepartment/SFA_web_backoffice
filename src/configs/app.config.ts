@@ -7,10 +7,11 @@ export type AppConfig = {
     enableMock: boolean
     activeNavTranslation: boolean
 }
+export const DASHBOARDS_PREFIX_PATH = '/dashboards'
 
 const appConfig: AppConfig = {
     apiPrefix: '/api',
-    authenticatedEntryPath: '/home',
+    authenticatedEntryPath:  `${DASHBOARDS_PREFIX_PATH}/ecommerce`,
      unAuthenticatedEntryPath: '/sign-in',
     locale: 'en',
     accessTokenPersistStrategy: 'cookies',
