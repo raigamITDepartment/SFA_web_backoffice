@@ -10,6 +10,7 @@ import AdminModuleNavigationConfig from './AdminModule.navigation.config'
 import Reportnavigationconfig from './Report.navigation.config'
 import HrModulenavigationconfig from './HrModule.navigation.config'
 import dashboardsNavigationConfig from './dashboards.navigation.config'
+//import authNavigationConfig from './auth.navigation.config'
 import type { NavigationTree } from '@/@types/navigation'
 
 const navigationConfig: NavigationTree[] = [
@@ -24,7 +25,7 @@ const navigationConfig: NavigationTree[] = [
     //     subMenu: [],
     // },
     /** Example purpose only, please remove */
-   
+   //...authNavigationConfig,
    ...dashboardsNavigationConfig,
    ...Masternavigationconfig,
    ...Salesnavigationconfig,

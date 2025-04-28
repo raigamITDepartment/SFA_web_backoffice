@@ -12,6 +12,14 @@ import type { Routes } from '@/@types/routes'
         authority: [],
     },
    
+
+
+    {
+        key: 'UserModule.BookingReverse',
+        path: '/User-menu-BookingReverse',
+        component: lazy(() => import('@/views/admin/BookingReverse/products/ProductList/ProductList')),
+        authority: [],
+    },
    
 
 ]
