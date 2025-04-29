@@ -11,7 +11,7 @@ import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios';
 import { log } from 'console'
-import { fetchDepartments } from '@/services/singupDropdownService'; 
+import { fetchDepartments ,fetchRegion} from '@/services/singupDropdownService'; 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
     setMessage?: (message: string) => void
@@ -66,6 +66,7 @@ const SignUpForm = (props: SignUpFormProps) => {
 
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([]);
+    const [region, setRegion] = useState<any>([]);
     const { signUp } = useAuth()
 
     const {
@@ -75,9 +76,6 @@ const SignUpForm = (props: SignUpFormProps) => {
         watch } = useForm<SignUpFormSchema>({
             resolver: zodResolver(validationSchema),
         })
-
-
-
         useEffect(() => {
             const loadDepartments = async () => {
                 try {
@@ -93,6 +91,28 @@ const SignUpForm = (props: SignUpFormProps) => {
     
             loadDepartments();
         }, [setMessage]);;
+
+
+            useEffect(() => {
+                const loadregion = async () => {
+                    try {
+                        const token =
+                            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
+                        const regionOptions = await fetchRegion(token);
+                        setRegion(regionOptions);
+                        console.log('Region logs: ', regionOptions[0]?.label);
+                    } catch (error) {
+                        setMessage?.('Failed to load Region.');
+                    }
+                };
+        
+                loadregion();
+            }, [setMessage]);;
+    
+    
+
+
+
 
     const onSignUp = async (values: SignUpFormSchema) => {
         const { userName, password, email, mobileNumber } = values
@@ -300,7 +320,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Region"
-                                        //options={Department}
+                                        options={region}
                                         {...field}
                                     />
                                 )}
