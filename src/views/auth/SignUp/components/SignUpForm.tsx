@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState , useEffect} from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -9,7 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
-
+import axios from 'axios';
+import { log } from 'console'
+import { fetchDepartments } from '@/services/singupDropdownService'; 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
     setMessage?: (message: string) => void
@@ -63,7 +65,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
 
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
-
+    const [departments, setDepartments] = useState<any>([]);
     const { signUp } = useAuth()
 
     const {
@@ -73,6 +75,24 @@ const SignUpForm = (props: SignUpFormProps) => {
         watch } = useForm<SignUpFormSchema>({
             resolver: zodResolver(validationSchema),
         })
+
+
+
+        useEffect(() => {
+            const loadDepartments = async () => {
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
+                    const departmentOptions = await fetchDepartments(token);
+                    setDepartments(departmentOptions);
+                    console.log('department logs: ', departmentOptions[0]?.label);
+                } catch (error) {
+                    setMessage?.('Failed to load departments.');
+                }
+            };
+    
+            loadDepartments();
+        }, [setMessage]);;
 
     const onSignUp = async (values: SignUpFormSchema) => {
         const { userName, password, email, mobileNumber } = values
@@ -220,25 +240,26 @@ const SignUpForm = (props: SignUpFormProps) => {
                             </FormItem>
 
                             <FormItem
-                                label="Department"
-                                invalid={Boolean(errors.department)}
-                                errorMessage={errors.department?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
-                            >
-                                <Controller
-                                    name="department"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select"
-                                            //options={Department}
-                                            {...field}
-                                        />
-                                    )}
-                                />
-                            </FormItem>
+                            label="Department"
+                            invalid={Boolean(errors.department)}
+                            errorMessage={errors.department?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="department"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select"
+                                        options={departments}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+
 
 
                         </div>
