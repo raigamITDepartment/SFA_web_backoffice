@@ -1,4 +1,4 @@
-import { useState , useEffect} from 'react'
+import { useState , useEffect, use} from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -11,7 +11,8 @@ import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios';
 import { log } from 'console'
-import { fetchDepartments } from '@/services/singupDropdownService'; 
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'; 
+
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
     setMessage?: (message: string) => void
@@ -66,6 +67,11 @@ const SignUpForm = (props: SignUpFormProps) => {
 
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([]);
+    const[territory, setTerritory] = useState<any>([]);
+    const[region, setRegion] = useState<any>([]);
+    const[channel, setChannel] = useState<any>([]);
+    const[area, setArea] = useState<any>([]);
+    const [range, setRange] = useState<any>([]);
     const { signUp } = useAuth()
 
     const {
@@ -93,6 +99,87 @@ const SignUpForm = (props: SignUpFormProps) => {
     
             loadDepartments();
         }, [setMessage]);;
+
+        useEffect(() => {
+            const loadTerritories = async () =>{
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwOTgxMSwiZXhwIjoxNzQ2NTE0NjExfQ.nFCTjGMfGwj-i3N6ZVGKwumkFNSAG39wSzKCT8jqj-pbksdX87UOQLzOqMEsLA6nw-JyqkPK9r8c6vAsUYYNCQ'; // Replace with the actual token retrieval logic
+                    const territoryOptions = await fetchTerritories(token);
+                    setTerritory(territoryOptions);
+                    console.log('territory logs: ', territoryOptions[0]?.label);
+                } catch (error) {
+                    setMessage?.('Failed to load territories.');
+                }
+            };
+            loadTerritories();
+        }, [setMessage]);; 
+
+        useEffect(() => {
+            const loadRegion = async () => {
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkxNjM3NCwiZXhwIjoxNzQ2NTIxMTc0fQ.Q93NadQSXOIRGWfaKHRXvc8utIbsoXFxGWlYmwCB87pVKJWULdVwzHP3uTh8pMPnfxcdmJbxlTan7-sT303ZPg'; // Replace with the actual token retrieval logic
+                    const regionOptions = await fetchRegions(token);
+                    setRegion(regionOptions);
+                    console.log('region logs: ', regionOptions[0]?.label);
+                } catch (error) {
+                    setMessage?.('Failed to load regions.');
+                }
+            };
+            loadRegion();
+        }, [setMessage]);;
+
+
+        useEffect(() => {
+            const loadChannel = async () => {
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkyMDE2NywiZXhwIjoxNzQ2NTI0OTY3fQ.JelsvIRik8wksLshsemwws6eILeWqdkmfvfjeZWpUF4jZcHO_uoZl6Tvp6MO87nW0wCnvfVUNGSA35wyGPTmng'; // Replace with the actual token retrieval logic
+                    const channelOptions = await fetchChannels(token);
+                    setChannel(channelOptions);
+                    console.log('channel logs: ', channelOptions[0]?.label);
+                } catch (error) {
+                    setMessage?.('Failed to load channels.');
+                }
+            }
+            loadChannel();  
+        }, [setMessage]);;
+
+        useEffect(() => {
+            const loadArea = async () => {  
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkyMDE2NywiZXhwIjoxNzQ2NTI0OTY3fQ.JelsvIRik8wksLshsemwws6eILeWqdkmfvfjeZWpUF4jZcHO_uoZl6Tvp6MO87nW0wCnvfVUNGSA35wyGPTmng'; // Replace with the actual token retrieval logic
+                    const areaOptions = await fetchAreas(token);
+                    setArea(areaOptions);
+                    console.log('area logs: ', areaOptions[0]?.label);      
+                }
+                catch (error) {
+                    setMessage?.('Failed to load areas.');
+                }
+            }
+            loadArea();
+        }, [setMessage]);;
+
+        useEffect(() => {
+            const loadRange = async () => {
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkyMDE2NywiZXhwIjoxNzQ2NTI0OTY3fQ.JelsvIRik8wksLshsemwws6eILeWqdkmfvfjeZWpUF4jZcHO_uoZl6Tvp6MO87nW0wCnvfVUNGSA35wyGPTmng'; // Replace with the actual token retrieval logic
+                    const rangeOptions = await fetchRanges(token);
+                    setRange(rangeOptions);
+                    console.log('range logs: ', rangeOptions[0]?.label); 
+                } catch (error) {
+                    setMessage?.('Failed to load ranges.');
+                }
+            }
+            loadRange();
+        
+    },[setMessage]);;
+
+
+
 
     const onSignUp = async (values: SignUpFormSchema) => {
         const { userName, password, email, mobileNumber } = values
@@ -300,7 +387,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Region"
-                                        //options={Department}
+                                        options={region}
                                         {...field}
                                     />
                                 )}
@@ -320,8 +407,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     <Select
                                         size="sm"
                                         className="mb-4"
-                                        placeholder="Please Select Region"
-                                        //options={Department}
+                                        placeholder="Please Select Channel"
+                                        options={channel}
                                         {...field}
                                     />
                                 )}
@@ -342,7 +429,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select"
-                                        //options={Department}
+                                        options={area}
                                         {...field}
                                     />
                                 )}
@@ -362,7 +449,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Area"
-                                        //options={Department}
+                                        options={territory}
                                         {...field}
                                     />
                                 )}
@@ -384,7 +471,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Range"
-                                        //options={Department}
+                                        options={range}
                                         {...field}
                                     />
                                 )}
