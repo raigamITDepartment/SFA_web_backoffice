@@ -81,9 +81,6 @@ const SignUpForm = (props: SignUpFormProps) => {
         watch } = useForm<SignUpFormSchema>({
             resolver: zodResolver(validationSchema),
         })
-
-
-
         useEffect(() => {
             const loadDepartments = async () => {
                 try {
@@ -177,6 +174,28 @@ const SignUpForm = (props: SignUpFormProps) => {
             loadRange();
         
     },[setMessage]);;
+
+
+
+
+
+            useEffect(() => {
+                const loadregion = async () => {
+                    try {
+                        const token =
+                            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
+                        const regionOptions = await fetchRegion(token);
+                        setRegion(regionOptions);
+                        console.log('Region logs: ', regionOptions[0]?.label);
+                    } catch (error) {
+                        setMessage?.('Failed to load Region.');
+                    }
+                };
+        
+                loadregion();
+            }, [setMessage]);;
+    
+    
 
 
 
@@ -387,6 +406,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Region"
+                                        options={region}
                                         options={region}
                                         {...field}
                                     />
