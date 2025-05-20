@@ -179,7 +179,7 @@ const Region = () => {
     const {
         handleSubmit,
         formState: { errors },
-        control,
+        control,  
     } = useForm<FormSchema>({
         defaultValues: {
             channel: '',
@@ -187,7 +187,7 @@ const Region = () => {
             regionName: '',
             isActive: true, // Set default value to true
         },
-    });
+    }); 
 
     const onSubmit = async (values: FormSchema) => {
         await new Promise((r) => setTimeout(r, 500));
