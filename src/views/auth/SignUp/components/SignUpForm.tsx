@@ -1,44 +1,36 @@
-import { useState , useEffect} from 'react'
-import Input from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
-import { FormItem, Form } from '@/components/ui/Form'
-import { useAuth } from '@/auth'
-import Select from '@/components/ui/Select'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import type { ZodType } from 'zod'
-import type { CommonProps } from '@/@types/common'
-import axios from 'axios';
-import { log } from 'console'
-import { fetchDepartments ,fetchRegion} from '@/services/singupDropdownService'; 
-interface SignUpFormProps extends CommonProps {
-    disableSubmit?: boolean
-    setMessage?: (message: string) => void
-    employeeCategory: string
-    gender: string
-    region: string
-    area: string
-    territory: string
-    range: string
-}
+import { useState, useEffect } from 'react';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import { FormItem, Form } from '@/components/ui/Form';
+import { useAuth } from '@/auth';
+import Select from '@/components/ui/Select';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import type { ZodType } from 'zod';
+import type { CommonProps } from '@/@types/common';
+import { fetchDepartments, fetchRegion } from '@/services/singupDropdownService';
 
+interface SignUpFormProps extends CommonProps {
+    disableSubmit?: boolean;
+    setMessage?: (message: string) => void;
+}
 
 type SignUpFormSchema = {
-    userName: string
-    password: string
-    email: string
-    mobileNumber: string
-    confirmPassword: string
-    employeeCategory: string
-    department: string
-    grade: string
-    channel: string
-    region: string
-    area: string
-    territory: string
-    range: string
-}
+    userName: string;
+    password: string;
+    email: string;
+    mobileNumber: string;
+    confirmPassword: string;
+    employeeCategory: string;
+    department: string;
+    grade: string;
+    channel: string;
+    region: string;
+    area: string;
+    territory: string;
+    range: string;
+};
 
 const validationSchema: ZodType<SignUpFormSchema> = z
     .object({
@@ -59,75 +51,88 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     .refine((data) => data.password === data.confirmPassword, {
         message: 'Password not match',
         path: ['confirmPassword'],
-    })
+    });
 
 const SignUpForm = (props: SignUpFormProps) => {
-    const { disableSubmit = false, className, setMessage } = props
+    const { disableSubmit = false, className, setMessage } = props;
 
-    const [isSubmitting, setSubmitting] = useState<boolean>(false)
+    const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const [departments, setDepartments] = useState<any>([]);
     const [region, setRegion] = useState<any>([]);
-    const { signUp } = useAuth()
+
+    const { signUp } = useAuth();
+    const getToken = () => {
+        // Implement your logic to retrieve the token, e.g., from cookies or local storage
+        return localStorage.getItem('authToken') || '';
+    };
 
     const {
         handleSubmit,
         formState: { errors },
         control,
-        watch } = useForm<SignUpFormSchema>({
-            resolver: zodResolver(validationSchema),
-        })
-        useEffect(() => {
-            const loadDepartments = async () => {
-                try {
-                    const token =
-                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
-                    const departmentOptions = await fetchDepartments(token);
-                    setDepartments(departmentOptions);
-                    console.log('department logs: ', departmentOptions[0]?.label);
-                } catch (error) {
-                    setMessage?.('Failed to load departments.');
+    } = useForm<SignUpFormSchema>({
+        resolver: zodResolver(validationSchema),
+    });
+    useEffect(() => {
+        const loadDepartments = async () => {
+            try {
+                const token = getToken();
+                if (!token) {
+                    throw new Error('No token found');
                 }
-            };
-    
-            loadDepartments();
-        }, [setMessage]);;
 
+                const departmentOptions = await fetchDepartments();
+                setDepartments(departmentOptions);
+                console.log('Department logs: ', departmentOptions[0]?.label);
+            } catch (error) {
+                if (error instanceof Error) {
+                    console.error('Failed to load departments:', error.message);
+                } else {
+                    console.error('Failed to load departments:', error);
+                }
+                setMessage?.('Failed to load departments.');
+            }
+        };
 
-            useEffect(() => {
-                const loadregion = async () => {
-                    try {
-                        const token =
-                            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
-                        const regionOptions = await fetchRegion(token);
-                        setRegion(regionOptions);
-                        console.log('Region logs: ', regionOptions[0]?.label);
-                    } catch (error) {
-                        setMessage?.('Failed to load Region.');
-                    }
-                };
-        
-                loadregion();
-            }, [setMessage]);;
-    
-    
+        loadDepartments();
+    }, [setMessage]);
 
+    useEffect(() => {
+        const loadRegion = async () => {
+            try {
+                const token = getToken(); // Get the token from cookies or state
+                if (!token) {
+                    throw new Error('No token found');
+                }
 
+                const regionOptions = await fetchRegion();
+                setRegion(regionOptions);
+                console.log('Region logs: ', regionOptions[0]?.label);
+            } catch (error) {
+                setMessage?.('Failed to load region.');
+            }
+        };
 
+        loadRegion();
+    }, [setMessage, getToken]);
 
     const onSignUp = async (values: SignUpFormSchema) => {
-        const { userName, password, email, mobileNumber } = values
+        const { userName, password, email } = values;
 
         if (!disableSubmit) {
-            setSubmitting(true)
-            const result = await signUp({ userName, password, email })
+            setSubmitting(true);
+            const result = await signUp({ userName, password, email });
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message)
+                setMessage?.(result.message);
+            } else {
+                console.log('Sign-up successful.');
+                // You can now use the token for further actions, such as redirecting the user
             }
 
-            setSubmitting(false)
+            setSubmitting(false);
         }
-    }
+    };
 
     return (
         <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
@@ -135,10 +140,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                 <div className="card-body">
                     <Form onSubmit={handleSubmit(onSignUp)}>
                         <FormItem
-                            label="User name"
+                            label="User Name"
                             invalid={Boolean(errors.userName)}
                             errorMessage={errors.userName?.message}
-                            
                         >
                             <Controller
                                 name="userName"
@@ -165,7 +169,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 render={({ field }) => (
                                     <Input
                                         type="email"
-                                        size='sm'
+                                        size="sm"
                                         placeholder="Email"
                                         autoComplete="off"
                                         {...field}
@@ -426,7 +430,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SignUpForm
+export default SignUpForm;
