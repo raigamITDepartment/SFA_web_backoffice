@@ -88,14 +88,11 @@ const SignInForm = (props: SignInFormProps) => {
             const result = await signIn({ userName, password })
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message)
-            }
+            setMessage?.(result.message);
+        } else {
+            console.log('Login successful');
         }
-
-        setSubmitting(false)
-    }
-
-
+    };
     
 
     return (
