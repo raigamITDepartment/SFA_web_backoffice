@@ -407,7 +407,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         className="mb-4"
                                         placeholder="Please Select Region"
                                         options={region}
-                                        options={region}
                                         {...field}
                                     />
                                 )}
