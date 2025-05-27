@@ -5,10 +5,16 @@ import { Controller } from 'react-hook-form'
 import type { FormSectionBaseProps } from '../types'
 import DatePicker from '@/components/ui/DatePicker'
 import { useState } from 'react'
+import Select from '@/components/ui/Select'
+import Button from '@/components/ui/Button'
 
 type PricingSectionProps = FormSectionBaseProps
 
-
+const channelOptions = [
+    { value: 'retail', label: 'Retail' },
+    { value: 'wholesale', label: 'Wholesale' },
+    // Add more or fetch from API
+]
 
 
 const PricingSection = ({ control, errors }: PricingSectionProps) => {
@@ -37,20 +43,46 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
     return (
         <Card>
             <h4 className="mb-6">New Pricing</h4>
+
+            <div className="mb-4">
+                <FormItem
+                    
+                    label="Channel"
+                    invalid={Boolean(errors.channel)}
+                    errorMessage={errors.channel?.message}
+                >
+                    <Controller
+                        name="channel"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                options={channelOptions}
+                                {...field}
+                                value={channelOptions.find(option => option.value === field.value) || null}
+                                onChange={option => field.onChange(option?.value)}
+                                placeholder="Select channel"
+                            />
+                        )}
+                    />
+                </FormItem>
+            </div>
+
             <div>
                 <FormItem
+                    
                     label="Price"
                     invalid={Boolean(errors.price)}
                     errorMessage={errors.price?.message}
                 >
                     <Controller
                         name="price"
+                        disabled
                         control={control}
                         render={({ field }) => (
                             <NumericInput
                                 thousandSeparator
                                 type="text"
-                                inputPrefix="$"
+                                inputPrefix="Rs."
                                 autoComplete="off"
                                 placeholder="0.00"
                                 value={field.value}
@@ -59,8 +91,11 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
                         )}
                     />
                 </FormItem>
+            </div>
+            
+            <div>    
                 <FormItem
-                    label="Cost price"
+                    label="New price"
                     invalid={Boolean(errors.costPerItem)}
                     errorMessage={errors.costPerItem?.message}
                 >
@@ -71,7 +106,7 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
                             <NumericInput
                                 thousandSeparator
                                 type="text"
-                                inputPrefix="$"
+                                inputPrefix="Rs."
                                 autoComplete="off"
                                 placeholder="0.00"
                                 value={field.value}
@@ -95,6 +130,11 @@ const PricingSection = ({ control, errors }: PricingSectionProps) => {
             />
                 </FormItem>
                
+            </div>
+            <div className="flex mt-6 w-full">
+                <Button variant="solid" type="submit" className="w-full sm:w-auto">
+                    Update
+                </Button>
             </div>
         </Card>
     )

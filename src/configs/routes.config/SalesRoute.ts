@@ -48,14 +48,14 @@ const SalesRoute: Routes = [
     {
             key: 'SalesMenu.ItemSequence',
             path: `${SALES_PREFIX_PATH} /Salesmenu/ItemSequence`,
-            component: lazy(() => import('@/views/SalesDetails/ItemSequence')),
+            component: lazy(() => import('@/views/SalesDetails/ItemSequence/ItemSequence')),
             authority: [],
      },
 
     {
         key: 'SalesMenu.PriceUpdate',
         path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
-        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm')),
+        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm/PriceUpdateForm')),
         authority: [],
     },
 

@@ -132,9 +132,8 @@ const TerritoryWise = () => {
         },
     ], []);
 
-
-
-    const [data] = useState<Territory[]>([
+    // Use state for table data
+    const [territories, setTerritories] = useState<Territory[]>([
         {
             areaCode: 'A01',
             territoryCode: 'T01',
@@ -161,10 +160,10 @@ const TerritoryWise = () => {
         },
     ]);
 
-    const totalData = data.length;
+    //const totalData = data.length;
 
     const table = useReactTable({
-        data,
+        data: territories,
         columns,
         filterFns: { fuzzy: fuzzyFilter },
         state: { columnFilters, globalFilter },
@@ -435,7 +434,7 @@ const TerritoryWise = () => {
                                 {table.getRowModel().rows.map((row) => (
                                     <Tr key={row.id}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <Td key={cell.id} className='py-1 text-s'>
+                                            <Td key={cell.id} className='py-1 px-0 text-sm break-words whitespace-normal'>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </Td>
                                         ))}
@@ -447,7 +446,7 @@ const TerritoryWise = () => {
                             <Pagination
                                 pageSize={table.getState().pagination.pageSize}
                                 currentPage={table.getState().pagination.pageIndex + 1}
-                                total={totalData}
+                                total={territories.length} 
                                 onChange={onPaginationChange}
                             />
                             <div style={{ minWidth: 130 }}>
@@ -481,9 +480,7 @@ const TerritoryWise = () => {
                             ].map((territory) => (
                                 <div key={territory.code} className="border-b py-3 flex flex-col md:flex-row md:items-center gap-4">
                                     <div className="flex items-center min-w-[200px]">
-                                        <Checkbox  onChange={onCheck}>
-                                            Checkbox
-                                        </Checkbox>
+                                        <Checkbox  onChange={onCheck}/>
                                         <span className="font-semibold ml-2">{territory.name}</span>
                                     </div>
                                     <div className="flex flex-col md:flex-row gap-2 flex-1">
