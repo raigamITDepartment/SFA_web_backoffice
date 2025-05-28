@@ -7,9 +7,10 @@ import {
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
+    getSortedRowModel,
     flexRender,
 } from '@tanstack/react-table';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { HiArrowUp, HiArrowDown } from 'react-icons/hi';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
@@ -65,6 +66,105 @@ const staticData: Item[] = [
         itemCategorySeq: 5,
         isActive: true,
     },
+    {
+        itemName: 'Item 4',
+        itemCode: 'CODE4',
+        channelId: 'Channel 4',
+        subChannelId: 'SubChannel 4',
+        rangeId: 'Range 4',
+        mainCategorySeq: 4,
+        subCategorySeq: 5,
+        itemCategorySeq: 6,
+        isActive: true,
+    },
+    {
+        itemName: 'Item 5',
+        itemCode: 'CODE5',
+        channelId: 'Channel 5',
+        subChannelId: 'SubChannel 5',
+        rangeId: 'Range 5',
+        mainCategorySeq: 5,
+        subCategorySeq: 6,
+        itemCategorySeq: 7,
+        isActive: false,
+    },
+    {
+        itemName: 'Item 6',
+        itemCode: 'CODE6',
+        channelId: 'Channel 6',
+        subChannelId: 'SubChannel 6',
+        rangeId: 'Range 6',
+        mainCategorySeq: 6,
+        subCategorySeq: 7,
+        itemCategorySeq: 8,
+        isActive: true,
+    },
+    {
+        itemName: 'Item 7',
+        itemCode: 'CODE7',
+        channelId: 'Channel 7',
+        subChannelId: 'SubChannel 7',
+        rangeId: 'Range 7',
+        mainCategorySeq: 7,
+        subCategorySeq: 8,
+        itemCategorySeq: 9,
+        isActive: true,
+    },
+    {
+        itemName: 'Item 8',
+        itemCode: 'CODE8',
+        channelId: 'Channel 8',
+        subChannelId: 'SubChannel 8',
+        rangeId: 'Range 8',
+        mainCategorySeq: 8,
+        subCategorySeq: 9,
+        itemCategorySeq: 10,
+        isActive: false,
+    },
+    {
+        itemName: 'Item 9',
+        itemCode: 'CODE9',
+        channelId: 'Channel 9',
+        subChannelId: 'SubChannel 9',
+        rangeId: 'Range 9',
+        mainCategorySeq: 9,
+        subCategorySeq: 10,
+        itemCategorySeq: 11,
+        isActive: true,
+    },
+    {
+        itemName: 'Item 10',
+        itemCode: 'CODE10',
+        channelId: 'Channel 10',
+        subChannelId: 'SubChannel 10',
+        rangeId: 'Range 10',
+        mainCategorySeq: 10,
+        subCategorySeq: 11,
+        itemCategorySeq: 12,
+        isActive: false,
+    },
+    {
+        itemName: 'Item 11',
+        itemCode: 'CODE11',
+        channelId: 'Channel 11',
+        subChannelId: 'SubChannel 11',
+        rangeId: 'Range 11',
+        mainCategorySeq: 11,
+        subCategorySeq: 12,
+        itemCategorySeq: 13,
+        isActive: true,
+    },
+    {
+        itemName: 'Item 12',
+        itemCode: 'CODE12',
+        channelId: 'Channel 12',
+        subChannelId: 'SubChannel 12',
+        rangeId: 'Range 12',
+        mainCategorySeq: 12,
+        subCategorySeq: 13,
+        itemCategorySeq: 14,
+        isActive: false,
+    },
 ];
 
 const totalData = staticData.length;
@@ -77,6 +177,11 @@ const pageSizeOption = [
     { value: 50, label: '50 / page' },
 ];
 
+// Extend TableMeta to add updateData function
+interface CustomMeta extends TableMeta<Item> {
+    updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+}
+
 const SequenceTable = () => {
     const [pageSize, setPageSize] = useState(10);
     const [data, setData] = useState(staticData);
@@ -86,108 +191,59 @@ const SequenceTable = () => {
         setData(prevData => prevData.filter(d => d.itemCode !== item.itemCode));
     };
 
+    // Editable cell renderer pattern
+    const EditableNumberCell = ({ getValue, row, column, table }: any) => {
+        const initialValue = getValue() as number;
+        const [value, setValue] = useState(initialValue);
+
+        useEffect(() => {
+            setValue(initialValue);
+        }, [initialValue]);
+
+        const onBlur = () => {
+            const newValue = Number(value);
+            if (!isNaN(newValue)) {
+                table.options.meta?.updateData(row.index, column.id, newValue);
+            }
+        };
+
+        return (
+            <Input
+                type="number"
+                className="border-transparent bg-transparent hover:border-gray-300 focus:bg-white rounded px-1 py-0.5 w-full max-w-[80px]"
+                size="sm"
+                value={value}
+                onChange={e => setValue(Number(e.target.value))}
+                onBlur={onBlur}
+                min={0}
+            />
+        );
+    };
+
     const columns = useMemo<ColumnDef<Item>[]>(
         () => [
-            { header: 'Item Name', accessorKey: 'itemName' },
-            { header: 'Item Code', accessorKey: 'itemCode' },
-            { header: 'Channel ID', accessorKey: 'channelId' },
-            { header: 'Sub-channel ID', accessorKey: 'subChannelId' },
-            { header: 'Range ID', accessorKey: 'rangeId' },
+            { header: 'Item Name', accessorKey: 'itemName', enableSorting: true },
+            { header: 'Item Code', accessorKey: 'itemCode', enableSorting: true },
+            { header: 'Channel', accessorKey: 'channelId', enableSorting: true }, // Removed "ID"
+            { header: 'Sub-channel', accessorKey: 'subChannelId', enableSorting: true }, // Removed "ID"
+            { header: 'Range', accessorKey: 'rangeId', enableSorting: true }, // Removed "ID"
             { 
                 header: 'Main Category Seq', 
                 accessorKey: 'mainCategorySeq',
-                cell: ({ getValue, row, column, table }) => {
-                    const initialValue = getValue() as number;
-                    const [value, setValue] = useState(initialValue);
-
-                    useEffect(() => {
-                        setValue(initialValue);
-                    }, [initialValue]);
-
-                    const onBlur = () => {
-                        table.options.meta?.updateData(
-                            row.index,
-                            column.id,
-                            Number(value)
-                        );
-                    };
-
-                    return (
-                        <Input
-                            type="number"
-                            className="border border-gray-300 rounded px-1 py-0.5 w-full max-w-[80px]"
-                            size="sm"
-                            value={value}
-                            onChange={e => setValue(Number(e.target.value))}
-                            onBlur={onBlur}
-                            min={0}
-                        />
-                    );
-                }
+                cell: EditableNumberCell,
+                enableSorting: true
             },
             { 
                 header: 'Sub Category Seq', 
                 accessorKey: 'subCategorySeq',
-                cell: ({ getValue, row, column, table }) => {
-                    const initialValue = getValue() as number;
-                    const [value, setValue] = useState(initialValue);
-
-                    useEffect(() => {
-                        setValue(initialValue);
-                    }, [initialValue]);
-
-                    const onBlur = () => {
-                        table.options.meta?.updateData(
-                            row.index,
-                            column.id,
-                            Number(value)
-                        );
-                    };
-
-                    return (
-                        <Input
-                            type="number"
-                            className="border border-gray-300 rounded px-1 py-0.5 w-full max-w-[80px]"
-                            size="sm"
-                            value={value}
-                            onChange={e => setValue(Number(e.target.value))}
-                            onBlur={onBlur}
-                            min={0}
-                        />
-                    );
-                }
+                cell: EditableNumberCell,
+                enableSorting: true
             },
             { 
                 header: 'Item Category Seq', 
                 accessorKey: 'itemCategorySeq',
-                cell: ({ getValue, row, column, table }) => {
-                    const initialValue = getValue() as number;
-                    const [value, setValue] = useState(initialValue);
-
-                    useEffect(() => {
-                        setValue(initialValue);
-                    }, [initialValue]);
-
-                    const onBlur = () => {
-                        table.options.meta?.updateData(
-                            row.index,
-                            column.id,
-                            Number(value)
-                        );
-                    };
-
-                    return (
-                        <Input
-                            type="number"
-                            className="border border-gray-300 rounded px-1 py-0.5 w-full max-w-[80px]"
-                            size="sm"
-                            value={value}
-                            onChange={e => setValue(Number(e.target.value))}
-                            onBlur={onBlur}
-                            min={0}
-                        />
-                    );
-                }
+                cell: EditableNumberCell,
+                enableSorting: true
             },
             { 
                 header: 'Is Active', 
@@ -227,19 +283,18 @@ const SequenceTable = () => {
         columns,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         initialState: { pagination: { pageSize } },
         meta: {
             updateData: (rowIndex: number, columnId: string, value: unknown) => {
                 setData(old =>
                     old.map((row, index) => 
-                        index === rowIndex ? { ...row, [columnId]: Number(value) } : row
+                        index === rowIndex ? { ...row, [columnId]: value } : row
                     )
                 );
             },
-        } as {
-            updateData: (rowIndex: number, columnId: string, value: unknown) => void;
-        },
+        } as CustomMeta,
     });
 
     const onPaginationChange = (page: number) => table.setPageIndex(page - 1);
@@ -324,6 +379,6 @@ const SequenceTable = () => {
             </div>
         </div>
     );
-}
+};
 
 export default SequenceTable;
