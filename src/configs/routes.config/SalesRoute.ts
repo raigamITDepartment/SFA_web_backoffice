@@ -71,13 +71,21 @@ const SalesRoute: Routes = [
     {
         key: 'SalesMenu.MarketReturn',
         path:`${SALES_PREFIX_PATH}/Salesmenu/MarketReturn`,
-        component: lazy(() => import('@/views/SalesDetails/MarketReturn/Marketreturn')),
+        component: lazy(() => import('@/views/SalesDetails/MarketReturn/MarketReturn')),
         authority: [],
     },
+
     {
         key: 'SalesMenu.WorkingDay',
         path:`${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
-        component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
+        component: lazy(() => import('@/views/SalesDetails/WorkingDay/WorkingDay')),
+        authority: [],
+    },
+
+    {
+        key: 'SalesMenu.Invoice',
+        path:`${SALES_PREFIX_PATH}/Salesmenu/Invoice`,
+        component: lazy(() => import('@/views/SalesDetails/Invoice/Invoice')),
         authority: [],
     },
 

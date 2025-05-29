@@ -1,6 +1,6 @@
 /** Example purpose only */
 const WorkingDay = () => {
-    return <div>useWorkingDayrs</div>
+    return <div>Working Days</div>
 }
 
 export default WorkingDay

@@ -1,6 +1,6 @@
 
 const MarketReturn = () => {
-    return <div>MarketReturn</div>
+    return <div>Market Return</div>
 }
 
 export default MarketReturn

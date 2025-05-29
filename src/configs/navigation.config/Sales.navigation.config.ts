@@ -27,7 +27,7 @@ const Salesnavigationconfig: NavigationTree[] = [
             {
                 key: 'CategoryAdd',
                 path: `${SALES_PREFIX_PATH}/Salesmenu/CategoryAdd`,
-                title: 'CategoryAdd',
+                title: 'Category Add',
                 translateKey: 'nav.SalesMenu.CategoryAdd',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
@@ -102,7 +102,7 @@ const Salesnavigationconfig: NavigationTree[] = [
 
             {
                 key: 'MarketReturn',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/MarketReturn`,
+                path: `${SALES_PREFIX_PATH}/Salesmenu/MarketReturn`,
                 title: 'Market Return',
                 translateKey: 'nav.SalesMenu.MarketReturn',
                 icon: '',
@@ -114,8 +114,8 @@ const Salesnavigationconfig: NavigationTree[] = [
 
             {
                 key: 'Working',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/WorkingDay`,
-                title: 'WorkingDay',
+                path: `${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
+                title: 'Working Day',
                 translateKey: 'nav.SalesMenu.WorkingDay',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
@@ -125,7 +125,7 @@ const Salesnavigationconfig: NavigationTree[] = [
 
             {
                 key: 'Invoice',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/Invoice`,
+                path: `${SALES_PREFIX_PATH}/Salesmenu/Invoice`,
                 title: 'Invoice',
                 translateKey: 'nav.SalesMenu.Invoice',
                 icon: '',

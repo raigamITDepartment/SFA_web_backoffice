@@ -1,6 +1,6 @@
 import React from 'react'
 
-function BookingandActual() {
+function FilterForm() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function BookingandActual() {
   )
 }
 
-export default BookingandActual
+export default FilterForm

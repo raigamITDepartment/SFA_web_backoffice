@@ -1,269 +1,238 @@
-import { useMemo } from 'react'
-import Tag from '@/components/ui/Tag'
-import Tooltip from '@/components/ui/Tooltip'
-import DataTable from '@/components/shared/DataTable'
-import useCustomerList from '../hooks/useCustomerList'
-import { Link, useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
-import { TbPencil, TbEye } from 'react-icons/tb'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
-import type { Customer } from '../types'
-import type { TableQueries } from '@/@types/common'
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { TbPencil, TbEye } from 'react-icons/tb';
+import cloneDeep from 'lodash/cloneDeep';
+import Tag from '@/components/ui/Tag';
+import Tooltip from '@/components/ui/Tooltip';
+import DataTable from '@/components/shared/DataTable';
+import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable';
+import type { TableQueries } from '@/@types/common';
 
-const statusColor: Record<string, string> = {
-    active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
-    blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
+// API Service Functions
+const outletService = {
+  getOutlets: async (params: TableQueries): Promise<{ data: Outlet[]; total: number }> => {
+    // In real app, replace with actual API call:
+    // const response = await fetch(`/api/outlets?page=${params.pageIndex}&size=${params.pageSize}`);
+    // return response.json();
+    
+    // Mock implementation
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const data = generateSampleOutlets(50);
+        const pageIndex = params.pageIndex ?? 1;
+        const pageSize = params.pageSize ?? 10;
+        const paginatedData = data.slice(
+          (pageIndex - 1) * pageSize,
+          pageIndex * pageSize
+        );
+        resolve({ data: paginatedData, total: data.length });
+      }, 500);
+    });
+  }
+};
+
+// Type Definitions
+interface Outlet {
+  id: string;
+  name: string;
+  outletId: string;
+  category: string;
+  route: string;
+  range: string;
+  address1: string;
+  address2: string;
+  address3: string;
+  ownerName: string;
+  mobileNumber: string;
+  openTime: string;
+  closeTime: string;
+  latitude: string;
+  longitude: string;
+  outletSequence: string;
+  isApproved: boolean;
+  status: string;
 }
 
-const NameColumn = ({ row }: { row: Customer }) => {
-    return (
-        <div className="flex items-center">
-            <Link
-                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/concepts/customers/customer-details/${row.id}`}
-            >
-                {row.name}
-            </Link>
-        </div>
-    )
-}
+// Constants
+const STATUS_COLORS: Record<string, string> = {
+  active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
+  blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
+};
 
-const ActionColumn = ({
-    onEdit,
-    onViewDetail,
-}: {
-    onEdit: () => void
-    onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
-    )
-}
+const CATEGORIES = ['Grocery', 'Food City', 'Bakery', 'Restaurant', 'Supermarket'];
+const ROUTES = ['Route A', 'Route B', 'Route C', 'Route D'];
+const RANGES = ['1-5km', '6-10km', '11-15km', '16-20km'];
 
-const CustomerListTable = () => {
-    const navigate = useNavigate()
+// Helper Functions
+const generateSampleOutlets = (count: number): Outlet[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `outlet-${i + 1}`,
+    name: `Outlet ${i + 1}`,
+    outletId: `OUT-${1000 + i}`,
+    category: CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)],
+    route: ROUTES[Math.floor(Math.random() * ROUTES.length)],
+    range: RANGES[Math.floor(Math.random() * RANGES.length)],
+    address1: `#${i * 10}, Main Street`,
+    address2: `Block ${String.fromCharCode(65 + (i % 4))}`,
+    address3: `City ${Math.ceil(i / 10)}`,
+    ownerName: `Owner ${i + 1}`,
+    mobileNumber: `+1${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+    openTime: `${8 + (i % 4)}:00 AM`,
+    closeTime: `${8 + (i % 4) + 8}:00 PM`,
+    latitude: `${37.77 + (i * 0.01)}`,
+    longitude: `-${122.41 + (i * 0.01)}`,
+    outletSequence: `${i + 1}`,
+    isApproved: i % 4 !== 0,
+    status: i % 5 === 0 ? 'blocked' : 'active'
+  }));
+};
 
-    const {
-        customerList,
-        customerListTotal,
-        tableData,
-        isLoading,
-        setTableData,
-        setSelectAllCustomer,
-        setSelectedCustomer,
-        selectedCustomer,
-    } = useCustomerList()
+// Components
+const NameColumn = ({ row }: { row: Outlet }) => (
+  <div className="flex items-center">
+    <Link
+      className="hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100"
+      to={`/outlets/${row.id}`}
+    >
+      {row.name}
+    </Link>
+  </div>
+);
 
-    const handleEdit = (customer: Customer) => {
-        navigate(`/Outlet-Module-editOutlet`)
+const ActionColumn = ({ onEdit, onView }: { onEdit: () => void; onView: () => void }) => (
+  <div className="flex items-center gap-3">
+    <Tooltip title="Edit">
+      <div className="text-xl cursor-pointer select-none font-semibold" onClick={onEdit}>
+        <TbPencil />
+      </div>
+    </Tooltip>
+    <Tooltip title="View">
+      <div className="text-xl cursor-pointer select-none font-semibold" onClick={onView}>
+        <TbEye />
+      </div>
+    </Tooltip>
+  </div>
+);
+
+// Main Component
+const OutletListTable = () => {
+  const navigate = useNavigate();
+  const [outlets, setOutlets] = useState<Outlet[]>([]);
+  const [totalOutlets, setTotalOutlets] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [selectedOutlets, setSelectedOutlets] = useState<Outlet[]>([]);
+  const [tableData, setTableData] = useState<TableQueries>({
+    pageIndex: 1,
+    pageSize: 10,
+    sort: { key: '', order: '' },
+  });
+
+  // API Integration Point
+  const fetchOutlets = async () => {
+    setLoading(true);
+    try {
+      const response = await outletService.getOutlets(tableData);
+      setOutlets(response.data);
+      setTotalOutlets(response.total);
+    } catch (error) {
+      console.error('Failed to fetch outlets:', error);
+      // Handle error (e.g., show notification)
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const handleViewDetails = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-details/${customer.id}`)
-    }
+  useEffect(() => {
+    fetchOutlets();
+  }, [tableData]);
 
-    const columns: ColumnDef<Customer>[] = useMemo(
-        () => [
-            {
-                header: 'Name',
-                accessorKey: 'name',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <NameColumn row={row} />
-                },
-            },
-            {
-                header: 'Outlet ID',
-                accessorKey: 'outletId',
-            },
-            {
-                header: 'Category',
-                accessorKey: 'category',
-            },
-            {
-                header: 'Route',
-                accessorKey: 'route',
-            },
-            {
-                header: 'Range',
-                accessorKey: 'range',
-            },
-            
-            {
-                header: 'Address 1',
-                accessorKey: 'address1',
-            },
-            {
-                header: 'Address 2',
-                accessorKey: 'address2',
-            },
-            {
-                header: 'Address 3',
-                accessorKey: 'address3',
-            },
-            {
-                header: 'Owner Name',
-                accessorKey: 'ownerName',
-            },
-            {
-                header: 'Mobile Number',
-                accessorKey: 'mobileNumber',
-            },
-            {
-                header: 'Open Time',
-                accessorKey: 'openTime',
-            },
-            {
-                header: 'Close Time',
-                accessorKey: 'closeTime',
-            },
-            {
-                header: 'Latitude',
-                accessorKey: 'latitude',
-            },
-            {
-                header: 'Longitude',
-                accessorKey: 'longitude',
-            },
-            {
-                header: 'Outlet Sequence',
-                accessorKey: 'outletSequence',
-            },
-            {
-                header: 'Is Approved',
-                accessorKey: 'isApproved',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <div className="flex items-center">
-                            <Tag
-                                className={
-                                    row.isApproved
-                                        ? 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900'
-                                        : 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900'
-                                }
-                            >
-                                <span className="capitalize">
-                                    {row.isApproved ? 'Approved' : 'Not Approved'}
-                                </span>
-                            </Tag>
-                        </div>
-                    )
-                },
-            },
-            {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <div className="flex items-center">
-                            <Tag className={statusColor[row.status]}>
-                                <span className="capitalize">{row.status}</span>
-                            </Tag>
-                        </div>
-                    )
-                },
-            },
-            {
-                header: '',                                      
-                id: 'action',
-                cell: (props) => (
-                    <ActionColumn
-                        onEdit={() => handleEdit(props.row.original)}
-                        onViewDetail={() =>
-                            handleViewDetails(props.row.original)
-                        }
-                    />
-                ),
-            },
-        ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
-    )
+  // Action Handlers
+  const handleEdit = (outlet: Outlet) => navigate(`/outlets/edit/${outlet.id}`);
+  const handleView = (outlet: Outlet) => navigate(`/outlets/${outlet.id}`);
+  const handleRowSelect = (checked: boolean, outlet: Outlet) => {
+    setSelectedOutlets(prev => 
+      checked ? [...prev, outlet] : prev.filter(o => o.id !== outlet.id)
+    );
+  };
+  const handleAllSelect = (checked: boolean, rows: Row<Outlet>[]) => {
+    setSelectedOutlets(checked ? rows.map(row => row.original) : []);
+  };
+  const handlePagination = (page: number) => updateTableData({ pageIndex: page });
+  const handlePageSize = (size: number) => updateTableData({ pageIndex: 1, pageSize: size });
+  const handleSort = (sort: OnSortParam) => updateTableData({ sort });
 
-    const handleSetTableData = (data: TableQueries) => {
-        setTableData(data)
-        if (selectedCustomer.length > 0) {
-            setSelectAllCustomer([])
-        }
-    }
+  const updateTableData = (update: Partial<TableQueries>) => {
+    setTableData(prev => ({ ...prev, ...update }));
+  };
 
-    const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
-    }
-
-    const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
-    }
-
-    const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
-    }
-
-    const handleRowSelect = (checked: boolean, row: Customer) => {
-        setSelectedCustomer(checked, row)
-    }
-
-    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
-        if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllCustomer(originalRows)
-        } else {
-            setSelectAllCustomer([])
-        }
-    }
-
-    return (
-        <DataTable
-            selectable
-            columns={columns}
-            data={customerList}
-            noData={!isLoading && customerList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
-            loading={isLoading}
-            pagingData={{
-                total: customerListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
-            checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
-            }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
+  // Table Columns
+  const columns = useMemo<ColumnDef<Outlet>[]>(() => [
+    { header: 'Name', accessorKey: 'name', cell: ({ row }) => <NameColumn row={row.original} /> },
+    { header: 'Outlet ID', accessorKey: 'outletId' },
+    { header: 'Category', accessorKey: 'category' },
+    { header: 'Route', accessorKey: 'route' },
+    { header: 'Range', accessorKey: 'range' },
+    { header: 'Address 1', accessorKey: 'address1' },
+    { header: 'Address 2', accessorKey: 'address2' },
+    { header: 'Address 3', accessorKey: 'address3' },
+    { header: 'Owner Name', accessorKey: 'ownerName' },
+    { header: 'Mobile', accessorKey: 'mobileNumber' },
+    { header: 'Open Time', accessorKey: 'openTime' },
+    { header: 'Close Time', accessorKey: 'closeTime' },
+    { header: 'Latitude', accessorKey: 'latitude' },
+    { header: 'Longitude', accessorKey: 'longitude' },
+    { header: 'Sequence', accessorKey: 'outletSequence' },
+    {
+      header: 'Approved',
+      accessorKey: 'isApproved',
+      cell: ({ row }) => (
+        <Tag className={row.original.isApproved 
+          ? 'bg-emerald-200 text-gray-900' 
+          : 'bg-red-200 text-gray-900'}>
+          {row.original.isApproved ? 'Approved' : 'Not Approved'}
+        </Tag>
+      )
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: ({ row }) => (
+        <Tag className={STATUS_COLORS[row.original.status]}>
+          {row.original.status}
+        </Tag>
+      )
+    },
+    {
+      header: '',
+      id: 'actions',
+      cell: ({ row }) => (
+        <ActionColumn 
+          onEdit={() => handleEdit(row.original)} 
+          onView={() => handleView(row.original)} 
         />
-    )
-}
+      )
+    }
+  ], []);
 
-export default CustomerListTable
+  return (
+    <DataTable
+      selectable
+      columns={columns}
+      data={outlets}
+      loading={loading}
+      pagingData={{
+        total: totalOutlets,
+        pageIndex: tableData.pageIndex as number,
+        pageSize: tableData.pageSize as number,
+      }}
+      onPaginationChange={handlePagination}
+      onSelectChange={handlePageSize}
+      onSort={handleSort}
+      onCheckBoxChange={handleRowSelect}
+      onIndeterminateCheckBoxChange={handleAllSelect}
+      checkboxChecked={outlet => selectedOutlets.some(o => o.id === outlet.id)}
+    />
+  );
+};
+
+export default OutletListTable;
