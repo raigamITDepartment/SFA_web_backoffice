@@ -101,10 +101,10 @@ const Salesnavigationconfig: NavigationTree[] = [
             },
 
             {
-                key: 'Marketeturn',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/Marketreturn`,
+                key: 'MarketReturn',
+                path: `${SALES_PREFIX_PATH} /Salesmenu/MarketReturn`,
                 title: 'Market Return',
-                translateKey: 'nav.SalesMenu.Marketreturn',
+                translateKey: 'nav.SalesMenu.MarketReturn',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],

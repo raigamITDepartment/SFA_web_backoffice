@@ -69,9 +69,9 @@ const SalesRoute: Routes = [
     },
 
     {
-        key: 'SalesMenu.Marketreturn',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/Marketreturn`,
-        component: lazy(() => import('@/views/SalesDetails/Marketreturn')),
+        key: 'SalesMenu.MarketReturn',
+        path:`${SALES_PREFIX_PATH}/Salesmenu/MarketReturn`,
+        component: lazy(() => import('@/views/SalesDetails/MarketReturn/Marketreturn')),
         authority: [],
     },
     {
@@ -81,12 +81,7 @@ const SalesRoute: Routes = [
         authority: [],
     },
 
-    {
-        key: 'SalesMenu.Report',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
-        component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
-        authority: [],
-    },
+ 
     {
         key: 'SalesMenu.Target',
         path:`${SALES_PREFIX_PATH}/Salesmenu/Target`,
