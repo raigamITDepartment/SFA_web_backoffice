@@ -1,8 +1,12 @@
 
 import axios from 'axios';
 
-export const fetchDepartments = async (token: string) => {
+export const fetchDepartments = async () => {
     try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/department',
             {
@@ -12,7 +16,6 @@ export const fetchDepartments = async (token: string) => {
                 timeout: 10000, // Set timeout to 10 seconds
             }
         );
-
         return response.data.payload.map((dep: any) => ({
             label: dep.departmentName,
             value: dep.id,
