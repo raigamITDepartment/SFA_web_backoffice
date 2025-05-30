@@ -35,7 +35,7 @@ const dashboardsNavigationConfig: NavigationTree[] = [
             {
                 key: 'dashboard.project',
                 path: `${DASHBOARDS_PREFIX_PATH}/project`,
-                title: 'Project',
+                title: 'Achievements',
                 translateKey: 'nav.dashboard.project',
                 icon: 'dashboardProject',
                 type: NAV_ITEM_TYPE_ITEM,
