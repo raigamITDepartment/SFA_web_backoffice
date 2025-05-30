@@ -75,8 +75,14 @@ function AuthProvider({ children }: AuthProviderProps) {
     const signIn = async (values: SignInCredential): AuthResult => {
         try {
             const resp = await apiSignIn(values)
+            console.log(resp,'response');
             if (resp) {
-               handleSignIn({ accessToken: resp.token }, resp.user)
+                const { token, ...user } = resp.payload;
+                //save token in session storage
+                sessionStorage.setItem('accessToken', token);
+                
+
+                handleSignIn({ accessToken: token }, user);
                 redirect()
                 return {
                     status: 'success',

@@ -120,7 +120,7 @@ const MainCategory = () => {
         { MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true },
         { MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false },
         { MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true },
-    
+
     ]);
 
     const totalData = data.length;
@@ -175,7 +175,7 @@ const MainCategory = () => {
         control,
     } = useForm<FormSchema>({
         defaultValues: {
-         
+
             MainCategoryName: '',
             isActive: true, // Set default value to true
         },
@@ -189,46 +189,56 @@ const MainCategory = () => {
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Category Creation</h5>
-                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                        
-                        <FormItem
-                            invalid={Boolean(errors.MainCategoryName)}
-                            errorMessage={errors.MainCategoryName?.message}
-                        >
-                            <Controller
-                                name="MainCategoryName"
-                                control={control}
-                                rules={{ required: 'Required' }}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Category Name"
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
 
-                        <FormItem>
-                            <Controller
-                                name="isActive"
-                                control={control}
-                                render={({ field }) =>
-                                    <Checkbox {...field} checked={field.value}>
-                                        IsActive
-                                    </Checkbox>
-                                }
-                            />
-                        </FormItem>
 
-                        <FormItem>
-                            <Button variant="solid" block type="submit">Create</Button>
-                        </FormItem>
-                    </Form>
-                </Card>
+                <div className='flex-row lg:w-1/3 xl:w-1/3 h-1/2'>
+
+                    <Card bordered={false} className='mb-4'>
+                        <h5 className='mb-2'>Category Creation</h5>
+                        <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+
+                            <FormItem
+                                invalid={Boolean(errors.MainCategoryName)}
+                                errorMessage={errors.MainCategoryName?.message}
+                            >
+                                <Controller
+                                    name="MainCategoryName"
+                                    control={control}
+                                    rules={{ required: 'Required' }}
+                                    render={({ field }) => (
+                                        <Input
+                                            type="text"
+                                            autoComplete="off"
+                                            placeholder="Category Name"
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+
+                            <FormItem>
+                                <Controller
+                                    name="isActive"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Checkbox {...field} checked={field.value}>
+                                            IsActive
+                                        </Checkbox>
+                                    }
+                                />
+                            </FormItem>
+
+                            <FormItem>
+                                <Button variant="solid" block type="submit">Create</Button>
+                            </FormItem>
+                        </Form>
+                    </Card>
+
+                    <Card bordered={false}>
+
+                    </Card>
+
+                </div>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
                     <div>

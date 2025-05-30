@@ -1,11 +1,10 @@
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import SequenceTable from './Components/SequenceTable';
+import FilterForm from './Components/FilterForm';
+import RouteTable from './Components/RouteTable';
 
-
-const HeaderFooter = () => {
-    const headerExtraContent = null;
-
+const Route = () => {
+    const headerExtraContent = <FilterForm />;
 
     const cardFooter = (
         <div className="flex justify-end">
@@ -18,23 +17,23 @@ const HeaderFooter = () => {
         </div>
     );
 
-
     return (
         <div>
             <Card
                 header={{
-                    content: 'Item Sequence',
+                    content: 'Route Table',
                     extra: headerExtraContent,
                 }}
                 footer={{
                     content: cardFooter,
                 }}
             >
-                <SequenceTable />
+                <RouteTable />
             </Card>
         </div>
     );
 };
 
+export default Route;
 
-export default HeaderFooter;
+

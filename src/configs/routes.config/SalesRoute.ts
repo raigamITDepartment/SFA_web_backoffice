@@ -1,6 +1,6 @@
 import { lazy } from 'react'
 import  {SALES_PREFIX_PATH} from '@/constants/route.constant'
-import {CONCEPTS_PREFIX_PATH} from '@/constants/route.constant'
+//import {CONCEPTS_PREFIX_PATH} from '@/constants/route.constant'
 import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
@@ -74,10 +74,18 @@ const SalesRoute: Routes = [
         component: lazy(() => import('@/views/SalesDetails/MarketReturn/MarketReturn')),
         authority: [],
     },
+
     {
         key: 'SalesMenu.WorkingDay',
         path:`${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
-        component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
+        component: lazy(() => import('@/views/SalesDetails/WorkingDay/WorkingDay')),
+        authority: [],
+    },
+
+    {
+        key: 'SalesMenu.Invoice',
+        path:`${SALES_PREFIX_PATH}/Salesmenu/Invoice`,
+        component: lazy(() => import('@/views/SalesDetails/Invoice/Invoice')),
         authority: [],
     },
 
