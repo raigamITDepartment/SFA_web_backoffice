@@ -13,6 +13,7 @@ import dashboardsNavigationConfig from './dashboards.navigation.config'
 //import authNavigationConfig from './auth.navigation.config'
 import type { NavigationTree } from '@/@types/navigation'
 
+
 const navigationConfig: NavigationTree[] = [
     // {
     //     key: 'Dashboard',
@@ -33,6 +34,7 @@ const navigationConfig: NavigationTree[] = [
     ...Reportnavigationconfig,
    ...HrModulenavigationconfig,
    ...AdminModuleNavigationConfig,
+   
    
 
 

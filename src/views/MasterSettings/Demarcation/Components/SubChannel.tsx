@@ -201,10 +201,10 @@ const SubChannel = () => {
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        options={[
-                                            { label: 'National Channel', value: 'National Channel' }as any,
-                                            { label: 'Bakery Channel', value: 'Bakery Channel' },
-                                        ]}
+                                        // options={[
+                                        //     { label: 'National Channel', value: 'National Channel' }as any,
+                                        //     { label: 'Bakery Channel', value: 'Bakery Channel' },
+                                        // ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}
                                     />

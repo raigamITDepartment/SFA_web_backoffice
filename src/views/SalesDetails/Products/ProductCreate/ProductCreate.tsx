@@ -54,7 +54,8 @@ const ProductCreate = () => {
                     name: '',
                     description: '',
                     productCode: '',
-                    SPAcode: '',
+                    SAPcode: '',
+                    channel: '', 
                     price: '',
                     costPerItem: '',
                     imgList: [],
@@ -66,7 +67,7 @@ const ProductCreate = () => {
                     Size: '',
                     Volume: '',
                     UnitValue: '',
-                    UOM: '', // Added UOM property
+                    UOM: '', 
                 }}
                 onFormSubmit={handleFormSubmit}
             >

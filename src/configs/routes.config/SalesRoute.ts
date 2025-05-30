@@ -1,6 +1,6 @@
 import { lazy } from 'react'
 import  {SALES_PREFIX_PATH} from '@/constants/route.constant'
-import {CONCEPTS_PREFIX_PATH} from '@/constants/route.constant'
+//import {CONCEPTS_PREFIX_PATH} from '@/constants/route.constant'
 import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
@@ -48,14 +48,14 @@ const SalesRoute: Routes = [
     {
             key: 'SalesMenu.ItemSequence',
             path: `${SALES_PREFIX_PATH} /Salesmenu/ItemSequence`,
-            component: lazy(() => import('@/views/SalesDetails/ItemSequence')),
+            component: lazy(() => import('@/views/SalesDetails/ItemSequence/ItemSequence')),
             authority: [],
      },
 
     {
         key: 'SalesMenu.PriceUpdate',
         path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
-        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm')),
+        component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm/PriceUpdateForm')),
         authority: [],
     },
 
@@ -69,9 +69,9 @@ const SalesRoute: Routes = [
     },
 
     {
-        key: 'SalesMenu.Marketreturn',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/Marketreturn`,
-        component: lazy(() => import('@/views/SalesDetails/Marketreturn')),
+        key: 'SalesMenu.MarketReturn',
+        path:`${SALES_PREFIX_PATH}/Salesmenu/MarketReturn`,
+        component: lazy(() => import('@/views/SalesDetails/MarketReturn/MarketReturn')),
         authority: [],
     },
     {
@@ -81,10 +81,11 @@ const SalesRoute: Routes = [
         authority: [],
     },
 
+ 
     {
-        key: 'SalesMenu.Report',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
-        component: lazy(() => import('@/views/SalesDetails/WorkingDay')),
+        key: 'SalesMenu.Target',
+        path:`${SALES_PREFIX_PATH}/Salesmenu/Target`,
+        component: lazy(() => import('@/views/SalesDetails/Target/Target')),
         authority: [],
     },
 

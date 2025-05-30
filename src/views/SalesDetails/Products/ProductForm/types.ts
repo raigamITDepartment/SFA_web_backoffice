@@ -42,7 +42,8 @@ export type MeasurementFields= {
 export type GeneralFields = {
     name: string
     productCode: string
-    SPAcode: string
+    SAPcode: string
+    channel: string
     description: string
 }
 

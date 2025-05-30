@@ -24,6 +24,7 @@ export type Product = {
     sales: number
     salesPercentage: number
     description: string
+    channel: string
 }
 
 export type GeneralFields = {

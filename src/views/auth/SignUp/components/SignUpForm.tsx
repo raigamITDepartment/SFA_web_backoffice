@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { FormItem, Form } from '@/components/ui/Form';
-import { useAuth } from '@/auth';
-import Select from '@/components/ui/Select';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import type { ZodType } from 'zod';
-import type { CommonProps } from '@/@types/common';
-import { fetchDepartments, fetchRegion } from '@/services/singupDropdownService';
-
+import { useState , useEffect} from 'react'
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import { FormItem, Form } from '@/components/ui/Form'
+import { useAuth } from '@/auth'
+import Select from '@/components/ui/Select'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import type { ZodType } from 'zod'
+import type { CommonProps } from '@/@types/common'
+import axios from 'axios';
+import { log } from 'console'
+import { fetchDepartments ,fetchRegion} from '@/services/singupDropdownService'; 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean;
     setMessage?: (message: string) => void;
@@ -59,65 +60,55 @@ const SignUpForm = (props: SignUpFormProps) => {
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const [departments, setDepartments] = useState<any>([]);
     const [region, setRegion] = useState<any>([]);
-
-    const { signUp } = useAuth();
-    const getToken = () => {
-        // Implement your logic to retrieve the token, e.g., from cookies or local storage
-        return localStorage.getItem('authToken') || '';
-    };
+    const { signUp } = useAuth()
 
     const {
         handleSubmit,
         formState: { errors },
         control,
-    } = useForm<SignUpFormSchema>({
-        resolver: zodResolver(validationSchema),
-    });
-    useEffect(() => {
-        const loadDepartments = async () => {
-            try {
-                const token = getToken();
-                if (!token) {
-                    throw new Error('No token found');
+        watch } = useForm<SignUpFormSchema>({
+            resolver: zodResolver(validationSchema),
+        })
+        useEffect(() => {
+            const loadDepartments = async () => {
+                try {
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
+                    const departmentOptions = await fetchDepartments(token);
+                    setDepartments(departmentOptions);
+                    console.log('department logs: ', departmentOptions[0]?.label);
+                } catch (error) {
+                    setMessage?.('Failed to load departments.');
                 }
+            };
+    
+            loadDepartments();
+        }, [setMessage]);;
 
-                const departmentOptions = await fetchDepartments();
-                setDepartments(departmentOptions);
-                console.log('Department logs: ', departmentOptions[0]?.label);
-            } catch (error) {
-                if (error instanceof Error) {
-                    console.error('Failed to load departments:', error.message);
-                } else {
-                    console.error('Failed to load departments:', error);
-                }
-                setMessage?.('Failed to load departments.');
-            }
-        };
 
-        loadDepartments();
-    }, [setMessage]);
+            useEffect(() => {
+                const loadregion = async () => {
+                    try {
+                        const token =
+                            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
+                        const regionOptions = await fetchRegion(token);
+                        setRegion(regionOptions);
+                        console.log('Region logs: ', regionOptions[0]?.label);
+                    } catch (error) {
+                        setMessage?.('Failed to load Region.');
+                    }
+                };
+        
+                loadregion();
+            }, [setMessage]);;
+    
+    
 
-    useEffect(() => {
-        const loadRegion = async () => {
-            try {
-                const token = getToken(); // Get the token from cookies or state
-                if (!token) {
-                    throw new Error('No token found');
-                }
 
-                const regionOptions = await fetchRegion();
-                setRegion(regionOptions);
-                console.log('Region logs: ', regionOptions[0]?.label);
-            } catch (error) {
-                setMessage?.('Failed to load region.');
-            }
-        };
 
-        loadRegion();
-    }, [setMessage, getToken]);
 
     const onSignUp = async (values: SignUpFormSchema) => {
-        const { userName, password, email } = values;
+        const { userName, password, email, mobileNumber } = values
 
         if (!disableSubmit) {
             setSubmitting(true);
@@ -311,6 +302,50 @@ const SignUpForm = (props: SignUpFormProps) => {
 
 
                         <FormItem
+                            label="Select Channel "
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Channel"
+                                        options={channel}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+
+                          <FormItem
+                            label="Select  Sub Channel "
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Channel"
+                                        options={channel}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+
+
+
+                        <FormItem
                             label="Select Region"
                             invalid={Boolean(errors.region)}
                             errorMessage={errors.region?.message}
@@ -331,26 +366,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             />
                         </FormItem>
 
-                        <FormItem
-                            label="Select Channel "
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="channel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Region"
-                                        //options={Department}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
+                   
 
                         <FormItem
                             label="Select Area"
@@ -366,7 +382,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select"
-                                        //options={Department}
+                                        options={area}
                                         {...field}
                                     />
                                 )}
@@ -386,7 +402,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Area"
-                                        //options={Department}
+                                        options={territory}
                                         {...field}
                                     />
                                 )}
@@ -408,7 +424,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select Range"
-                                        //options={Department}
+                                        options={range}
                                         {...field}
                                     />
                                 )}
