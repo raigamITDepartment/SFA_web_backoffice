@@ -108,6 +108,11 @@ useEffect(() => {
         useEffect(() => {
             const loadTerritories = async () =>{
                 try {
+                    const token = localStorage.getItem('authToken') || ''; 
+
+            if (!token) {
+                throw new Error('No authentication token found.');
+            }
                     
                     const territoryOptions = await fetchTerritories(token);
                     setTerritory(territoryOptions);
@@ -123,6 +128,11 @@ useEffect(() => {
         useEffect(() => {
             const loadRegion = async () => {
                 try {
+                    const token = localStorage.getItem('authToken') || ''; 
+
+            if (!token) {
+                throw new Error('No authentication token found.');
+            }
                     
                     const regionOptions = await fetchRegions(token);
                     setRegion(regionOptions);
@@ -140,6 +150,11 @@ useEffect(() => {
             const loadChannel = async () => {
                 try {
                     
+                    const token = localStorage.getItem('authToken') || ''; 
+
+            if (!token) {
+                throw new Error('No authentication token found.');
+            }
                     const channelOptions = await fetchChannels(token);
                     setChannel(channelOptions);
                     console.log('channel logs: ', channelOptions[0]?.label);
@@ -154,6 +169,11 @@ useEffect(() => {
         useEffect(() => {
             const loadArea = async () => {  
                 try {
+                    const token = localStorage.getItem('authToken') || ''; 
+
+            if (!token) {
+                throw new Error('No authentication token found.');
+            }
                    
                     const areaOptions = await fetchAreas(token);
                     setArea(areaOptions);
@@ -170,7 +190,11 @@ useEffect(() => {
         useEffect(() => {
             const loadRange = async () => {
                 try {
-                   
+                   const token = localStorage.getItem('authToken') || ''; 
+
+            if (!token) {
+                throw new Error('No authentication token found.');
+            }
                     const rangeOptions = await fetchRanges(token);
                     setRange(rangeOptions);
                     console.log('range logs: ', rangeOptions[0]?.label); 
@@ -190,6 +214,11 @@ useEffect(() => {
             useEffect(() => {
                 const loadregion = async () => {
                     try {
+                        const token = localStorage.getItem('authToken') || ''; 
+
+            if (!token) {
+                throw new Error('No authentication token found.');
+            }
                         
                         const regionOptions = await fetchRegion(token);
                         setRegion(regionOptions);
@@ -421,9 +450,8 @@ useEffect(() => {
                             />
                         </FormItem>
 
-
-                        <FormItem
-                            label="Sub Select Channel "
+                          <FormItem
+                            label="Select  Sub Channel "
                             invalid={Boolean(errors.channel)}
                             errorMessage={errors.channel?.message}
                             style={{ flex: 1, marginLeft: '10px' }}
@@ -442,6 +470,8 @@ useEffect(() => {
                                 )}
                             />
                         </FormItem>
+
+
 
                         <FormItem
                             label="Select Region"
@@ -464,26 +494,7 @@ useEffect(() => {
                             />
                         </FormItem>
 
-                        <FormItem
-                            label="Select Channel "
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="channel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Channel"
-                                        options={channel}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
+                   
 
                         <FormItem
                             label="Select Area"
