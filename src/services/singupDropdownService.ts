@@ -1,8 +1,12 @@
 
 import axios from 'axios';
 
-export const fetchDepartments = async (token: string) => {
+export const fetchDepartments = async () => {
     try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/department',
             {
@@ -12,7 +16,6 @@ export const fetchDepartments = async (token: string) => {
                 timeout: 10000, // Set timeout to 10 seconds
             }
         );
-
         return response.data.payload.map((dep: any) => ({
             label: dep.departmentName,
             value: dep.id,
@@ -23,8 +26,12 @@ export const fetchDepartments = async (token: string) => {
     }
 };
 
-export const fetchRegion = async (token: string) => {
+export const fetchRegion = async () => {
     try {
+
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/region',
             {
@@ -45,8 +52,11 @@ export const fetchRegion = async (token: string) => {
     }
 };
 
-export const fetchTerritories = async (token: string) => {
+export const fetchTerritories = async () => {
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/territory',
             {
@@ -67,8 +77,11 @@ export const fetchTerritories = async (token: string) => {
     }
 };
 
-export const fetchRegions = async (token: string) => {
+export const fetchRegions = async () => {
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/region',
             {
@@ -89,8 +102,11 @@ export const fetchRegions = async (token: string) => {
     }
 }
 
-export const fetchChannels = async (token: string) => {
+export const fetchChannels = async () => {
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/channel',
             {
@@ -111,8 +127,12 @@ export const fetchChannels = async (token: string) => {
     }
 }
 
-export const fetchAreas = async (token: string) => {
+export const fetchAreas = async () => {
+    
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/area',
             {
@@ -133,8 +153,12 @@ export const fetchAreas = async (token: string) => {
     }
 }
 
-export const fetchRanges = async (token: string) => {
+export const fetchRanges = async () => {
     try {
+
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/range',
             {
