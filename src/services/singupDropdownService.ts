@@ -1,14 +1,23 @@
 
 import axios from 'axios';
+import { getToken } from '../utils/authUtils';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.8.90:8080';
 
 export const fetchDepartments = async () => {
+export const fetchDepartments = async () => {
+    const token = getToken();
+    if (!token) {
+        throw new Error('No token provided or token has expired');
+    }
+
     try {
         const token = sessionStorage.getItem('accessToken');
 
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/department',
+            `${BASE_URL}/api/v1/arcation/department`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -27,13 +36,19 @@ export const fetchDepartments = async () => {
 };
 
 export const fetchRegion = async () => {
+export const fetchRegion = async () => {
+    const token = getToken();
+    if (!token) {
+        throw new Error('No token provided or token has expired');
+    }
+
     try {
 
            const token = sessionStorage.getItem('accessToken');
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/region',
+            `${BASE_URL}/api/v1/userDemarcation/region`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

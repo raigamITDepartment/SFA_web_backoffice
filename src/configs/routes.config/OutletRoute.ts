@@ -22,7 +22,7 @@ const OutletRoute: Routes = [
     {
         key: 'OutletModule.Route',
         path:'/Outlet-Module-Route',
-        component: lazy(() => import('@/views/OutletModule/Route')),
+        component: lazy(() => import('@/views/OutletModule/Route/Route')),
         authority: [],
     },
 
