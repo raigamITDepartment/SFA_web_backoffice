@@ -24,13 +24,11 @@ export type IsolatedNavigatorRef = {
 
 const IsolatedNavigator = ({ ref }: { ref: Ref<IsolatedNavigatorRef> }) => {
     const navigate = useNavigate()
-
     useImperativeHandle(ref, () => {
         return {
             navigate,
         }
     }, [navigate])
-
     return <></>
 }
 
@@ -44,14 +42,12 @@ function AuthProvider({ children }: AuthProviderProps) {
     const { token, setToken } = useToken()
 
     const authenticated = Boolean(token && signedIn)
-
     const navigatorRef = useRef<IsolatedNavigatorRef>(null)
 
     const redirect = () => {
         const search = window.location.search
         const params = new URLSearchParams(search)
         const redirectUrl = params.get(REDIRECT_URL_KEY)
-
         navigatorRef.current?.navigate(
             redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath,
         )
@@ -60,7 +56,6 @@ function AuthProvider({ children }: AuthProviderProps) {
     const handleSignIn = (tokens: Token, user?: User) => {
         setToken(tokens.accessToken)
         setSessionSignedIn(true)
-
         if (user) {
             setUser(user)
         }
@@ -69,10 +64,10 @@ function AuthProvider({ children }: AuthProviderProps) {
     const handleSignOut = () => {
         setToken('')
         setUser({})
-       setSessionSignedIn(false)
+        setSessionSignedIn(false)
     }
 
-    const signIn = async (values: SignInCredential): AuthResult => {
+    const signIn = async (values: SignInCredential): Promise<AuthResult> => {
         try {
             const resp = await apiSignIn(values)
             console.log(resp,'response');
@@ -83,17 +78,15 @@ function AuthProvider({ children }: AuthProviderProps) {
                 
 
                 handleSignIn({ accessToken: token }, user);
+            console.log('apiSignIn response:', resp)
+            // Use token and user from resp directly
+            if (resp && resp.token) {
+                localStorage.setItem('authToken', resp.token)
+                handleSignIn({ accessToken: resp.token }, resp.user)
                 redirect()
-                return {
-                    status: 'success',
-                    message: '',
-                }
+                return { status: 'success', message: '' }
             }
-            return {
-                status: 'failed',
-                message: 'Unable to sign in',
-            }
-            // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+            return { status: 'failed', message: 'Unable to sign in' }
         } catch (errors: any) {
             return {
                 status: 'failed',
@@ -102,22 +95,17 @@ function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
-    const signUp = async (values: SignUpCredential): AuthResult => {
+    const signUp = async (values: SignUpCredential): Promise<AuthResult> => {
         try {
             const resp = await apiSignUp(values)
-            if (resp) {
+            console.log('apiSignUp response:', resp)
+            if (resp && resp.token) {
+                localStorage.setItem('authToken', resp.token)
                 handleSignIn({ accessToken: resp.token }, resp.user)
                 redirect()
-                return {
-                    status: 'success',
-                    message: '',
-                }
+                return { status: 'success', message: '' }
             }
-            return {
-                status: 'failed',
-                message: 'Unable to sign up',
-            }
-            // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+            return { status: 'failed', message: 'Unable to sign up' }
         } catch (errors: any) {
             return {
                 status: 'failed',
@@ -134,6 +122,7 @@ function AuthProvider({ children }: AuthProviderProps) {
             navigatorRef.current?.navigate(appConfig.unAuthenticatedEntryPath)
         }
     }
+
     const oAuthSignIn = (
         callback: (payload: OauthSignInCallbackPayload) => void,
     ) => {

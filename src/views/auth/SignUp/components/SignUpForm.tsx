@@ -9,36 +9,29 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
-
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'; 
-
+import axios from 'axios';
+import { log } from 'console'
+import { fetchDepartments ,fetchRegion} from '@/services/singupDropdownService'; 
 interface SignUpFormProps extends CommonProps {
-    disableSubmit?: boolean
-    setMessage?: (message: string) => void
-    employeeCategory: string
-    gender: string
-    region: string
-    area: string
-    territory: string
-    range: string
+    disableSubmit?: boolean;
+    setMessage?: (message: string) => void;
 }
-
 
 type SignUpFormSchema = {
-    userName: string
-    password: string
-    email: string
-    mobileNumber: string
-    confirmPassword: string
-    employeeCategory: string
-    department: string
-    grade: string
-    channel: string
-    region: string
-    area: string
-    territory: string
-    range: string
-}
+    userName: string;
+    password: string;
+    email: string;
+    mobileNumber: string;
+    confirmPassword: string;
+    employeeCategory: string;
+    department: string;
+    grade: string;
+    channel: string;
+    region: string;
+    area: string;
+    territory: string;
+    range: string;
+};
 
 const validationSchema: ZodType<SignUpFormSchema> = z
     .object({
@@ -59,18 +52,14 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     .refine((data) => data.password === data.confirmPassword, {
         message: 'Password not match',
         path: ['confirmPassword'],
-    })
+    });
 
 const SignUpForm = (props: SignUpFormProps) => {
-    const { disableSubmit = false, className, setMessage } = props
+    const { disableSubmit = false, className, setMessage } = props;
 
-    const [isSubmitting, setSubmitting] = useState<boolean>(false)
+    const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const [departments, setDepartments] = useState<any>([]);
-    const[territory, setTerritory] = useState<any>([]);
-    const[region, setRegion] = useState<any>([]);
-    const[channel, setChannel] = useState<any>([]);
-    const[area, setArea] = useState<any>([]);
-    const [range, setRange] = useState<any>([]);
+    const [region, setRegion] = useState<any>([]);
     const { signUp } = useAuth()
 
     const {
@@ -80,152 +69,33 @@ const SignUpForm = (props: SignUpFormProps) => {
         watch } = useForm<SignUpFormSchema>({
             resolver: zodResolver(validationSchema),
         })
-
-
-useEffect(() => {
-    const loadDepartments = async () => {
-        try {
-            // Fetch the token from an appropriate source, e.g., localStorage or a function
-            const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-
-            const departmentOptions = await fetchDepartments(token);
-            setDepartments(departmentOptions);
-            console.log('department logs: ', departmentOptions[0]?.label);
-        } catch (error) {
-            console.error('Error loading departments:', error);
-            setMessage?.('Failed to load departments.');
-        }
-    };
-
-    loadDepartments();
-}, [setMessage]);
-
-
         useEffect(() => {
-            const loadTerritories = async () =>{
+            const loadDepartments = async () => {
                 try {
-                    const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-                    
-                    const territoryOptions = await fetchTerritories(token);
-                    setTerritory(territoryOptions);
-                    console.log('territory logs: ', territoryOptions[0]?.label);
+                    const token =
+                        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
+                    const departmentOptions = await fetchDepartments(token);
+                    setDepartments(departmentOptions);
+                    console.log('department logs: ', departmentOptions[0]?.label);
                 } catch (error) {
-               console.error('Error loading Territories:', error);
-            setMessage?.('Failed to load Territories.');
+                    setMessage?.('Failed to load departments.');
                 }
             };
-            loadTerritories();
-        }, [setMessage]);; 
-
-        useEffect(() => {
-            const loadRegion = async () => {
-                try {
-                    const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-                    
-                    const regionOptions = await fetchRegions(token);
-                    setRegion(regionOptions);
-                    console.log('region logs: ', regionOptions[0]?.label);
-                } catch (error) {
-                        console.error('Error loading Region:', error);
-                       setMessage?.('Failed to load Region.');
-                }
-            };
-            loadRegion();
+    
+            loadDepartments();
         }, [setMessage]);;
-
-
-        useEffect(() => {
-            const loadChannel = async () => {
-                try {
-                    
-                    const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-                    const channelOptions = await fetchChannels(token);
-                    setChannel(channelOptions);
-                    console.log('channel logs: ', channelOptions[0]?.label);
-                } catch (error) {
-                     console.error('Error loading chennel:', error);
-                       setMessage?.('Failed to load channel.');
-                }
-            }
-            loadChannel();  
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadArea = async () => {  
-                try {
-                    const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-                   
-                    const areaOptions = await fetchAreas(token);
-                    setArea(areaOptions);
-                    console.log('area logs: ', areaOptions[0]?.label);      
-                }
-                catch (error) {
-                    console.error('Error loading Area:', error);
-                       setMessage?.('Failed to load Area.');
-                }
-            }
-            loadArea();
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadRange = async () => {
-                try {
-                   const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-                    const rangeOptions = await fetchRanges(token);
-                    setRange(rangeOptions);
-                    console.log('range logs: ', rangeOptions[0]?.label); 
-                } catch (error) {
-                    console.error('Error loading Range:', error);
-                       setMessage?.('Failed to load Range.');
-                }
-            }
-            loadRange();
-        
-    },[setMessage]);;
-
-
-
 
 
             useEffect(() => {
                 const loadregion = async () => {
                     try {
-                        const token = localStorage.getItem('authToken') || ''; 
-
-            if (!token) {
-                throw new Error('No authentication token found.');
-            }
-                        
+                        const token =
+                            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
                         const regionOptions = await fetchRegion(token);
                         setRegion(regionOptions);
                         console.log('Region logs: ', regionOptions[0]?.label);
                     } catch (error) {
-                       console.error('Error loading Region', error);
-                       setMessage?.('Failed to load Region.');
+                        setMessage?.('Failed to load Region.');
                     }
                 };
         
@@ -238,19 +108,22 @@ useEffect(() => {
 
 
     const onSignUp = async (values: SignUpFormSchema) => {
-        const { userName, password, email } = values
+        const { userName, password, email, mobileNumber } = values
 
         if (!disableSubmit) {
-            setSubmitting(true)
-            const result = await signUp({ userName, password, email })
+            setSubmitting(true);
+            const result = await signUp({ userName, password, email });
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message)
+                setMessage?.(result.message);
+            } else {
+                console.log('Sign-up successful.');
+                // You can now use the token for further actions, such as redirecting the user
             }
 
-            setSubmitting(false)
+            setSubmitting(false);
         }
-    }
+    };
 
     return (
         <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
@@ -258,10 +131,9 @@ useEffect(() => {
                 <div className="card-body">
                     <Form onSubmit={handleSubmit(onSignUp)}>
                         <FormItem
-                            label="User name"
+                            label="User Name"
                             invalid={Boolean(errors.userName)}
                             errorMessage={errors.userName?.message}
-                            
                         >
                             <Controller
                                 name="userName"
@@ -288,7 +160,7 @@ useEffect(() => {
                                 render={({ field }) => (
                                     <Input
                                         type="email"
-                                        size='sm'
+                                        size="sm"
                                         placeholder="Email"
                                         autoComplete="off"
                                         {...field}
@@ -574,7 +446,7 @@ useEffect(() => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SignUpForm
+export default SignUpForm;
