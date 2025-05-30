@@ -1,11 +1,11 @@
 import React from 'react'
 
-function Invoices() {
+function Invoice() {
   return (
     <div>
-      
+      Invoice
     </div>
   )
 }
 
-export default Invoices
+export default Invoice

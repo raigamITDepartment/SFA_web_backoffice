@@ -11,4 +11,5 @@ export const USER_MENU_PREFIX_PATH = '/User-menu'
 export const SALES_MENU_PREFIX_PATH = '/Sales-menu'
 export const USER_MENU_MODIFIY_USER = '/User-menu-ModifiyUser'
 export const USER_MENU_USER_GROUP = '/User-menu-UserGroup'
-export const SALES_MENU_CATEGORY_ADD = '/Sales-menu-CategoryAdd'    
+export const SALES_MENU_CATEGORY_ADD = '/Sales-menu-CategoryAdd'
+  

@@ -189,7 +189,7 @@ const ProductListTable = () => {
             },
 
             {
-                header: 'Unite Value',
+                header: 'Unit Value',
                 accessorKey: 'stock',
                 cell: (props) => {
                     const row = props.row.original

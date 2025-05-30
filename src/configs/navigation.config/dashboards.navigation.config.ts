@@ -25,7 +25,7 @@ const dashboardsNavigationConfig: NavigationTree[] = [
             {
                 key: 'dashboard.ecommerce',
                 path: `${DASHBOARDS_PREFIX_PATH}/ecommerce`,
-                title: 'Ecommerce',
+                title: 'Overview',
                 translateKey: 'nav.dashboard.ecommerce',
                 icon: 'dashboardEcommerce',
                 type: NAV_ITEM_TYPE_ITEM,
@@ -35,7 +35,7 @@ const dashboardsNavigationConfig: NavigationTree[] = [
             {
                 key: 'dashboard.project',
                 path: `${DASHBOARDS_PREFIX_PATH}/project`,
-                title: 'Project',
+                title: 'Achievements',
                 translateKey: 'nav.dashboard.project',
                 icon: 'dashboardProject',
                 type: NAV_ITEM_TYPE_ITEM,
