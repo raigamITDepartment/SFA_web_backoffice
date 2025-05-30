@@ -6,6 +6,7 @@ import GeneralSection from './components/GeneralSection'
 import PricingSection from './components/PricingSection'
 
 import OldPrice from './components/OldPrice'
+import Button from '@/components/ui/Button'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,6 +54,7 @@ const ProductForm = (props: ProductFormProps) => {
         onFormSubmit,
         defaultValues = {
             imgList: [],
+            channel: '',
         },
         children,
     } = props
@@ -82,18 +84,18 @@ const ProductForm = (props: ProductFormProps) => {
 
     return (
         <Form
-            className="flex w-full h-full"
+            className="flex flex-col w-full h-full"
             containerClassName="flex flex-col w-full justify-between"
             onSubmit={handleSubmit(onSubmit)}
         >
             <Container>
-                <div className="flex flex-col xl:flex-row gap-4">
-                    <div className="gap-4 flex flex-col flex-auto">
-                        <GeneralSection control={control} errors={errors} />
+                <div className="flex flex-col gap-4 xl:flex-row">
+                    <div className="flex flex-col gap-4 w-full xl:w-1/3">
+                        <GeneralSection/>
                         <PricingSection control={control} errors={errors} />
                     </div>
-                    <div className="lg:min-w-[440px] 2xl:w-[500px] gap-4 flex flex-col">
-                    <OldPrice />
+                    <div className="flex flex-col gap-4 w-full xl:w-2/3 lg:min-w-[180px] 2xl:w-[150px]">
+                        <OldPrice/>
                     </div>
                 </div>
             </Container>

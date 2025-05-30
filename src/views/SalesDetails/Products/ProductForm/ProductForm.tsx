@@ -24,8 +24,10 @@ type ProductFormProps = {
 const validationSchema: ZodType<ProductFormSchema> = z.object({
     name: z.string().min(1, { message: 'Product name required!' }),
     productCode: z.string().min(1, { message: 'Product code required!' }),
-    SPAcode: z.string().min(1, { message: 'SPA code required!' }),
+    SAPcode: z.string().min(1, { message: 'SAP code required!' }),
     description: z.string().min(1, { message: 'Product description required!' }),
+    channel: z.string().min(1, { message: 'Channel required!' }),
+    
 
     price: z.string().min(1, { message: 'Price required!' }),
  
@@ -47,16 +49,32 @@ const validationSchema: ZodType<ProductFormSchema> = z.object({
     Volume: z.string().min(1, { message: 'Volume required!' }),
     UnitValue: z.string().min(1, { message: 'Unit value required!' }),
     UOM: z.string().min(1, { message: 'UOM required!' }),
+
+    pricingRows: z.array(
+        z.object({
+            channel: z.string().min(1, { message: 'Channel required!' }),
+            price: z.string().min(1, { message: 'Price required!' }),
+        })
+    ).min(1, { message: 'At least one pricing row required!' }),
 })
+
+
 
 const ProductForm = (props: ProductFormProps) => {
     const {
         onFormSubmit,
         defaultValues = {
             imgList: [],
+            pricingRows: [
+            { channel: '', price: '' },
+            { channel: '', price: '' },
+            { channel: '', price: '' },
+        ],
         },
         children,
     } = props
+
+    
 
     const {
         handleSubmit,
@@ -66,6 +84,11 @@ const ProductForm = (props: ProductFormProps) => {
     } = useForm<ProductFormSchema>({
         defaultValues: {
             ...defaultValues,
+        //     pricingRows: defaultValues.pricingRows ?? [
+        //     { channel: '', price: '' },
+        //     { channel: '', price: '' },
+        //     { channel: '', price: '' },
+        // ],
         },
         resolver: zodResolver(validationSchema),
     })
@@ -88,9 +111,10 @@ const ProductForm = (props: ProductFormProps) => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <Container>
+                <h2 className='mb-2'>Item Creation</h2>
                 <div className="flex flex-col xl:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <GeneralSection control={control} errors={errors} />
+                        <GeneralSection control={control} errors={errors} /> 
                         <PricingSection control={control} errors={errors} />
                         <MeasurementSection control={control} errors={errors} />
                     </div>

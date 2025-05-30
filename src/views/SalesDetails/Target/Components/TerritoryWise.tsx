@@ -9,7 +9,10 @@ import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
-
+import Dialog from '@/components/ui/Dialog'
+import type { MouseEvent } from 'react'
+import DatePicker from '@/components/ui/DatePicker'
+import { useRef } from 'react'
 import {
     useReactTable,
     getCoreRowModel,
@@ -28,7 +31,10 @@ import type { ChangeEvent } from 'react';
 type FormSchema = {
     channel: string;
     subChannel: string;
-    regionName: string;
+    region: string;
+    area: string;
+    range: string;
+    territoryName: string;
     isActive: boolean;
 };
 
@@ -42,13 +48,18 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-interface Region {
-    channelCode: string;
-    subChannelCode: string;
-    regionCode: string;
-    regionName: string;
-    isActive: boolean;
+const { DatePickerRange } = DatePicker
+
+
+interface Territory {
+    areaCode: string;
+    territoryCode: string;
+    territoryName: string;
+    targetValue: string;
+    pcTarget: string;
+    dateRange: string;
 }
+
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -86,59 +97,73 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-const Region = () => {
+const TerritoryWise = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [dialogIsOpen, setIsOpen] = useState(false)
+    const [dialogData, setDialogData] = useState<FormSchema | null>(null)
 
-    const columns = useMemo<ColumnDef<Region>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-        { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Region Name', accessorKey: 'regionName' },
+    const columns = useMemo<ColumnDef<Territory>[]>(() => [
+        { header: 'Area Code', accessorKey: 'areaCode' },
+        { header: 'Territory Code', accessorKey: 'territoryCode' },
+        { header: 'Territory Name', accessorKey: 'territoryName' },
         {
-            header: 'Is Active',
-            accessorKey: 'isActive',
+            header: 'Target Value',
+            accessorKey: 'targetValue',
             cell: ({ row }) => (
-                <div className="mr-2 rtl:ml-2">
-                    <Tag className={row.original.isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
-                        {row.original.isActive ? "Active" : "Inactive"}
-                    </Tag>
-                </div>
+                <Input value={row.original.targetValue} size="sm" readOnly />
             ),
         },
         {
-            header: 'Action',
-            accessorKey: 'action',
+            header: 'PC Target',
+            accessorKey: 'pcTarget',
             cell: ({ row }) => (
-                <div className="flex ">
-                    <FaRegEdit onClick={() => handleEdit(row.original)} className="cursor-pointer mr-4 text-primary-deep text-lg" />
-                    <MdDeleteOutline onClick={() => handleDelete(row.original)} className="cursor-pointer text-red-600 text-xl" />
-                </div>
+                <Input value={row.original.pcTarget} size="sm" readOnly />
+            ),
+        },
+        {
+            header: 'Date Range',
+            accessorKey: 'dateRange',
+            cell: ({ row }) => (
+                <Input value={row.original.dateRange} size="sm" readOnly />
             ),
         },
     ], []);
 
-    const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
+    // Use state for table data
+    const [territories, setTerritories] = useState<Territory[]>([
+        {
+            areaCode: 'A01',
+            territoryCode: 'T01',
+            territoryName: 'Colombo North',
+            targetValue: '100000',
+            pcTarget: '500',
+            dateRange: '2024-06-01 ~ 2024-06-30',
+        },
+        {
+            areaCode: 'A02',
+            territoryCode: 'T02',
+            territoryName: 'Kandy Central',
+            targetValue: '120000',
+            pcTarget: '600',
+            dateRange: '2024-06-01 ~ 2024-06-30',
+        },
+        {
+            areaCode: 'A03',
+            territoryCode: 'T03',
+            territoryName: 'Galle South',
+            targetValue: '90000',
+            pcTarget: '400',
+            dateRange: '2024-06-01 ~ 2024-06-30',
+        },
     ]);
 
-    const totalData = data.length;
+    //const totalData = data.length;
 
     const table = useReactTable({
-        data,
+        data: territories,
         columns,
         filterFns: { fuzzy: fuzzyFilter },
         state: { columnFilters, globalFilter },
@@ -166,39 +191,56 @@ const Region = () => {
         console.log(value, e);
     };
 
-    const handleEdit = (region: Region) => {
+    const handleEdit = (territory: Territory) => {
         // Implement edit functionality here
-        console.log('Edit:', region);
+        console.log('Edit:', territory);
     };
 
-    const handleDelete = (region: Region) => {
+    const handleDelete = (territory: Territory) => {
         // Implement delete functionality here
-        console.log('Delete:', region);
+        console.log('Delete:', territory);
     };
 
     const {
         handleSubmit,
         formState: { errors },
-        control,  
+        control,
     } = useForm<FormSchema>({
         defaultValues: {
             channel: '',
             subChannel: '',
-            regionName: '',
+            region: '',
+            area: '',
+            range: '',
+            territoryName: '',
             isActive: true, // Set default value to true
         },
-    }); 
+    });
 
     const onSubmit = async (values: FormSchema) => {
-        await new Promise((r) => setTimeout(r, 500));
-        alert(JSON.stringify(values, null, 2));
-    };
+        setDialogData(values) // Optionally pass form data to dialog
+        openDialog()
+    }
+
+    const openDialog = () => {
+        setIsOpen(true)
+    }
+
+    const onDialogClose = (e: MouseEvent) => {
+        setIsOpen(false)
+    }
+
+    const onDialogOk = (e: MouseEvent) => {
+        setIsOpen(false)
+    }
+
+
 
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Region Creation</h5>
+                    <h5 className='mb-2'>Territory Wise Target</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
                             invalid={Boolean(errors.channel)}
@@ -212,8 +254,8 @@ const Region = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' }as any,
-                                            
+                                            { label: 'National Channel', value: 'National Channel' } as any,
+                                            { label: 'Bakery Channel', value: 'Bakery Channel' },
                                         ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}
@@ -243,7 +285,7 @@ const Region = () => {
                                         size="sm"
                                         placeholder="Select Sub-Channel"
                                         options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' } as any,
                                             { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                         ]}
                                         value={field.value}
@@ -263,18 +305,84 @@ const Region = () => {
                             />
                         </FormItem>
                         <FormItem
-                            invalid={Boolean(errors.regionName)}
-                            errorMessage={errors.regionName?.message}
+                            invalid={Boolean(errors.region)}
+                            errorMessage={errors.region?.message}
                         >
                             <Controller
-                                name="regionName"
+                                name="region"
                                 control={control}
                                 render={({ field }) =>
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Region Name"
-                                        {...field}
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Region"
+                                        options={[
+                                            { label: 'Region 1', value: 'Region 1' } as any,
+                                            { label: 'Region 2', value: 'Region 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.area)}
+                            errorMessage={errors.area?.message}
+                        >
+                            <Controller
+                                name="area"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Area"
+                                        options={[
+                                            { label: 'Area 1', value: 'Area 1' } as any,
+                                            { label: 'Area 2', value: 'Area 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.range)}
+                            errorMessage={errors.range?.message}
+                        >
+                            <Controller
+                                name="range"
+                                control={control}
+                                render={({ field }) =>
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Range"
+                                        options={[
+                                            { label: 'Range 1', value: 'Range 1' } as any,
+                                            { label: 'Range 2', value: 'Range 2' },
+                                        ]}
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
                                     />
                                 }
                                 rules={{
@@ -291,19 +399,7 @@ const Region = () => {
                         </FormItem>
 
                         <FormItem>
-                            <Controller
-                                name="isActive"
-                                control={control}
-                                render={({ field }) =>
-                                    <Checkbox {...field} checked={field.value}>
-                                        IsActive
-                                    </Checkbox>
-                                }
-                            />
-                        </FormItem>
-
-                        <FormItem>
-                            <Button variant="solid" block type="submit">Create</Button>
+                            <Button variant="solid" block type="submit">Submit</Button>
                         </FormItem>
                     </Form>
                 </Card>
@@ -316,6 +412,8 @@ const Region = () => {
                             placeholder="Search all columns..."
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
+                        
+
                         <Table>
                             <THead>
                                 {table.getHeaderGroups().map((headerGroup) => (
@@ -323,12 +421,8 @@ const Region = () => {
                                         {headerGroup.headers.map((header) => (
                                             <Th key={header.id} colSpan={header.colSpan}>
                                                 {header.isPlaceholder ? null : (
-                                                    <div
-                                                        className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
-                                                        onClick={header.column.getToggleSortingHandler()}
-                                                    >
+                                                    <div>
                                                         {flexRender(header.column.columnDef.header, header.getContext())}
-                                                        <Sorter sort={header.column.getIsSorted()} />
                                                     </div>
                                                 )}
                                             </Th>
@@ -340,7 +434,7 @@ const Region = () => {
                                 {table.getRowModel().rows.map((row) => (
                                     <Tr key={row.id}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <Td key={cell.id} className='py-1 text-xs'>
+                                            <Td key={cell.id} className='py-1 px-0 text-sm break-words whitespace-normal'>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </Td>
                                         ))}
@@ -352,7 +446,7 @@ const Region = () => {
                             <Pagination
                                 pageSize={table.getState().pagination.pageSize}
                                 currentPage={table.getState().pagination.pageIndex + 1}
-                                total={totalData}
+                                total={territories.length} 
                                 onChange={onPaginationChange}
                             />
                             <div style={{ minWidth: 130 }}>
@@ -367,9 +461,65 @@ const Region = () => {
                         </div>
                     </div>
                 </Card>
+
+                {/* Dialog code */}
+                <Dialog
+                    isOpen={dialogIsOpen}
+                    width={1000}
+                    height={500}
+                    onClose={onDialogClose}
+                    onRequestClose={onDialogClose}
+                >
+                    <div className="flex flex-col h-full">
+                        <h5 className="mb-4">Territory Wise Value Target</h5>
+                        <div className="flex-1 overflow-y-auto">
+                            {[
+                                { code: 'T01', name: 'Colombo North' },
+                                { code: 'T02', name: 'Kandy Central' },
+                                { code: 'T03', name: 'Galle South' },
+                            ].map((territory) => (
+                                <div key={territory.code} className="border-b py-3 flex flex-col md:flex-row md:items-center gap-4">
+                                    <div className="flex items-center min-w-[200px]">
+                                        <Checkbox  onChange={onCheck}/>
+                                        <span className="font-semibold ml-2">{territory.name}</span>
+                                    </div>
+                                    <div className="flex flex-col md:flex-row gap-2 flex-1">
+                                        <div className="mb-2 md:mb-0">
+                                            <Input placeholder="Target Value" size='sm' />
+                                        </div>
+                                        <div className="mb-2 md:mb-0">
+                                            <Input placeholder="PC Target" size='sm' />
+                                        </div>
+                                        <div>
+                                            <DatePickerRange placeholder="Select dates range" size='sm' />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="text-right mt-6">
+                            <Button
+                                className="ltr:mr-2 rtl:ml-2"
+                                variant="plain"
+                                onClick={onDialogClose}
+                            >
+                                Cancel
+                            </Button>
+                            <Button variant="solid" onClick={onDialogOk}>
+                                Add
+                            </Button>
+                        </div>
+                    </div>
+                </Dialog>
+
+                
+
+                    
+
+
             </div>
         </div>
     );
 };
 
-export default Region;
+export default TerritoryWise;

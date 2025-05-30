@@ -4,8 +4,25 @@ import { FormItem } from '@/components/ui/Form'
 import RichTextEditor from '@/components/shared/RichTextEditor'
 import { Controller } from 'react-hook-form'
 import type { FormSectionBaseProps } from '../types'
+import Select from '@/components/ui/Select'
 
 type GeneralSectionProps = FormSectionBaseProps
+
+const channelOptions = [
+    { value: 'C', label: 'C' },
+    { value: 'D', label: 'D' },
+    { value: 'S', label: 'S' },
+    { value: 'K', label: 'K' },
+    { value: 'B', label: 'B' },
+    { value: 'R', label: 'R' },
+]
+
+const subChannelOptions = [
+    { value: 'SC1', label: 'Sub-channel 1' },
+    { value: 'SC2', label: 'Sub-channel 2' },
+    { value: 'SC3', label: 'Sub-channel 3' },
+    // Add more sub-channel options as needed
+]
 
 const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
     return (
@@ -50,19 +67,56 @@ const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
                 </FormItem>
 
                 <FormItem
-                    label="SPA code"
-                    invalid={Boolean(errors.SPAcode)}
-                    errorMessage={errors.SPAcode?.message}
+                    label="SAP code"
+                    invalid={Boolean(errors.SAPcode)}
+                    errorMessage={errors.SAPcode?.message}
                 >
                     <Controller
-                        name="SPAcode"
+                        name="SAPcode"
                         control={control}
                         render={({ field }) => (
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="Product Code"
+                                placeholder="SAP Code"
                                 {...field}
+                            />
+                        )}
+                    />
+                </FormItem>
+                <FormItem
+                    label="Channel"
+                    invalid={Boolean(errors.channel)}
+                    errorMessage={errors.channel?.message}
+                >
+                    <Controller
+                        name="channel"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                placeholder="Select Channel"
+                                options={channelOptions}
+                                value={channelOptions.find(opt => opt.value === field.value) || null}
+                                onChange={option => field.onChange(option?.value)}
+                            />
+                        )}
+                    />
+                </FormItem>
+
+                <FormItem
+                    label="Sub-channel"
+                    invalid={Boolean(errors.subchannel)}
+                    errorMessage={errors.subchannel?.message}
+                >
+                    <Controller
+                        name="subChannel"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                placeholder="Select Sub-channel"
+                                options={subChannelOptions}
+                                value={subChannelOptions.find(opt => opt.value === field.value) || null}
+                                onChange={option => field.onChange(option?.value)}
                             />
                         )}
                     />
