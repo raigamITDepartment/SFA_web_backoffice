@@ -1,7 +1,16 @@
 
 import axios from 'axios';
+import { getToken } from '../utils/authUtils';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.8.90:8080';
 
 export const fetchDepartments = async () => {
+export const fetchDepartments = async () => {
+    const token = getToken();
+    if (!token) {
+        throw new Error('No token provided or token has expired');
+    }
+
     try {
         const token = sessionStorage.getItem('accessToken');
 
@@ -26,10 +35,24 @@ export const fetchDepartments = async () => {
     }
 };
 
-export const fetchRegion = async (token: string) => {
+export const fetchRegion = async () => {
+export const fetchRegion = async () => {
+    const token = getToken();
+    if (!token) {
+        throw new Error('No token provided or token has expired');
+    }
+
     try {
+
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
+<<<<<<< HEAD
             'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/region',
+=======
+            `${BASE_URL}/api/v1/userDemarcation/region`,
+>>>>>>> 0602bd8cbb59c5407d8c479b4a31ee17f5267703
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -48,8 +71,11 @@ export const fetchRegion = async (token: string) => {
     }
 };
 
-export const fetchTerritories = async (token: string) => {
+export const fetchTerritories = async () => {
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/territory',
             {
@@ -70,8 +96,11 @@ export const fetchTerritories = async (token: string) => {
     }
 };
 
-export const fetchRegions = async (token: string) => {
+export const fetchRegions = async () => {
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/region',
             {
@@ -92,8 +121,11 @@ export const fetchRegions = async (token: string) => {
     }
 }
 
-export const fetchChannels = async (token: string) => {
+export const fetchChannels = async () => {
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/channel',
             {
@@ -114,8 +146,12 @@ export const fetchChannels = async (token: string) => {
     }
 }
 
-export const fetchAreas = async (token: string) => {
+export const fetchAreas = async () => {
+    
     try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/area',
             {
@@ -136,8 +172,12 @@ export const fetchAreas = async (token: string) => {
     }
 }
 
-export const fetchRanges = async (token: string) => {
+export const fetchRanges = async () => {
     try {
+
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
         const response = await axios.get(
             'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/range',
             {

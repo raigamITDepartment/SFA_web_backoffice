@@ -192,7 +192,7 @@ const SequenceTable = () => {
     };
 
     // Editable cell renderer pattern
-    const EditableNumberCell = ({ getValue, row, column, table }: any) => {
+    const EditableNumberCell = ({ getValue, row, column, table, disabled }: any) => {
         const initialValue = getValue() as number;
         const [value, setValue] = useState(initialValue);
 
@@ -216,6 +216,7 @@ const SequenceTable = () => {
                 onChange={e => setValue(Number(e.target.value))}
                 onBlur={onBlur}
                 min={0}
+                disabled={disabled} // Set the disabled prop
             />
         );
     };
@@ -224,23 +225,23 @@ const SequenceTable = () => {
         () => [
             { header: 'Item Name', accessorKey: 'itemName', enableSorting: true },
             { header: 'Item Code', accessorKey: 'itemCode', enableSorting: true },
-            { header: 'Channel', accessorKey: 'channelId', enableSorting: true }, // Removed "ID"
-            { header: 'Sub-channel', accessorKey: 'subChannelId', enableSorting: true }, // Removed "ID"
-            { header: 'Range', accessorKey: 'rangeId', enableSorting: true }, // Removed "ID"
+            { header: 'Channel', accessorKey: 'channelId', enableSorting: true },
+            { header: 'Sub-channel', accessorKey: 'subChannelId', enableSorting: true },
+            { header: 'Range', accessorKey: 'rangeId', enableSorting: true },
             { 
                 header: 'Main Category Seq', 
                 accessorKey: 'mainCategorySeq',
-                cell: EditableNumberCell,
+                cell: (props) => <EditableNumberCell {...props} disabled={true} />,
                 enableSorting: true
             },
             { 
                 header: 'Sub Category Seq', 
                 accessorKey: 'subCategorySeq',
-                cell: EditableNumberCell,
+                cell: (props) => <EditableNumberCell {...props} disabled={true} />, 
                 enableSorting: true
             },
             { 
-                header: 'Item Category Seq', 
+                header: 'Item Seq',  
                 accessorKey: 'itemCategorySeq',
                 cell: EditableNumberCell,
                 enableSorting: true

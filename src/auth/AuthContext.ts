@@ -6,19 +6,18 @@ import type {
     User,
     OauthSignInCallbackPayload,
 } from '@/@types/auth'
-
 type Auth = {
     authenticated: boolean
     user: User
-    signIn: (values: SignInCredential) => AuthResult
-    signUp: (values: SignUpCredential) => AuthResult
+    signIn: (values: SignInCredential) => Promise<AuthResult>
+    signUp: (values: SignUpCredential) => Promise<AuthResult>
     signOut: () => void
     oAuthSignIn: (
         callback: (payload: OauthSignInCallbackPayload) => void,
     ) => void
 }
 
-const defaultFunctionPlaceHolder = async (): AuthResult => {
+const defaultFunctionPlaceHolder = async (_: any): Promise<AuthResult> => {
     await new Promise((resolve) => setTimeout(resolve, 0))
     return {
         status: '',
@@ -37,9 +36,9 @@ const defaultOAuthSignInPlaceHolder = (
 
 const AuthContext = createContext<Auth>({
     authenticated: false,
-    user: {},
-    signIn: async () => defaultFunctionPlaceHolder(),
-    signUp: async () => defaultFunctionPlaceHolder(),
+    user: {} as User,
+    signIn: (values: SignInCredential) => defaultFunctionPlaceHolder(values),
+    signUp: (values: SignUpCredential) => defaultFunctionPlaceHolder(values),
     signOut: () => {},
     oAuthSignIn: defaultOAuthSignInPlaceHolder,
 })
