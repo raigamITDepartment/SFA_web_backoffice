@@ -8,7 +8,7 @@ export const fetchDepartments = async () => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/department',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/department',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -29,7 +29,7 @@ export const fetchDepartments = async () => {
 export const fetchRegion = async (token: string) => {
     try {
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/region',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/region',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ export const fetchRegion = async (token: string) => {
 export const fetchTerritories = async (token: string) => {
     try {
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/territory',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/territory',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ export const fetchTerritories = async (token: string) => {
 export const fetchRegions = async (token: string) => {
     try {
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/region',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/region',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ export const fetchRegions = async (token: string) => {
 export const fetchChannels = async (token: string) => {
     try {
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/channel',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/channel',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -117,7 +117,7 @@ export const fetchChannels = async (token: string) => {
 export const fetchAreas = async (token: string) => {
     try {
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/area',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/area',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -139,7 +139,7 @@ export const fetchAreas = async (token: string) => {
 export const fetchRanges = async (token: string) => {
     try {
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/range',
+            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/range',
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
