@@ -87,7 +87,7 @@ function AuthProvider({ children }: AuthProviderProps) {
                 return { status: 'success', message: '' }
             }
             return { status: 'failed', message: 'Unable to sign in' }
-        } catch (errors: any) {
+        }} catch (errors: any) {
             return {
                 status: 'failed',
                 message: errors?.response?.data?.message || errors.toString(),
