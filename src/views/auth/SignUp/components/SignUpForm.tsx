@@ -1,4 +1,4 @@
-import { useState , useEffect, use} from 'react'
+import { useState, useEffect, use } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -11,7 +11,7 @@ import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios';
 import { log } from 'console'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'; 
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService';
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -64,15 +64,16 @@ const validationSchema: ZodType<SignUpFormSchema> = z
 
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
-
+    //get access token
+    const token = sessionStorage.getItem('accessToken');
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([]);
-    const[territory, setTerritory] = useState<any>([]);
-    const[region, setRegion] = useState<any>([]);
-    const[channel, setChannel] = useState<any>([]);
-    const[area, setArea] = useState<any>([]);
+    const [territory, setTerritory] = useState<any>([]);
+    const [region, setRegion] = useState<any>([]);
+    const [channel, setChannel] = useState<any>([]);
+    const [area, setArea] = useState<any>([]);
     const [range, setRange] = useState<any>([]);
-    const { signUp } = useAuth()
+    const { signUp } = useAuth();
 
     const {
         handleSubmit,
@@ -81,43 +82,42 @@ const SignUpForm = (props: SignUpFormProps) => {
         watch } = useForm<SignUpFormSchema>({
             resolver: zodResolver(validationSchema),
         })
+
         useEffect(() => {
+            if (!token) {
+                setMessage?.('No auth token found.');
+                return;
+            }
+
             const loadDepartments = async () => {
                 try {
-                    
                     const departmentOptions = await fetchDepartments(token);
                     setDepartments(departmentOptions);
-                    console.log('department logs: ', departmentOptions[0]?.label);
                 } catch (error) {
                     setMessage?.('Failed to load departments.');
                 }
             };
-    
+
             loadDepartments();
-        }, [setMessage]);;
+        }, [token, setMessage]);
 
         useEffect(() => {
-            const loadTerritories = async () =>{
+            const loadTerritories = async () => {
                 try {
-                
                     const territoryOptions = await fetchTerritories(token);
                     setTerritory(territoryOptions);
-                    console.log('territory logs: ', territoryOptions[0]?.label);
                 } catch (error) {
                     setMessage?.('Failed to load territories.');
                 }
             };
             loadTerritories();
-        }, [setMessage]);; 
+        }, [setMessage]);;
 
         useEffect(() => {
             const loadRegion = async () => {
                 try {
-
-                      
                     const regionOptions = await fetchRegions(token);
                     setRegion(regionOptions);
-                    console.log('region logs: ', regionOptions[0]?.label);
                 } catch (error) {
                     setMessage?.('Failed to load regions.');
                 }
@@ -125,29 +125,23 @@ const SignUpForm = (props: SignUpFormProps) => {
             loadRegion();
         }, [setMessage]);;
 
-
         useEffect(() => {
             const loadChannel = async () => {
                 try {
-             
-                        
                     const channelOptions = await fetchChannels(token);
                     setChannel(channelOptions);
-                    console.log('channel logs: ', channelOptions[0]?.label);
                 } catch (error) {
                     setMessage?.('Failed to load channels.');
                 }
             }
-            loadChannel();  
+            loadChannel();
         }, [setMessage]);;
 
         useEffect(() => {
-            const loadArea = async () => {  
+            const loadArea = async () => {
                 try {
-                
                     const areaOptions = await fetchAreas(token);
                     setArea(areaOptions);
-                    console.log('area logs: ', areaOptions[0]?.label);      
                 }
                 catch (error) {
                     setMessage?.('Failed to load areas.');
@@ -159,57 +153,43 @@ const SignUpForm = (props: SignUpFormProps) => {
         useEffect(() => {
             const loadRange = async () => {
                 try {
-                    
                     const rangeOptions = await fetchRanges(token);
                     setRange(rangeOptions);
-                    console.log('range logs: ', rangeOptions[0]?.label); 
                 } catch (error) {
                     setMessage?.('Failed to load ranges.');
                 }
             }
             loadRange();
-        
-    },[setMessage]);;
 
+        }, [setMessage]);;
 
+        useEffect(() => {
+            const loadregion = async () => {
+                try {
+                    const regionOptions = await fetchRegion(token);
+                    setRegion(regionOptions);
+                } catch (error) {
+                    setMessage?.('Failed to load Region.');
+                }
+            };
 
+            loadregion();
+        }, [setMessage]);;
 
+        const onSignUp = async (values: SignUpFormSchema) => {
+            const { userName, password, email, mobileNumber } = values
 
-            useEffect(() => {
-                const loadregion = async () => {
-                    try {
-                        const token =
-                            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW1hZG1pbiIsImlhdCI6MTc0NTkwODEwMSwiZXhwIjoxNzQ2NTEyOTAxfQ.EorLrt8GdeSpRI9n0dsQ-ExUTSH860FMFqYop631kqmVnKG1yA-hCttnFEb2EhgmEUgmX3tL8wAw1ZuwC2FI6A'; // Replace with the actual token retrieval logic
-                        const regionOptions = await fetchRegion(token);
-                        setRegion(regionOptions);
-                        console.log('Region logs: ', regionOptions[0]?.label);
-                    } catch (error) {
-                        setMessage?.('Failed to load Region.');
-                    }
-                };
-        
-                loadregion();
-            }, [setMessage]);;
-    
-    
+            if (!disableSubmit) {
+                setSubmitting(true)
+                const result = await signUp({ userName, password, email })
 
+                if (result?.status === 'failed') {
+                    setMessage?.(result.message)
+                }
 
-
-
-    const onSignUp = async (values: SignUpFormSchema) => {
-        const { userName, password, email, mobileNumber } = values
-
-        if (!disableSubmit) {
-            setSubmitting(true)
-            const result = await signUp({ userName, password, email })
-
-            if (result?.status === 'failed') {
-                setMessage?.(result.message)
+                setSubmitting(false)
             }
-
-            setSubmitting(false)
         }
-    }
 
     return (
         <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
@@ -220,7 +200,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             label="User name"
                             invalid={Boolean(errors.userName)}
                             errorMessage={errors.userName?.message}
-                            
+
                         >
                             <Controller
                                 name="userName"
@@ -342,25 +322,25 @@ const SignUpForm = (props: SignUpFormProps) => {
                             </FormItem>
 
                             <FormItem
-                            label="Department"
-                            invalid={Boolean(errors.department)}
-                            errorMessage={errors.department?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="department"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select"
-                                        options={departments}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
+                                label="Department"
+                                invalid={Boolean(errors.department)}
+                                errorMessage={errors.department?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="department"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select"
+                                            options={departments}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
 
 
 

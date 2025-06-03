@@ -14,162 +14,169 @@ import {
 } from '@tanstack/react-table'
 import Pagination from '@/components/ui/Pagination'
 import { rankItem } from '@tanstack/match-sorter-utils'
-import { data10 } from './data'
-import type { Person } from './data'
 import type {
     ColumnDef,
     FilterFn,
     ColumnFiltersState,
 } from '@tanstack/react-table'
 import type { InputHTMLAttributes, ReactNode, CSSProperties } from 'react'
-export interface GroupBase<Option> {
-    readonly options: readonly Option[];
-    readonly label?: string;
-}
-export interface CommonProps {
-    id?: string
-    className?: string
-    children?: ReactNode
-    style?: CSSProperties
-}
-interface DebouncedInputProps
-    extends Omit<
-        InputHTMLAttributes<HTMLInputElement>,
-        'onChange' | 'size' | 'prefix'
-    > {
-    value: string | number
-    onChange: (value: string | number) => void
-    debounce?: number
-}
+import { fetchUsers } from '@/services/singupDropdownService';
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-function DebouncedInput({
-    value: initialValue,
-    onChange,
-    debounce = 500,
-    ...props
-}: DebouncedInputProps) {
-    const [value, setValue] = useState(initialValue)
+    type Person = {
+        id: number
+        userName: string
+        roleId: number | string
+        email: string
+    }
 
-    useEffect(() => {
-        setValue(initialValue)
-    }, [initialValue])
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            onChange(value)
-        }, debounce)
+    export interface GroupBase<Option> {
+        readonly options: readonly Option[];
+        readonly label?: string;
+    }
+    export interface CommonProps {
+        id?: string
+        className?: string
+        children?: ReactNode
+        style?: CSSProperties
+    }
+    interface DebouncedInputProps
+        extends Omit<
+            InputHTMLAttributes<HTMLInputElement>,
+            'onChange' | 'size' | 'prefix'
+        > {
+        value: string | number
+        onChange: (value: string | number) => void
+        debounce?: number
+    }
 
-        return () => clearTimeout(timeout)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value])
+    const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-    return (
-        <div className="flex justify-end">
-            <div className="flex items-center mb-4">
-                <span className="mr-2">Search:</span>
-                <Input
-                    {...props}
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                />
+    function DebouncedInput({
+        value: initialValue,
+        onChange,
+        debounce = 500,
+        ...props
+    }: DebouncedInputProps) {
+        const [value, setValue] = useState(initialValue)
+
+        useEffect(() => {
+            setValue(initialValue)
+        }, [initialValue])
+
+        useEffect(() => {
+            const timeout = setTimeout(() => {
+                onChange(value)
+            }, debounce)
+
+            return () => clearTimeout(timeout)
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [value])
+
+        return (
+            <div className="flex justify-end">
+                <div className="flex items-center mb-4">
+                    <span className="mr-2">Search:</span>
+                    <Input
+                        {...props}
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)}
+                    />
+                </div>
             </div>
-        </div>
-    )
-}
+        )
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    // Rank the item
-    const itemRank = rankItem(row.getValue(columnId), value)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+        // Rank the item
+        const itemRank = rankItem(row.getValue(columnId), value)
 
-    // Store the itemRank info
-    addMeta({
-        itemRank,
-    })
+        // Store the itemRank info
+        addMeta({
+            itemRank,
+        })
 
-    // Return if the item should be filtered in/out
-    return itemRank.passed
-}
+        // Return if the item should be filtered in/out
+        return itemRank.passed
+    }
 
 
-const Filtering = () => {
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [globalFilter, setGlobalFilter] = useState('')
+    const Filtering = () => {
+        const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+        const [globalFilter, setGlobalFilter] = useState('')
 
-    const columns = useMemo<ColumnDef<Person>[]>(
-        () => [
-            { header: 'Username', accessorKey: 'Username' },
-            { header: 'Role', accessorKey: 'Role' },
+        const columns = useMemo<ColumnDef<Person>[]>(() => [
+            { header: 'Username', accessorKey: 'userName' },
+            { header: 'Role ID', accessorKey: 'roleId' },
             { header: 'Email', accessorKey: 'email' },
-        ],
-        [],
-    )
+        ], [])
 
-    const [data] = useState(() => data10)
 
-    const table = useReactTable({
-        data,
-        columns,
-        filterFns: {
-            fuzzy: fuzzyFilter,
-        },
-        state: {
-            columnFilters,
-            globalFilter,
-        },
-        onColumnFiltersChange: setColumnFilters,
-        onGlobalFilterChange: setGlobalFilter,
-        globalFilterFn: fuzzyFilter,
-        getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getFacetedRowModel: getFacetedRowModel(),
-        getFacetedUniqueValues: getFacetedUniqueValues(),
-        getFacetedMinMaxValues: getFacetedMinMaxValues(),
-        debugHeaders: true,
-        debugColumns: false,
-    })
-    type Option = {
-        value: number
-        label: string
-    }
+        const [data, setData] = useState<Person[]>([])
 
-    const onSelectChange = (value = 0) => {
-        table.setPageSize(Number(value))
-    }
+        useEffect(() => {
+            const loadUsers = async () => {
+                try {
+                    const res = await fetchUsers()
+                    console.log(res);
+                    // Assuming fetchUsers returns an array of user objects
+                    setData(res)
+                } catch (err) {
+                    console.error('Failed to load users:', err)
+                }
+            }
 
-    const pageSizeOptions = [
-        { value: 10, label: '10 / page' },
-        { value: 20, label: '20 / page' },
-        { value: 30, label: '30 / page' },
-        { value: 40, label: '40 / page' },
-        { value: 50, label: '50 / page' },
-    ];
+            loadUsers()
+        }, [])
 
-    const tableData = (): Person[] => {
-        const arr = []
-        for (let i = 0; i < 50; i++) {
-            arr.push({
-                id: i,
-                Username: `Maria ${i}`,
-                lastName: `Anders ${i}`,
-                email: `maria${i}@example.com`,
-                gender: i % 2 === 0 ? 'female' : 'male',
-                age: i,
-            })
+
+        const table = useReactTable({
+            data,
+            columns,
+            filterFns: {
+                fuzzy: fuzzyFilter,
+            },
+            state: {
+                columnFilters,
+                globalFilter,
+            },
+            onColumnFiltersChange: setColumnFilters,
+            onGlobalFilterChange: setGlobalFilter,
+            globalFilterFn: fuzzyFilter,
+            getCoreRowModel: getCoreRowModel(),
+            getFilteredRowModel: getFilteredRowModel(),
+            getSortedRowModel: getSortedRowModel(),
+            getPaginationRowModel: getPaginationRowModel(),
+            getFacetedRowModel: getFacetedRowModel(),
+            getFacetedUniqueValues: getFacetedUniqueValues(),
+            getFacetedMinMaxValues: getFacetedMinMaxValues(),
+            debugHeaders: true,
+            debugColumns: false,
+        })
+        type Option = {
+            value: number
+            label: string
         }
-        return arr
-    }
 
+        const onSelectChange = (value = 0) => {
+            table.setPageSize(Number(value))
+        }
 
-    const onPaginationChange = (page: number) => {
-        table.setPageIndex(page - 1)
-    }
-    
-    const totalData = tableData().length
+        const pageSizeOptions = [
+            { value: 10, label: '10 / page' },
+            { value: 20, label: '20 / page' },
+            { value: 30, label: '30 / page' },
+            { value: 40, label: '40 / page' },
+            { value: 50, label: '50 / page' },
+        ];
+
+        const onPaginationChange = (page: number) => {
+            table.setPageIndex(page - 1)
+        }
+        
+        const totalData = data.length
 
     return (
         <div className="table-container">

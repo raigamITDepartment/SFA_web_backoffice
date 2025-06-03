@@ -67,7 +67,7 @@ export const fetchTerritories = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            `${AuthService_URL}/v1/userDemarcation/territory`,
+            `${AuthService_URL}/api/v1/userDemarcation/territory`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -165,7 +165,7 @@ export const fetchAreas = async () => {
 export const fetchRanges = async () => {
     try {
 
-           const token = sessionStorage.getItem('accessToken');
+        const token = sessionStorage.getItem('accessToken');
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
@@ -187,3 +187,25 @@ export const fetchRanges = async () => {
         throw new Error(error.response?.data?.message || 'Failed to load ranges.');
     }
 }
+
+export const fetchUsers = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/user`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load users.');
+    }
+};
