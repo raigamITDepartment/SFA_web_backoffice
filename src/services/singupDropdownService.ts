@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { getToken } from '../utils/authUtils';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.8.90:8080';
+import { AuthService_URL } from '../configs/Config';
 
 export const fetchDepartments = async (token: string) => {
 
@@ -12,7 +12,7 @@ export const fetchDepartments = async (token: string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/department',
+            `${AuthService_URL}/api/v1/userDemarcation/department`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ export const fetchRegion = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/region',
+            `${AuthService_URL}/api/v1/userDemarcation/region`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ export const fetchTerritories = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/territory',
+            `${AuthService_URL}/v1/userDemarcation/territory`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ export const fetchRegions = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/region',
+            `${AuthService_URL}/api/v1/userDemarcation/region`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -117,7 +117,7 @@ export const fetchChannels = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/channel',
+            `${AuthService_URL}//api/v1/userDemarcation/channel`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@ export const fetchAreas = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/area',
+            `${AuthService_URL}/api/v1/userDemarcation/area`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -169,7 +169,7 @@ export const fetchRanges = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-441978242392.us-central1.run.app/api/v1/userDemarcation/range',
+            `${AuthService_URL}/api/v1/userDemarcation/range`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

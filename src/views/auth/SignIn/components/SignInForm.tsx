@@ -1,16 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
 import PasswordInput from '@/components/shared/PasswordInput'
 import classNames from '@/utils/classNames'
 import { useAuth } from '@/auth'
-import { useForm, Controller } from 'react-hook-form'
+import { useAppSelector, useAppDispatch } from '@/Store/Hooks'
+
+//import { loginUser } from '../../../../actions/UserAction'
+import { useNavigate } from 'react-router-dom'
+import { useForm, Controller, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
+
 import type { ReactNode } from 'react'
+import { Navigation } from 'yet-another-react-lightbox/*'
 
 interface SignInFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -74,28 +80,30 @@ const SignInForm = (props: SignInFormProps) => {
     const { signIn } = useAuth()
 
     const onSignIn = async (values: SignInFormSchema) => {
-        const { userName, password } = values;
+        const {  userName, password } = values
 
         if (!disableSubmit) {
-            setSubmitting(true);
+            setSubmitting(true)
 
-            const result = await signIn({ userName, password });
+            const result = await signIn({ userName, password })
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message);
-            } else {
-                console.log('Login successful');
+                setMessage?.(result.message)
             }
-            setSubmitting(false);
         }
-    };
+
+        setSubmitting(false)
+    }
+
+
+    
 
     return (
         <div className={className}>
             <Form onSubmit={handleSubmit(onSignIn)}>
                 <FormItem
                     label="Username"
-                    invalid={Boolean(errors.userName)}
+                     invalid={Boolean(errors.userName)}
                     errorMessage={errors.userName?.message}
                 >
                     <Controller
@@ -145,7 +153,7 @@ const SignInForm = (props: SignInFormProps) => {
                 </Button>
             </Form>
         </div>
-    );
+    )
 }
 
 export default SignInForm
