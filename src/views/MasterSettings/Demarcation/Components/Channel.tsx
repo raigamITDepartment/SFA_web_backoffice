@@ -29,6 +29,7 @@ import type { ChangeEvent } from 'react';
 type FormSchema = {
     country: string;
     channelName: string;
+    channelCode?: string;
     isActive: boolean;
 };
 
@@ -89,8 +90,9 @@ const Channel = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
-    const [country, setCountry] = useState<string | null>(null);
+
     const [channelName, setChannelName] = useState<string>('');
+    const [channelCode, setChannelCode] = useState<string>('');
 
     const columns = useMemo<ColumnDef<Channel>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -186,6 +188,7 @@ const Channel = () => {
     } = useForm<FormSchema>({
         defaultValues: {
             country: '',
+            channelCode: '',
             channelName: '',
             isActive: true, // Set default value to true
         },
@@ -232,6 +235,36 @@ const Channel = () => {
                                 }}
                             />
                         </FormItem>
+
+                         <FormItem
+                            invalid={Boolean(errors.channelCode)}
+                            errorMessage={errors.channelCode?.message}
+                        >
+                          <Controller
+                                    name="channelCode" 
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Channel Code"
+                                        {...field}
+                                        />
+                                                               
+                                    }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+
                         <FormItem
                             invalid={Boolean(errors.channelName)}
                             errorMessage={errors.channelName?.message}

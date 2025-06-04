@@ -391,6 +391,26 @@ const SignUpForm = (props: SignUpFormProps) => {
                             </FormItem>
                         </div>
 
+                           <FormItem
+                            label="User Type"
+                            invalid={Boolean(errors.userType)}
+                            errorMessage={errors.userType?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="userType"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select User Type"
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+
                         {/* Row: Channel, Sub-Channel */}
                         <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
                             <FormItem
@@ -435,25 +455,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             </FormItem>
                         </div>
 
-                        <FormItem
-                            label="User Type"
-                            invalid={Boolean(errors.userType)}
-                            errorMessage={errors.userType?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="userType"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select User Type"
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
+                     
 
                         <FormItem
                             label="Select Region"

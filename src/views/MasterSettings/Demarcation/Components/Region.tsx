@@ -28,6 +28,7 @@ import type { ChangeEvent } from 'react';
 type FormSchema = {
     channel: string;
     subChannel: string;
+    regionCode: string;
     regionName: string;
     isActive: boolean;
 };
@@ -262,6 +263,38 @@ const Region = () => {
                                 }}
                             />
                         </FormItem>
+
+                         <FormItem
+                            invalid={Boolean(errors.regionCode)}
+                            errorMessage={errors.regionCode?.message}
+                        >
+                            <Controller
+                                name="regionCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Region Name"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+
+
+
+
                         <FormItem
                             invalid={Boolean(errors.regionName)}
                             errorMessage={errors.regionName?.message}
