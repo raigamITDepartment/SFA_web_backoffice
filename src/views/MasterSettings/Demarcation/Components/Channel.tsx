@@ -25,6 +25,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchChannels } from '@/services/DemarcationService'
 
 type FormSchema = {
     country: string;
@@ -91,8 +92,20 @@ const Channel = () => {
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
 
-    const [channelName, setChannelName] = useState<string>('');
-    const [channelCode, setChannelCode] = useState<string>('');
+    const [channelData, setChannelData] = useState<Channel[]>([]); 
+    const [loading, setLoading] = useState(true); 
+
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchChannels()
+                setChannelData(res)
+            } catch (err) {
+                console.error('Failed to load users:', err)
+            }
+        }
+        loadUsers()
+    }, [])
 
     const columns = useMemo<ColumnDef<Channel>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -120,20 +133,7 @@ const Channel = () => {
         },
     ], []);
 
-    const [data] = useState<Channel[]>([
-        { channelCode: '1', channelName: 'National Channel C', isActive: true },
-        { channelCode: '2', channelName: 'National Channel D', isActive: false },
-        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', channelName: 'National Channel C', isActive: true },
-        { channelCode: '2', channelName: 'National Channel D', isActive: false },
-        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', channelName: 'National Channel C', isActive: true },
-        { channelCode: '2', channelName: 'National Channel D', isActive: false },
-        { channelCode: '3', channelName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', channelName: 'Ruchi Channel', isActive: false },
-    ]);
+    const data = channelData;
 
     const totalData = data.length;
 

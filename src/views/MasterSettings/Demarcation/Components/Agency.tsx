@@ -24,6 +24,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchAgencies } from '@/services/DemarcationService'
 
 type FormSchema = {
     channel: string;
@@ -99,6 +100,19 @@ const Agency = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [agencyData, setAgencyData] = useState<Agency[]>([]); 
+    
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchAgencies()
+                setAgencyData(res)
+            } catch (err) {
+                console.error('Failed to load agencies:', err)
+            }
+        }
+        loadUsers()
+    }, [])
 
     const columns = useMemo<ColumnDef<Agency>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -132,18 +146,7 @@ const Agency = () => {
         },
     ], []);
 
-    const [data] = useState<Agency[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T1', routeCode: 'R1', agencyCode: 'A1', agencyName: 'Agency 1', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T2', routeCode: 'R2', agencyCode: 'A2', agencyName: 'Agency 2', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T3', routeCode: 'R3', agencyCode: 'A3', agencyName: 'Agency 3', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T4', routeCode: 'R4', agencyCode: 'A4', agencyName: 'Agency 4', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T5', routeCode: 'R5', agencyCode: 'A5', agencyName: 'Agency 5', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T6', routeCode: 'R6', agencyCode: 'A6', agencyName: 'Agency 6', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T7', routeCode: 'R7', agencyCode: 'A7', agencyName: 'Agency 7', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T8', routeCode: 'R8', agencyCode: 'A8', agencyName: 'Agency 8', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T9', routeCode: 'R9', agencyCode: 'A9', agencyName: 'Agency 9', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T10', routeCode: 'R10', agencyCode: 'A10', agencyName: 'Agency 10', isActive: false },
-    ]);
+    const data = agencyData
 
     const totalData = data.length;
 

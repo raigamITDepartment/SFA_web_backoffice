@@ -20,17 +20,22 @@ import type {
     ColumnFiltersState,
 } from '@tanstack/react-table'
 import type { InputHTMLAttributes, ReactNode, CSSProperties } from 'react'
-import { fetchUsers } from '@/services/singupDropdownService'
+import { fetchUsers, deleteUser } from '@/services/singupDropdownService'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import Dialog from '@/components/ui/Dialog'
 import Button from '@/components/ui/Button'
+import Tag from '@/components/ui/Tag';
 
 type Person = {
     id: number
     userName: string
     roleId: number | string
     email: string
+    firstName?: string
+    lastName?: string
+    role?: string
+    userType?: string
 }
 
 interface DebouncedInputProps
@@ -109,18 +114,43 @@ const Filtering = () => {
         setDialogIsOpen(true)
     }
 
-    const confirmDelete = () => {
-        if (selectedUser) {
-            setData(prev => prev.filter(u => u.id !== selectedUser.id))
-            setSelectedUser(null)
+const confirmDelete = async () => {
+    if (selectedUser) {
+        try {
+            await deleteUser(selectedUser.id); 
+            setData(prev => prev.filter(u => u.id !== selectedUser.id)); 
+        } catch (error) {
+            console.error('Failed to delete user:', error);
+        } finally {
+            setSelectedUser(null);
+            setDialogIsOpen(false);
         }
-        setDialogIsOpen(false)
     }
+};
 
     const columns = useMemo<ColumnDef<Person>[]>(() => [
         { header: 'Username', accessorKey: 'userName' },
-        { header: 'Role ID', accessorKey: 'roleId' },
+        { header: 'First Name', accessorKey: 'firstName' },
+        { header: 'Last Name', accessorKey: 'lastName' },
+        { header: 'Role', accessorKey: 'role' },
+        { header: 'User Type', accessorKey: 'userType' },
+        // { header: 'Role ID', accessorKey: 'roleId' },
         { header: 'Email', accessorKey: 'email' },
+        {
+            header: 'Status',
+            accessorKey: 'isActive',
+            cell: ({ getValue }) => {
+                const isActive = getValue();
+                return (
+                    <div className="mr-2 rtl:ml-2">
+                                            <Tag className={isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" :  "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
+                        {isActive ? 'Active' : 'Inactive'}
+                    </Tag>
+                    </div>
+                );
+            }
+        },
+
         {
             header: 'Actions',
             id: 'actions',
@@ -217,7 +247,6 @@ const Filtering = () => {
                 </div>
             </div>
 
-            {/* Delete Confirmation Dialog */}
             <Dialog isOpen={dialogIsOpen} onClose={() => setDialogIsOpen(false)} title="Confirm Delete">
                 <p>Are you sure you want to delete <strong>{selectedUser?.userName}</strong>?</p>
                 <div className="flex justify-end mt-4 space-x-2">

@@ -24,6 +24,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchSubChannels } from '@/services/DemarcationService'
 
 type FormSchema = {
     channel: string;
@@ -91,6 +92,19 @@ const SubChannel = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [channelData, setChannelData] = useState<SubChannel[]>([]); 
+    
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchSubChannels()
+                setChannelData(res)
+            } catch (err) {
+                console.error('Failed to load sub channels:', err)
+            }
+        }
+        loadUsers()
+    }, [])
 
     const columns = useMemo<ColumnDef<SubChannel>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -120,12 +134,7 @@ const SubChannel = () => {
         },
     ], []);
 
-    const [data] = useState<SubChannel[]>([
-        { channelCode: '1', channelName: 'National Channel', subChannelCode: 'R1A', subChannelName: 'National C', isActive: true },
-        { channelCode: '1', channelName: 'National Channel', subChannelCode: 'R2A', subChannelName: 'National D', isActive: false },
-        { channelCode: '2', channelName: 'Bakery Channel', subChannelCode: 'R3A', subChannelName: 'Horeka', isActive: true },
-        { channelCode: '2', channelName: 'Bakery Channel', subChannelCode: 'R4A', subChannelName: 'Bakery', isActive: false },
-    ]);
+   const data = channelData;
 
     const totalData = data.length;
 

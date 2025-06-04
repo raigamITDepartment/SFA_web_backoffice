@@ -24,6 +24,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchAreas } from '@/services/DemarcationService'
 
 type FormSchema = {
     channel: string;
@@ -93,6 +94,19 @@ const Area = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [areaData, setAreaData] = useState<Area[]>([]); 
+    
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchAreas()
+                setAreaData(res)
+            } catch (err) {
+                console.error('Failed to load areas:', err)
+            }
+        }
+        loadUsers()
+    }, [])
 
     const columns = useMemo<ColumnDef<Area>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -123,20 +137,7 @@ const Area = () => {
         },
     ], []);
 
-    const [data] = useState<Area[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', areaName: 'Sabaragamuwa', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', areaName: 'Southern', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', areaName: 'North-West', isActive: true },
-        { channelCode: '2', subChannelCode: 'R2B', regionCode: 'R2B', areaCode: 'A2', areaName: 'Central', isActive: false },
-        { channelCode: '2', subChannelCode: 'R2B', regionCode: 'R2B', areaCode: 'A2', areaName: 'Eastern', isActive: true },
-        { channelCode: '2', subChannelCode: 'R2B', regionCode: 'R2B', areaCode: 'A2', areaName: 'Western', isActive: false },
-        { channelCode: '3', subChannelCode: 'R3C', regionCode: 'R3C', areaCode: 'A3', areaName: 'Northern', isActive: true },
-        { channelCode: '3', subChannelCode: 'R3C', regionCode: 'R3C', areaCode: 'A3', areaName: 'Uva', isActive: false },
-        { channelCode: '3', subChannelCode: 'R3C', regionCode: 'R3C', areaCode: 'A3', areaName: 'North Central', isActive: true },
-        { channelCode: '4', subChannelCode: 'R4D', regionCode: 'R4D', areaCode: 'A4', areaName: 'Sabaragamuwa', isActive: false },
-        { channelCode: '4', subChannelCode: 'R4D', regionCode: 'R4D', areaCode: 'A4', areaName: 'Southern', isActive: true },
-        { channelCode: '4', subChannelCode: 'R4D', regionCode: 'R4D', areaCode: 'A4', areaName: 'North-West', isActive: false },
-    ]);
+    const data = areaData;
 
     const totalData = data.length;
 
