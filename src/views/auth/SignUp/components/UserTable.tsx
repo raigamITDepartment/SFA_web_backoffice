@@ -20,7 +20,7 @@ import type {
     ColumnFiltersState,
 } from '@tanstack/react-table'
 import type { InputHTMLAttributes, ReactNode, CSSProperties } from 'react'
-import { fetchUsers } from '@/services/singupDropdownService'
+import { fetchUsers, deleteUser } from '@/services/singupDropdownService'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import Dialog from '@/components/ui/Dialog'
@@ -109,13 +109,20 @@ const Filtering = () => {
         setDialogIsOpen(true)
     }
 
-    const confirmDelete = () => {
-        if (selectedUser) {
-            setData(prev => prev.filter(u => u.id !== selectedUser.id))
-            setSelectedUser(null)
+const confirmDelete = async () => {
+    if (selectedUser) {
+        try {
+            await deleteUser(selectedUser.id); 
+            setData(prev => prev.filter(u => u.id !== selectedUser.id)); 
+        } catch (error) {
+            console.error('Failed to delete user:', error);
+        } finally {
+            setSelectedUser(null);
+            setDialogIsOpen(false);
         }
-        setDialogIsOpen(false)
     }
+};
+
 
     const columns = useMemo<ColumnDef<Person>[]>(() => [
         { header: 'Username', accessorKey: 'userName' },
@@ -217,7 +224,6 @@ const Filtering = () => {
                 </div>
             </div>
 
-            {/* Delete Confirmation Dialog */}
             <Dialog isOpen={dialogIsOpen} onClose={() => setDialogIsOpen(false)} title="Confirm Delete">
                 <p>Are you sure you want to delete <strong>{selectedUser?.userName}</strong>?</p>
                 <div className="flex justify-end mt-4 space-x-2">

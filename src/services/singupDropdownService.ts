@@ -1,7 +1,5 @@
 
 import axios from 'axios';
-import { getToken } from '../utils/authUtils';
-
 import { AuthService_URL } from '../configs/Config';
 
 export const fetchDepartments = async (token: string) => {
@@ -176,5 +174,28 @@ export const fetchUsers = async () => {
     } catch (error: any) {
         console.error('Error fetching users:', error);
         throw new Error(error.response?.data?.message || 'Failed to load users.');
+    }
+};
+
+export const deleteUser = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.delete(
+            `${AuthService_URL}/api/v1/userDemarcation/user?id=${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error deleting user:', error);
+        throw new Error(error.response?.data?.message || 'Failed to delete user.');
     }
 };
