@@ -24,6 +24,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchTerritories } from '@/services/DemarcationService'
 
 type FormSchema = {
     channel: string;
@@ -97,6 +98,19 @@ const Territory = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [territoryData, setTerritoryData] = useState<Territory[]>([]); 
+    
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchTerritories()
+                setTerritoryData(res)
+            } catch (err) {
+                console.error('Failed to load territories:', err)
+            }
+        }
+        loadUsers()
+    }, [])
 
     const columns = useMemo<ColumnDef<Territory>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -129,18 +143,7 @@ const Territory = () => {
         },
     ], []);
 
-    const [data] = useState<Territory[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T1', territoryName: 'Territory 1', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T2', territoryName: 'Territory 2', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T3', territoryName: 'Territory 3', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T4', territoryName: 'Territory 4', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'C', territoryCode: 'T5', territoryName: 'Territory 5', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T6', territoryName: 'Territory 6', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T7', territoryName: 'Territory 7', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T8', territoryName: 'Territory 8', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T9', territoryName: 'Territory 9', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', range: 'D', territoryCode: 'T10', territoryName: 'Territory 10', isActive: false },
-    ]);
+    const data = territoryData
 
     const totalData = data.length;
 

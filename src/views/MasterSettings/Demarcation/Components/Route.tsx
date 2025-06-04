@@ -24,6 +24,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchRoutes } from '@/services/DemarcationService'
 
 type FormSchema = {
     channel: string;
@@ -97,6 +98,19 @@ const Route = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [routeData, setRouteData] = useState<Route[]>([]); 
+    
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchRoutes()
+                setRouteData(res)
+            } catch (err) {
+                console.error('Failed to load routes:', err)
+            }
+        }
+        loadUsers()
+    }, [])
 
     const columns = useMemo<ColumnDef<Route>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
@@ -129,19 +143,7 @@ const Route = () => {
         },
     ], []);
 
-    const [data] = useState<Route[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T1', routeCode: 'R1', routeName: 'Route 1', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T2', routeCode: 'R2', routeName: 'Route 2', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T3', routeCode: 'R3', routeName: 'Route 3', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T4', routeCode: 'R4', routeName: 'Route 4', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T5', routeCode: 'R5', routeName: 'Route 5', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T6', routeCode: 'R6', routeName: 'Route 6', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T7', routeCode: 'R7', routeName: 'Route 7', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T8', routeCode: 'R8', routeName: 'Route 8', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T9', routeCode: 'R9', routeName: 'Route 9', isActive: true },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', areaCode: 'A1', territoryCode: 'T10', routeCode: 'R10', routeName: 'Route 10', isActive: false },
-    ]);
-
+    const data = routeData
     const totalData = data.length;
 
     const table = useReactTable({

@@ -24,6 +24,7 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchRegions } from '@/services/DemarcationService'
 
 type FormSchema = {
     channel: string;
@@ -93,6 +94,20 @@ const Region = () => {
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
 
+    const [regionData, setRegionData] = useState<Region[]>([]); 
+    
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const res = await fetchRegions()
+                setRegionData(res)
+            } catch (err) {
+                console.error('Failed to load regions:', err)
+            }
+        }
+        loadUsers()
+    }, [])
+
     const columns = useMemo<ColumnDef<Region>[]>(() => [
         { header: 'Channel Code', accessorKey: 'channelCode' },
         { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
@@ -121,20 +136,7 @@ const Region = () => {
         },
     ], []);
 
-    const [data] = useState<Region[]>([
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-        { channelCode: '1', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel C', isActive: true },
-        { channelCode: '2', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'National Channel D', isActive: false },
-        { channelCode: '3', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Bakery Channel', isActive: true },
-        { channelCode: '4', subChannelCode: 'R1A', regionCode: 'R1A', regionName: 'Ruchi Channel', isActive: false },
-    ]);
+    const data = regionData;
 
     const totalData = data.length;
 
