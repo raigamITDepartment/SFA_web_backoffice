@@ -30,37 +30,6 @@ export const fetchDepartments = async (token: string) => {
     }
 };
 
-export const fetchRegion = async () => {
-    const token = getToken();
-    if (!token) {
-        throw new Error('No token provided or token has expired');
-    }
-
-    try {
-
-           const token = sessionStorage.getItem('accessToken');
-
-        if (!token) throw new Error('No access token found.');
-        const response = await axios.get(
-            `${AuthService_URL}/api/v1/userDemarcation/region`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                timeout: 10000, // Set timeout to 10 seconds
-            }
-        );
-
-        return response.data.payload.map((reg: any) => ({
-            label: reg.regionName,
-            value: reg.id,
-        }));
-    } catch (error: any) {
-        console.error('Error fetching region', error);
-        throw new Error(error.response?.data?.message || 'Failed to load reagion.');
-    }
-};
-
 export const fetchTerritories = async () => {
     try {
            const token = sessionStorage.getItem('accessToken');
