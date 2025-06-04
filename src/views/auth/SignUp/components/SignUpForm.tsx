@@ -10,7 +10,7 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -183,18 +183,6 @@ const SignUpForm = (props: SignUpFormProps) => {
             }
         }
         loadRange()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadregion = async () => {
-            try {
-                const regionOptions = await fetchRegion(token)
-                setRegion(regionOptions)
-            } catch (error) {
-                setMessage?.('Failed to load Region.')
-            }
-        }
-        loadregion()
     }, [setMessage])
 
     const onSignUp = async (values: SignUpFormSchema) => {
