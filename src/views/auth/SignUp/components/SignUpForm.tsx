@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -9,33 +9,36 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
-import axios from 'axios';
-import { log } from 'console'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService';
+import axios from 'axios'
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegion, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
     setMessage?: (message: string) => void
-    employeeCategory: string
+    role: string
     gender: string
     region: string
     area: string
     territory: string
     range: string
+    userType?: string
 }
 
 
 
 type SignUpFormSchema = {
     userName: string
+    firstName: string
+    lastName: string
     password: string
     email: string
     mobileNumber: string
     confirmPassword: string
-    employeeCategory: string
+    role: string
     department: string
-    grade: string
+    userType: string
     channel: string
+    subChannel: string
     region: string
     area: string
     territory: string
@@ -46,13 +49,16 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     .object({
         email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
         userName: z.string({ required_error: 'Please enter your name' }),
+        firstName: z.string({ required_error: 'Please enter your first name' }),
+        lastName: z.string({ required_error: 'Please enter your last name' }),
         password: z.string({ required_error: 'Password Required' }),
         mobileNumber: z.string({ required_error: 'Mobile Number Required' }).regex(/^\d+$/, 'Mobile Number must be numeric'),
         confirmPassword: z.string({ required_error: 'Please confirm your password' }),
-        employeeCategory: z.string({ required_error: 'Please select your employee category' }),
+        role: z.string({ required_error: 'Please select your role' }),
         department: z.string({ required_error: 'Please select your department' }),
-        grade: z.string({ required_error: 'Please select your grade' }),
+        userType: z.string({ required_error: 'Please select your user type' }),
         channel: z.string({ required_error: 'Please select your channel' }),
+        subChannel: z.string({ required_error: 'Please select your sub-channel' }),
         region: z.string({ required_error: 'Please select your region' }),
         area: z.string({ required_error: 'Please select your area' }),
         territory: z.string({ required_error: 'Please select your territory' }),
@@ -65,24 +71,25 @@ const validationSchema: ZodType<SignUpFormSchema> = z
 
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
-    //get access token
-    const token = sessionStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken')
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
-    const [departments, setDepartments] = useState<any>([]);
-    const [territory, setTerritory] = useState<any>([]);
-    const [region, setRegion] = useState<any>([]);
-    const [channel, setChannel] = useState<any>([]);
-    const [area, setArea] = useState<any>([]);
-    const [range, setRange] = useState<any>([]);
-    const { signUp } = useAuth();
+    const [departments, setDepartments] = useState<any>([])
+    const [territory, setTerritory] = useState<any>([])
+    const [region, setRegion] = useState<any>([])
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
+    const [area, setArea] = useState<any>([])
+    const [range, setRange] = useState<any>([])
+    const { signUp } = useAuth()
 
     const {
         handleSubmit,
         formState: { errors },
         control,
-        watch } = useForm<SignUpFormSchema>({
-            resolver: zodResolver(validationSchema),
-        })
+        watch,
+    } = useForm<SignUpFormSchema>({
+        resolver: zodResolver(validationSchema),
+    })
 
         const selectedDepartment = watch('department')
         const isSales = selectedDepartment?.label?.toLowerCase()  === 'sales';
@@ -93,107 +100,117 @@ const SignUpForm = (props: SignUpFormProps) => {
                 return;
             }
 
-            const loadDepartments = async () => {
-                try {
-                    const departmentOptions = await fetchDepartments(token);
-                    setDepartments(departmentOptions);
-                } catch (error) {
-                    setMessage?.('Failed to load departments.');
-                }
-            };
-
-            loadDepartments();
-        }, [token, setMessage]);
-
-        useEffect(() => {
-            const loadTerritories = async () => {
-                try {
-                    const territoryOptions = await fetchTerritories(token);
-                    setTerritory(territoryOptions);
-                } catch (error) {
-                    setMessage?.('Failed to load territories.');
-                }
-            };
-            loadTerritories();
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadRegion = async () => {
-                try {
-                    const regionOptions = await fetchRegions(token);
-                    setRegion(regionOptions);
-                } catch (error) {
-                    setMessage?.('Failed to load regions.');
-                }
-            };
-            loadRegion();
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadChannel = async () => {
-                try {
-                    const channelOptions = await fetchChannels(token);
-                    setChannel(channelOptions);
-                } catch (error) {
-                    setMessage?.('Failed to load channels.');
-                }
-            }
-            loadChannel();
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadArea = async () => {
-                try {
-                    const areaOptions = await fetchAreas(token);
-                    setArea(areaOptions);
-                }
-                catch (error) {
-                    setMessage?.('Failed to load areas.');
-                }
-            }
-            loadArea();
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadRange = async () => {
-                try {
-                    const rangeOptions = await fetchRanges(token);
-                    setRange(rangeOptions);
-                } catch (error) {
-                    setMessage?.('Failed to load ranges.');
-                }
-            }
-            loadRange();
-
-        }, [setMessage]);;
-
-        useEffect(() => {
-            const loadregion = async () => {
-                try {
-                    const regionOptions = await fetchRegion(token);
-                    setRegion(regionOptions);
-                } catch (error) {
-                    setMessage?.('Failed to load Region.');
-                }
-            };
-
-            loadregion();
-        }, [setMessage]);;
-
-        const onSignUp = async (values: SignUpFormSchema) => {
-            const { userName, password, email, mobileNumber } = values
-
-            if (!disableSubmit) {
-                setSubmitting(true)
-                const result = await signUp({ userName, password, email })
-
-                if (result?.status === 'failed') {
-                    setMessage?.(result.message)
-                }
-
-                setSubmitting(false)
+        const loadDepartments = async () => {
+            try {
+                const departmentOptions = await fetchDepartments(token)
+                setDepartments(departmentOptions)
+            } catch (error) {
+                setMessage?.('Failed to load departments.')
             }
         }
+
+        loadDepartments()
+    }, [token, setMessage])
+
+    useEffect(() => {
+        const loadTerritories = async () => {
+            try {
+                const territoryOptions = await fetchTerritories(token)
+                setTerritory(territoryOptions)
+            } catch (error) {
+                setMessage?.('Failed to load territories.')
+            }
+        }
+        loadTerritories()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRegion = async () => {
+            try {
+                const regionOptions = await fetchRegions(token)
+                setRegion(regionOptions)
+            } catch (error) {
+                setMessage?.('Failed to load regions.')
+            }
+        }
+        loadRegion()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
+    // Example: fetchSubChannels should be implemented in your service
+    // useEffect(() => {
+    //     const loadSubChannel = async () => {
+    //         try {
+    //             const subChannelOptions = await fetchSubChannels(token)
+    //             setSubChannel(subChannelOptions)
+    //         } catch (error) {
+    //             setMessage?.('Failed to load sub-channels.')
+    //         }
+    //     }
+    //     loadSubChannel()
+    // }, [setMessage])
+
+    useEffect(() => {
+        const loadArea = async () => {
+            try {
+                const areaOptions = await fetchAreas(token)
+                setArea(areaOptions)
+            } catch (error) {
+                setMessage?.('Failed to load areas.')
+            }
+        }
+        loadArea()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRange = async () => {
+            try {
+                const rangeOptions = await fetchRanges(token)
+                setRange(rangeOptions)
+            } catch (error) {
+                setMessage?.('Failed to load ranges.')
+            }
+        }
+        loadRange()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadregion = async () => {
+            try {
+                const regionOptions = await fetchRegion(token)
+                setRegion(regionOptions)
+            } catch (error) {
+                setMessage?.('Failed to load Region.')
+            }
+        }
+        loadregion()
+    }, [setMessage])
+
+    const onSignUp = async (values: SignUpFormSchema) => {
+        const { userName, password, email, mobileNumber } = values
+
+        if (!disableSubmit) {
+            setSubmitting(true)
+            const result = await signUp({ userName, password, email })
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+            }
+
+            setSubmitting(false)
+        }
+    }
 
     return (
         <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
@@ -204,7 +221,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                             label="User name"
                             invalid={Boolean(errors.userName)}
                             errorMessage={errors.userName?.message}
-
                         >
                             <Controller
                                 name="userName"
@@ -214,6 +230,44 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         size="sm"
                                         type="text"
                                         placeholder="User Name"
+                                        autoComplete="off"
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        <FormItem
+                            label="First Name"
+                            invalid={Boolean(errors.firstName)}
+                            errorMessage={errors.firstName?.message}
+                        >
+                            <Controller
+                                name="firstName"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        size="sm"
+                                        type="text"
+                                        placeholder="First Name"
+                                        autoComplete="off"
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        <FormItem
+                            label="Last Name"
+                            invalid={Boolean(errors.lastName)}
+                            errorMessage={errors.lastName?.message}
+                        >
+                            <Controller
+                                name="lastName"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        size="sm"
+                                        type="text"
+                                        placeholder="Last Name"
                                         autoComplete="off"
                                         {...field}
                                     />
@@ -231,7 +285,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 render={({ field }) => (
                                     <Input
                                         type="email"
-                                        size='sm'
+                                        size="sm"
                                         placeholder="Email"
                                         autoComplete="off"
                                         {...field}
@@ -297,39 +351,34 @@ const SignUpForm = (props: SignUpFormProps) => {
                             />
                         </FormItem>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        {/* Row: Role, Department */}
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
                             <FormItem
-                                label="Employee Category"
-                                invalid={Boolean(errors.employeeCategory)}
-                                errorMessage={errors.employeeCategory?.message}
-                                style={{ flex: 1, marginRight: '20px' }}
+                                label="Role"
+                                invalid={Boolean(errors.role)}
+                                errorMessage={errors.role?.message}
+                                style={{ flex: 1, minWidth: 180 }}
                             >
                                 <Controller
-                                    name="employeeCategory"
+                                    name="role"
                                     control={control}
-                                    rules={{ required: 'Employee Category is required' }}
+                                    rules={{ required: 'Role is required' }}
                                     render={({ field }) => (
                                         <Select
                                             size="sm"
                                             className="mb-4"
                                             placeholder="Please Select"
-                                            // options={[
-                                            //     { label: 'sales', value: 'sales' },
-                                            //     { label: 'Admin', value: 'admin' },
-                                            //     { label: 'Manage', value: 'Manager' },
-                                            // ]}
                                             value={field.value}
                                             onChange={(selectedOption) => field.onChange(selectedOption)}
                                         />
                                     )}
                                 />
                             </FormItem>
-
                             <FormItem
                                 label="Department"
                                 invalid={Boolean(errors.department)}
                                 errorMessage={errors.department?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
+                                style={{ flex: 1, minWidth: 180 }}
                             >
                                 <Controller
                                     name="department"
@@ -345,26 +394,22 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     )}
                                 />
                             </FormItem>
-
-
-
                         </div>
 
-                        <FormItem
-                            label="Select Grade"
-                            invalid={Boolean(errors.grade)}
-                            errorMessage={errors.grade?.message}
+                           <FormItem
+                            label="User Type"
+                            invalid={Boolean(errors.userType)}
+                            errorMessage={errors.userType?.message}
                             style={{ flex: 1, marginLeft: '10px' }}
                         >
                             <Controller
-                                name="grade"
+                                name="userType"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         className="mb-4"
-                                        placeholder="Please Select Grade "
-                                        //options={Department}
+                                        placeholder="Please Select User Type"
                                         {...field}
                                     />
                                 )}

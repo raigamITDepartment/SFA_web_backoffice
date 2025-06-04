@@ -31,7 +31,7 @@ export const SignUpBase = ({
             </div>
             <div className="mb-8">
                 <h3 className="mb-1">Sign Up</h3>
-                <p className="font-semibold heading-text">Add Modified User</p>
+                <p className="font-semibold heading-text">Add/Modify User</p>
             </div>
             {message && (
                 <Alert showIcon className="mb-4" type="danger">
@@ -44,7 +44,7 @@ export const SignUpBase = ({
                     <SignUpForm
                         disableSubmit={disableSubmit}
                         setMessage={setMessage}
-                        employeeCategory="defaultCategory"
+                        role="defaultRole"
                         gender="defaultGender"
                         region="defaultRegion"
                         area="defaultArea"
@@ -59,7 +59,7 @@ export const SignUpBase = ({
                 </div>
             </div>
 
-            <div>
+            {/* <div>
                 <div className="mt-6 text-center">
                     <span>Already have an account? </span>
                     <ActionLink
@@ -70,7 +70,7 @@ export const SignUpBase = ({
                         Sign in
                     </ActionLink>
                 </div>
-            </div>
+            </div> */}
         </>
     )
 }

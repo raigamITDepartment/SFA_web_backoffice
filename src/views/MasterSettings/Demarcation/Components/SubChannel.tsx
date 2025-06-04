@@ -28,6 +28,7 @@ import type { ChangeEvent } from 'react';
 type FormSchema = {
     channel: string;
     subChannelName: string;
+    subChannelCode: string;
     isActive: boolean;
 };
 
@@ -221,6 +222,43 @@ const SubChannel = () => {
                                 }}
                             />
                         </FormItem>
+
+
+                        <FormItem
+                            invalid={Boolean(errors.subChannelCode)}
+                            errorMessage={errors.subChannelCode?.message}
+                        >
+                            <Controller
+                                name="subChannelCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Sub-subChannelCode"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+
+
+
+
+
+
+
+
                         <FormItem
                             invalid={Boolean(errors.subChannelName)}
                             errorMessage={errors.subChannelName?.message}
@@ -248,6 +286,10 @@ const SubChannel = () => {
                                 }}
                             />
                         </FormItem>
+                         
+
+
+
 
                         <FormItem>
                             <Controller
