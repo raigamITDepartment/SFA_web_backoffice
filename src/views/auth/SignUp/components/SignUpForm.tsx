@@ -36,6 +36,7 @@ type SignUpFormSchema = {
     department: string
     userType: string
     channel: string
+    subChannel: string
     region: string
     area: string
     territory: string
@@ -55,6 +56,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
         department: z.string({ required_error: 'Please select your department' }),
         userType: z.string({ required_error: 'Please select your user type' }),
         channel: z.string({ required_error: 'Please select your channel' }),
+        subChannel: z.string({ required_error: 'Please select your sub-channel' }),
         region: z.string({ required_error: 'Please select your region' }),
         area: z.string({ required_error: 'Please select your area' }),
         territory: z.string({ required_error: 'Please select your territory' }),
@@ -73,6 +75,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const [territory, setTerritory] = useState<any>([])
     const [region, setRegion] = useState<any>([])
     const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
     const { signUp } = useAuth()
@@ -139,6 +142,19 @@ const SignUpForm = (props: SignUpFormProps) => {
         }
         loadChannel()
     }, [setMessage])
+
+    // Example: fetchSubChannels should be implemented in your service
+    // useEffect(() => {
+    //     const loadSubChannel = async () => {
+    //         try {
+    //             const subChannelOptions = await fetchSubChannels(token)
+    //             setSubChannel(subChannelOptions)
+    //         } catch (error) {
+    //             setMessage?.('Failed to load sub-channels.')
+    //         }
+    //     }
+    //     loadSubChannel()
+    // }, [setMessage])
 
     useEffect(() => {
         const loadArea = async () => {
@@ -330,12 +346,13 @@ const SignUpForm = (props: SignUpFormProps) => {
                             />
                         </FormItem>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        {/* Row: Role, Department */}
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
                             <FormItem
                                 label="Role"
                                 invalid={Boolean(errors.role)}
                                 errorMessage={errors.role?.message}
-                                style={{ flex: 1, marginRight: '20px' }}
+                                style={{ flex: 1, minWidth: 180 }}
                             >
                                 <Controller
                                     name="role"
@@ -344,7 +361,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     render={({ field }) => (
                                         <Select
                                             size="sm"
-                                            className="mb-4 mr-2"
+                                            className="mb-4"
                                             placeholder="Please Select"
                                             value={field.value}
                                             onChange={(selectedOption) => field.onChange(selectedOption)}
@@ -352,12 +369,11 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     )}
                                 />
                             </FormItem>
-
                             <FormItem
                                 label="Department"
                                 invalid={Boolean(errors.department)}
                                 errorMessage={errors.department?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
+                                style={{ flex: 1, minWidth: 180 }}
                             >
                                 <Controller
                                     name="department"
@@ -368,6 +384,50 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select"
                                             options={departments}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        </div>
+
+                        {/* Row: Channel, Sub-Channel */}
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+                            <FormItem
+                                label="Select Channel"
+                                invalid={Boolean(errors.channel)}
+                                errorMessage={errors.channel?.message}
+                                style={{ flex: 1, minWidth: 180 }}
+                            >
+                                <Controller
+                                    name="channel"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Channel"
+                                            options={channel}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                            <FormItem
+                                label="Select Sub-Channel"
+                                invalid={Boolean(errors.subChannel)}
+                                errorMessage={errors.subChannel?.message}
+                                style={{ flex: 1, minWidth: 180 }}
+                            >
+                                <Controller
+                                    name="subChannel"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Sub-Channel"
+                                            options={subChannel}
                                             {...field}
                                         />
                                     )}
@@ -410,27 +470,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         className="mb-4"
                                         placeholder="Please Select Region"
                                         options={region}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-
-                        <FormItem
-                            label="Select Channel"
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="channel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Channel"
-                                        options={channel}
                                         {...field}
                                     />
                                 )}
