@@ -69,31 +69,32 @@ function AuthProvider({ children }: AuthProviderProps) {
 
     const signIn = async (values: SignInCredential): Promise<AuthResult> => {
         try {
-            const resp = await apiSignIn(values)
-            console.log(resp,'response');
-            if (resp) {
-                const { token, ...user } = resp.payload;
-                //save token in session storage
-                sessionStorage.setItem('accessToken', token);
-                
+            const resp = await apiSignIn(values);
+            console.log('apiSignIn response:', resp);
 
+            if (resp && resp.payload?.token) {
+                const { token, ...user } = resp.payload;
+
+                // Save token in localStorage
+                sessionStorage.setItem('accessToken', token);
+                console.log('token',token);
+
+                // Call sign-in handler
                 handleSignIn({ accessToken: token }, user);
-            console.log('apiSignIn response:', resp)
-            // Use token and user from resp directly
-            if (resp && resp.token) {
-                localStorage.setItem('authToken', resp.token)
-                handleSignIn({ accessToken: resp.token }, resp.user)
-                redirect()
-                return { status: 'success', message: '' }
+
+                redirect();
+                return { status: 'success', message: '' };
             }
-            return { status: 'failed', message: 'Unable to sign in' }
+
+            return { status: 'failed', message: 'Unable to sign in' };
         } catch (errors: any) {
             return {
                 status: 'failed',
                 message: errors?.response?.data?.message || errors.toString(),
-            }
+            };
         }
-    }
+    };
+
 
     const signUp = async (values: SignUpCredential): Promise<AuthResult> => {
         try {

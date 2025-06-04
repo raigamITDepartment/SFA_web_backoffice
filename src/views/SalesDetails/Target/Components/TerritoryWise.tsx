@@ -36,6 +36,7 @@ type FormSchema = {
     range: string;
     territoryName: string;
     isActive: boolean;
+    targetValue?: string;
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -50,7 +51,6 @@ const pageSizeOptions = [
 
 const { DatePickerRange } = DatePicker
 
-
 interface Territory {
     areaCode: string;
     territoryCode: string;
@@ -59,7 +59,6 @@ interface Territory {
     pcTarget: string;
     dateRange: string;
 }
-
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -113,21 +112,21 @@ const TerritoryWise = () => {
             header: 'Target Value',
             accessorKey: 'targetValue',
             cell: ({ row }) => (
-                <Input value={row.original.targetValue} size="sm" readOnly />
+                <span>{row.original.targetValue}</span>
             ),
         },
         {
             header: 'PC Target',
             accessorKey: 'pcTarget',
             cell: ({ row }) => (
-                <Input value={row.original.pcTarget} size="sm" readOnly />
+                <span>{row.original.pcTarget}</span>
             ),
         },
         {
             header: 'Date Range',
             accessorKey: 'dateRange',
             cell: ({ row }) => (
-                <Input value={row.original.dateRange} size="sm" readOnly />
+                <span className="min-w-[160px] inline-block">{row.original.dateRange}</span>
             ),
         },
     ], []);
@@ -159,8 +158,6 @@ const TerritoryWise = () => {
             dateRange: '2024-06-01 ~ 2024-06-30',
         },
     ]);
-
-    //const totalData = data.length;
 
     const table = useReactTable({
         data: territories,
@@ -205,6 +202,7 @@ const TerritoryWise = () => {
         handleSubmit,
         formState: { errors },
         control,
+        reset,
     } = useForm<FormSchema>({
         defaultValues: {
             channel: '',
@@ -234,177 +232,246 @@ const TerritoryWise = () => {
         setIsOpen(false)
     }
 
-
-
     return (
         <div>
-            <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
+            <div className='flex flex-col gap-4'>
+
+                <Card bordered={false} className='w-full h-1/2'>
                     <h5 className='mb-2'>Territory Wise Target</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                        <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
-                        >
-                            <Controller
-                                name="channel"
-                                control={control}
-                                render={({ field }) =>
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Channel"
-                                        options={[
-                                            { label: 'National Channel', value: 'National Channel' } as any,
-                                            { label: 'Bakery Channel', value: 'Bakery Channel' },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <FormItem
+                                invalid={Boolean(errors.channel)}
+                                errorMessage={errors.channel?.message}
+                            >
+                                <Controller
+                                    name="channel"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Select
+                                            size="md"
+                                            placeholder="Select Channel"
+                                            options={[
+                                                { label: 'National Channel', value: 'National Channel' } as any,
+                                                { label: 'Bakery Channel', value: 'Bakery Channel' },
+                                            ]}
+                                            value={field.value}
+                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                        />
                                     }
-                                }}
-                            />
+                                    rules={{
+                                        validate: {
+                                            required: (value) => {
+                                                if (!value) {
+                                                    return 'Required';
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }}
+                                />
+                            </FormItem>
+                            <FormItem
+                                invalid={Boolean(errors.subChannel)}
+                                errorMessage={errors.subChannel?.message}
+                            >
+                                <Controller
+                                    name="subChannel"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Select
+                                            size="md"
+                                            placeholder="Select Sub-Channel"
+                                            options={[
+                                                { label: 'Sub-Channel 1', value: 'Sub-Channel 1' } as any,
+                                                { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
+                                            ]}
+                                            value={field.value}
+                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                        />
+                                    }
+                                    rules={{
+                                        validate: {
+                                            required: (value) => {
+                                                if (!value) {
+                                                    return 'Required';
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }}
+                                />
+                            </FormItem>
+                            <FormItem
+                                invalid={Boolean(errors.region)}
+                                errorMessage={errors.region?.message}
+                            >
+                                <Controller
+                                    name="region"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Select
+                                            size="md"
+                                            placeholder="Select Region"
+                                            options={[
+                                                { label: 'Region 1', value: 'Region 1' } as any,
+                                                { label: 'Region 2', value: 'Region 2' },
+                                            ]}
+                                            value={field.value}
+                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                        />
+                                    }
+                                    rules={{
+                                        validate: {
+                                            required: (value) => {
+                                                if (!value) {
+                                                    return 'Required';
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }}
+                                />
+                            </FormItem>
+                            <FormItem
+                                invalid={Boolean(errors.area)}
+                                errorMessage={errors.area?.message}
+                            >
+                                <Controller
+                                    name="area"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Select
+                                            size="md"
+                                            placeholder="Select Area"
+                                            options={[
+                                                { label: 'Area 1', value: 'Area 1' } as any,
+                                                { label: 'Area 2', value: 'Area 2' },
+                                            ]}
+                                            value={field.value}
+                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                        />
+                                    }
+                                    rules={{
+                                        validate: {
+                                            required: (value) => {
+                                                if (!value) {
+                                                    return 'Required';
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }}
+                                />
+                            </FormItem>
+                            <FormItem
+                                invalid={Boolean(errors.range)}
+                                errorMessage={errors.range?.message}
+                            >
+                                <Controller
+                                    name="range"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Select
+                                            size="md"
+                                            placeholder="Select Range"
+                                            options={[
+                                                { label: 'Range 1', value: 'Range 1' } as any,
+                                                { label: 'Range 2', value: 'Range 2' },
+                                            ]}
+                                            value={field.value}
+                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                        />
+                                    }
+                                    rules={{
+                                        validate: {
+                                            required: (value) => {
+                                                if (!value) {
+                                                    return 'Required';
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }}
+                                />
+                            </FormItem>
+
+                        </div>
+                        <FormItem>
+                            <span className="font-bold ">Territory List:</span>
+                            <div className="flex items-center gap-4 mt-6">
+
+                                <FormItem className="mb-0">
+                                    <Controller
+                                        name="territoryName"
+                                        control={control}
+                                        render={({ field }) =>
+                                            <Input
+                                                disabled
+                                                type="text"
+                                                autoComplete="off"
+                                                placeholder="Territory Name"
+                                                {...field}
+                                            />
+                                        }
+                                    />
+                                </FormItem>
+                                <FormItem className="mb-0">
+                                    <Controller
+                                        name="targetValue"
+                                        control={control}
+                                        render={({ field }) =>
+                                            <Input
+                                                type="text"
+                                                autoComplete="off"
+                                                placeholder="Target Value"
+                                                {...field}
+                                            />
+                                        }
+                                    />
+                                </FormItem>
+                                <div>
+                                    {/* <RangePicker /> */}
+                                    <DatePickerRange placeholder="Select dates range" />
+                                </div>
+                            </div>
                         </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.subChannel)}
-                            errorMessage={errors.subChannel?.message}
-                        >
-                            <Controller
-                                name="subChannel"
-                                control={control}
-                                render={({ field }) =>
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub-Channel"
-                                        options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' } as any,
-                                            { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
+                        <FormItem>
+                            <div className="flex justify-center gap-4">
+                                <Button
+                                    className="lg:w-70 xl:w-70 sm:w-full"
+                                    variant="solid"
+                                    block
+                                    type="submit"
+                                >
+                                    Submit
+                                </Button>
+                                <Button
+                                    className="lg:w-70 xl:w-70 sm:w-full"
+                                    type="button"
+                                    block
+                                    clickFeedback={false}
+                                    customColorClass={({ active, unclickable }) =>
+                                        [
+                                            'hover:text-red-800 dark:hover:bg-red-600 border-0 hover:ring-0',
+                                            active ? 'bg-red-200' : 'bg-red-100',
+                                            unclickable && 'opacity-50 cursor-not-allowed',
+                                            !active && !unclickable && 'hover:bg-red-200',
+                                        ].filter(Boolean).join(' ')
                                     }
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.region)}
-                            errorMessage={errors.region?.message}
-                        >
-                            <Controller
-                                name="region"
-                                control={control}
-                                render={({ field }) =>
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Region"
-                                        options={[
-                                            { label: 'Region 1', value: 'Region 1' } as any,
-                                            { label: 'Region 2', value: 'Region 2' },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.area)}
-                            errorMessage={errors.area?.message}
-                        >
-                            <Controller
-                                name="area"
-                                control={control}
-                                render={({ field }) =>
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Area"
-                                        options={[
-                                            { label: 'Area 1', value: 'Area 1' } as any,
-                                            { label: 'Area 2', value: 'Area 2' },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.range)}
-                            errorMessage={errors.range?.message}
-                        >
-                            <Controller
-                                name="range"
-                                control={control}
-                                render={({ field }) =>
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Range"
-                                        options={[
-                                            { label: 'Range 1', value: 'Range 1' } as any,
-                                            { label: 'Range 2', value: 'Range 2' },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }}
-                            />
+                                    onClick={() => {
+                                        reset();
+                                    }}
+                                >
+                                    Discard
+                                </Button>
+                            </div>
                         </FormItem>
 
-                        <FormItem>
-                            <Button variant="solid" block type="submit">Submit</Button>
-                        </FormItem>
                     </Form>
                 </Card>
 
-                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
+                <Card bordered={false} className='w-full overflow-auto'>
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
@@ -412,46 +479,47 @@ const TerritoryWise = () => {
                             placeholder="Search all columns..."
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
-                        
 
-                        <Table>
-                            <THead>
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <Tr key={headerGroup.id}>
-                                        {headerGroup.headers.map((header) => (
-                                            <Th key={header.id} colSpan={header.colSpan}>
-                                                {header.isPlaceholder ? null : (
-                                                    <div>
-                                                        {flexRender(header.column.columnDef.header, header.getContext())}
-                                                    </div>
-                                                )}
-                                            </Th>
-                                        ))}
-                                    </Tr>
-                                ))}
-                            </THead>
-                            <TBody>
-                                {table.getRowModel().rows.map((row) => (
-                                    <Tr key={row.id}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <Td key={cell.id} className='py-1 px-0 text-sm break-words whitespace-normal'>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </Td>
-                                        ))}
-                                    </Tr>
-                                ))}
-                            </TBody>
-                        </Table>
+                        <div className="min-w-[900px]">
+                            <Table>
+                                <THead>
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <Tr key={headerGroup.id}>
+                                            {headerGroup.headers.map((header) => (
+                                                <Th key={header.id} colSpan={header.colSpan}>
+                                                    {header.isPlaceholder ? null : (
+                                                        <div>
+                                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                                        </div>
+                                                    )}
+                                                </Th>
+                                            ))}
+                                        </Tr>
+                                    ))}
+                                </THead>
+                                <TBody>
+                                    {table.getRowModel().rows.map((row) => (
+                                        <Tr key={row.id}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <Td key={cell.id} className='py-1 px-0 text-sm break-words whitespace-normal'>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </Td>
+                                            ))}
+                                        </Tr>
+                                    ))}
+                                </TBody>
+                            </Table>
+                        </div>
                         <div className="flex items-center justify-between mt-4">
                             <Pagination
                                 pageSize={table.getState().pagination.pageSize}
                                 currentPage={table.getState().pagination.pageIndex + 1}
-                                total={territories.length} 
+                                total={territories.length}
                                 onChange={onPaginationChange}
                             />
                             <div style={{ minWidth: 130 }}>
                                 <Select
-                                    size="sm"
+                                    size="lg"
                                     isSearchable={false}
                                     value={pageSizeOptions.find(option => option.value === pageSize)}
                                     options={pageSizeOptions}
@@ -461,62 +529,6 @@ const TerritoryWise = () => {
                         </div>
                     </div>
                 </Card>
-
-                {/* Dialog code */}
-                <Dialog
-                    isOpen={dialogIsOpen}
-                    width={1000}
-                    height={500}
-                    onClose={onDialogClose}
-                    onRequestClose={onDialogClose}
-                >
-                    <div className="flex flex-col h-full">
-                        <h5 className="mb-4">Territory Wise Value Target</h5>
-                        <div className="flex-1 overflow-y-auto">
-                            {[
-                                { code: 'T01', name: 'Colombo North' },
-                                { code: 'T02', name: 'Kandy Central' },
-                                { code: 'T03', name: 'Galle South' },
-                            ].map((territory) => (
-                                <div key={territory.code} className="border-b py-3 flex flex-col md:flex-row md:items-center gap-4">
-                                    <div className="flex items-center min-w-[200px]">
-                                        <Checkbox  onChange={onCheck}/>
-                                        <span className="font-semibold ml-2">{territory.name}</span>
-                                    </div>
-                                    <div className="flex flex-col md:flex-row gap-2 flex-1">
-                                        <div className="mb-2 md:mb-0">
-                                            <Input placeholder="Target Value" size='sm' />
-                                        </div>
-                                        <div className="mb-2 md:mb-0">
-                                            <Input placeholder="PC Target" size='sm' />
-                                        </div>
-                                        <div>
-                                            <DatePickerRange placeholder="Select dates range" size='sm' />
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="text-right mt-6">
-                            <Button
-                                className="ltr:mr-2 rtl:ml-2"
-                                variant="plain"
-                                onClick={onDialogClose}
-                            >
-                                Cancel
-                            </Button>
-                            <Button variant="solid" onClick={onDialogOk}>
-                                Add
-                            </Button>
-                        </div>
-                    </div>
-                </Dialog>
-
-                
-
-                    
-
-
             </div>
         </div>
     );

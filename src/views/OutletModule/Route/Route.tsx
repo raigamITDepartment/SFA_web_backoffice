@@ -20,14 +20,12 @@ const Route = () => {
     return (
         <div>
             <Card
-                header={{
-                    content: 'Route Table',
-                    extra: headerExtraContent,
-                }}
+                
                 footer={{
                     content: cardFooter,
                 }}
             >
+                <FilterForm onSubmit={() => {}} />
                 <RouteTable />
             </Card>
         </div>

@@ -4,6 +4,7 @@ export type SignInCredential = {
 }
 
 export type SignInResponse = {
+    payload: { [x: string]: any; token: any }
     token: string
     user: {
         userId: string

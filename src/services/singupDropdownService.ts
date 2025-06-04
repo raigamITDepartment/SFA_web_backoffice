@@ -2,14 +2,9 @@
 import axios from 'axios';
 import { getToken } from '../utils/authUtils';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.8.90:8080';
+import { AuthService_URL } from '../configs/Config';
 
-export const fetchDepartments = async () => {
-export const fetchDepartments = async () => {
-    const token = getToken();
-    if (!token) {
-        throw new Error('No token provided or token has expired');
-    }
+export const fetchDepartments = async (token: string) => {
 
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -17,7 +12,7 @@ export const fetchDepartments = async () => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.get(
-            `${BASE_URL}/api/v1/arcation/department`,
+            `${AuthService_URL}/api/v1/userDemarcation/department`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -36,7 +31,6 @@ export const fetchDepartments = async () => {
 };
 
 export const fetchRegion = async () => {
-export const fetchRegion = async () => {
     const token = getToken();
     if (!token) {
         throw new Error('No token provided or token has expired');
@@ -48,7 +42,7 @@ export const fetchRegion = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            `${BASE_URL}/api/v1/userDemarcation/region`,
+            `${AuthService_URL}/api/v1/userDemarcation/region`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -73,7 +67,7 @@ export const fetchTerritories = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/territory',
+            `${AuthService_URL}/api/v1/userDemarcation/territory`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -98,7 +92,7 @@ export const fetchRegions = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/region',
+            `${AuthService_URL}/api/v1/userDemarcation/region`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -123,7 +117,7 @@ export const fetchChannels = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/channel',
+            `${AuthService_URL}//api/v1/userDemarcation/channel`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -149,7 +143,7 @@ export const fetchAreas = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/area',
+            `${AuthService_URL}/api/v1/userDemarcation/area`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -171,11 +165,11 @@ export const fetchAreas = async () => {
 export const fetchRanges = async () => {
     try {
 
-           const token = sessionStorage.getItem('accessToken');
+        const token = sessionStorage.getItem('accessToken');
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            'https://api-gateway-711667297937.asia-south1.run.app/api/v1/userDemarcation/range',
+            `${AuthService_URL}/api/v1/userDemarcation/range`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -193,3 +187,25 @@ export const fetchRanges = async () => {
         throw new Error(error.response?.data?.message || 'Failed to load ranges.');
     }
 }
+
+export const fetchUsers = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/user`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load users.');
+    }
+};
