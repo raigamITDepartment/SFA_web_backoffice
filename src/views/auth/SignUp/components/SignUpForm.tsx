@@ -24,6 +24,8 @@ interface SignUpFormProps extends CommonProps {
     userType?: string
 }
 
+
+
 type SignUpFormSchema = {
     userName: string
     firstName: string
@@ -89,11 +91,14 @@ const SignUpForm = (props: SignUpFormProps) => {
         resolver: zodResolver(validationSchema),
     })
 
-    useEffect(() => {
-        if (!token) {
-            setMessage?.('No auth token found.')
-            return
-        }
+        const selectedDepartment = watch('department')
+        const isSales = selectedDepartment?.label?.toLowerCase()  === 'sales';
+
+        useEffect(() => {
+            if (!token) {
+                setMessage?.('No auth token found.');
+                return;
+            }
 
         const loadDepartments = async () => {
             try {
@@ -411,73 +416,50 @@ const SignUpForm = (props: SignUpFormProps) => {
                             />
                         </FormItem>
 
-                        {/* Row: Channel, Sub-Channel */}
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
+                        {isSales && (
                             <FormItem
-                                label="Select Channel"
-                                invalid={Boolean(errors.channel)}
-                                errorMessage={errors.channel?.message}
-                                style={{ flex: 1, minWidth: 180 }}
+                                label="Select Region"
+                                invalid={Boolean(errors.region)}
+                                errorMessage={errors.region?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
                             >
                                 <Controller
-                                    name="channel"
+                                    name="region"
                                     control={control}
                                     render={({ field }) => (
                                         <Select
                                             size="sm"
                                             className="mb-4"
-                                            placeholder="Please Select Channel"
-                                            options={channel}
+                                            placeholder="Please Select Region"
+                                            options={region}
                                             {...field}
                                         />
                                     )}
                                 />
-                            </FormItem>
-                            <FormItem
-                                label="Select Sub-Channel"
-                                invalid={Boolean(errors.subChannel)}
-                                errorMessage={errors.subChannel?.message}
-                                style={{ flex: 1, minWidth: 180 }}
-                            >
-                                <Controller
-                                    name="subChannel"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Sub-Channel"
-                                            options={subChannel}
-                                            {...field}
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        </div>
-
-                     
-
+                            </FormItem>     )}
+                   
+  {isSales && (
                         <FormItem
-                            label="Select Region"
-                            invalid={Boolean(errors.region)}
-                            errorMessage={errors.region?.message}
+                            label="Select Channel "
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
                             style={{ flex: 1, marginLeft: '10px' }}
                         >
                             <Controller
-                                name="region"
+                                name="channel"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         className="mb-4"
-                                        placeholder="Please Select Region"
-                                        options={region}
+                                        placeholder="Please Select Channel"
+                                        options={channel}
                                         {...field}
                                     />
                                 )}
                             />
-                        </FormItem>
-
+                        </FormItem>  )}
+ {isSales && (
                         <FormItem
                             label="Select Area"
                             invalid={Boolean(errors.area)}
@@ -497,8 +479,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     />
                                 )}
                             />
-                        </FormItem>
-                        <FormItem
+                        </FormItem>)}
+                     {isSales && (    <FormItem
                             label="Select Territory"
                             invalid={Boolean(errors.territory)}
                             errorMessage={errors.territory?.message}
@@ -517,10 +499,11 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     />
                                 )}
                             />
-                        </FormItem>
+                        </FormItem>)}
 
-                        <FormItem
-                            label="Select Range"
+
+                    {isSales && (     <FormItem
+                            label="Select Range "
                             invalid={Boolean(errors.range)}
                             errorMessage={errors.range?.message}
                             style={{ flex: 1, marginLeft: '10px' }}
@@ -539,6 +522,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
+                             )}
 
                         <Button
                             block
