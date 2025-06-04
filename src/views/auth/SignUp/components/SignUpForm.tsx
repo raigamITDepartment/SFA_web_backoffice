@@ -25,6 +25,7 @@ interface SignUpFormProps extends CommonProps {
 }
 
 
+
 type SignUpFormSchema = {
     userName: string
     password: string
@@ -82,6 +83,9 @@ const SignUpForm = (props: SignUpFormProps) => {
         watch } = useForm<SignUpFormSchema>({
             resolver: zodResolver(validationSchema),
         })
+
+        const selectedDepartment = watch('department')
+        const isSales = selectedDepartment?.label?.toLowerCase()  === 'sales';
 
         useEffect(() => {
             if (!token) {
@@ -367,28 +371,29 @@ const SignUpForm = (props: SignUpFormProps) => {
                             />
                         </FormItem>
 
-
-                        <FormItem
-                            label="Select Region"
-                            invalid={Boolean(errors.region)}
-                            errorMessage={errors.region?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="region"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Region"
-                                        options={region}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-
+                        {isSales && (
+                            <FormItem
+                                label="Select Region"
+                                invalid={Boolean(errors.region)}
+                                errorMessage={errors.region?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="region"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Region"
+                                            options={region}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>     )}
+                   
+  {isSales && (
                         <FormItem
                             label="Select Channel "
                             invalid={Boolean(errors.channel)}
@@ -408,8 +413,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     />
                                 )}
                             />
-                        </FormItem>
-
+                        </FormItem>  )}
+ {isSales && (
                         <FormItem
                             label="Select Area"
                             invalid={Boolean(errors.area)}
@@ -429,8 +434,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     />
                                 )}
                             />
-                        </FormItem>
-                        <FormItem
+                        </FormItem>)}
+                     {isSales && (    <FormItem
                             label="Select Territory"
                             invalid={Boolean(errors.territory)}
                             errorMessage={errors.territory?.message}
@@ -449,10 +454,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     />
                                 )}
                             />
-                        </FormItem>
+                        </FormItem>)}
 
 
-                        <FormItem
+                    {isSales && (     <FormItem
                             label="Select Range "
                             invalid={Boolean(errors.range)}
                             errorMessage={errors.range?.message}
@@ -471,10 +476,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     />
                                 )}
                             />
-
-
-
                         </FormItem>
+                             )}
 
                         <Button
                             block
