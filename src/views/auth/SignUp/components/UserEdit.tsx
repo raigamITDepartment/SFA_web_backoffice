@@ -7,6 +7,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
+import { HiCheckCircle } from 'react-icons/hi'
+import { toast, Alert } from '@/components/ui'
 
 type SignUpFormSchema = {
     userName: string
@@ -68,7 +70,26 @@ function UserEdit() {
     const isSales = selectedDepartment?.label?.toLowerCase() === 'sales'
 
     const onSubmit = async (values: SignUpFormSchema) => {
-        alert('Submitted!')
+        // ...your update logic here...
+        toast.push(
+            <Alert
+                
+                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+            >
+                {/* <HiCheckCircle className="text-green-500 mb-2" size={48} /> */}
+                <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
+                    User updated successfully!
+                </div>
+            </Alert>,
+            {
+                offsetX: 5,
+                offsetY: 100,
+                transitionType: 'fade',
+                block: false,
+                placement: 'top-end',
+                
+            }
+        )
         navigate(-1)
     }
 
@@ -389,7 +410,9 @@ function UserEdit() {
                             </Button>
                             <button
                                 type="button"
-                                className="w-1/2 py-2 border border-red-500 text-red-600 rounded-md bg-white font-medium hover:bg-red-50 transition"
+                                className="w-1/2 py-2 border-2 border-red-500 text-red-600 rounded-lg bg-white font-medium
+                                    transition-all duration-300 ease-in-out
+                                    hover:bg-red-500 hover:text-white hover:shadow-lg hover:scale-105 active:scale-95"
                                 onClick={handleDiscard}
                             >
                                 Discard

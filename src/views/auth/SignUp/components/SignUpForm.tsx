@@ -11,8 +11,8 @@ import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
 import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'
-import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
+import { toast, Alert } from '@/components/ui'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -80,7 +80,6 @@ const SignUpForm = (props: SignUpFormProps) => {
     const [subChannel, setSubChannel] = useState<any>([])
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
-    const [successDialog, setSuccessDialog] = useState(false)
     const { signUp } = useAuth()
 
     const {
@@ -149,19 +148,6 @@ const SignUpForm = (props: SignUpFormProps) => {
         loadChannel()
     }, [setMessage])
 
-    // Example: fetchSubChannels should be implemented in your service
-    // useEffect(() => {
-    //     const loadSubChannel = async () => {
-    //         try {
-    //             const subChannelOptions = await fetchSubChannels(token)
-    //             setSubChannel(subChannelOptions)
-    //         } catch (error) {
-    //             setMessage?.('Failed to load sub-channels.')
-    //         }
-    //     }
-    //     loadSubChannel()
-    // }, [setMessage])
-
     useEffect(() => {
         const loadArea = async () => {
             try {
@@ -196,7 +182,26 @@ const SignUpForm = (props: SignUpFormProps) => {
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
             } else {
-                setSuccessDialog(true)
+                // Show success toast
+                toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <HiCheckCircle className="text-green-500 mb-2" size={48} />
+                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                            User created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 100,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    }
+                )
             }
 
             setSubmitting(false)
@@ -522,16 +527,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                     </Form>
                 </div>
             </div>
-            {/* Success Dialog */}
-            <Dialog isOpen={successDialog} onClose={() => setSuccessDialog(false)} title="Success">
-                <div className="flex flex-col items-center justify-center py-6">
-                    <HiCheckCircle className="text-green-500" size={48} />
-                    <div className="mt-4 text-green-700 font-semibold text-lg">User created successfully!</div>
-                    <Button className="mt-6" variant="solid" onClick={() => setSuccessDialog(false)}>
-                        OK
-                    </Button>
-                </div>
-            </Dialog>
         </div>
     )
 }

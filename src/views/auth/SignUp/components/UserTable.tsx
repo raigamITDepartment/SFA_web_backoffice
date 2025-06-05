@@ -23,11 +23,11 @@ import type { InputHTMLAttributes } from 'react'
 import { fetchUsers, deleteUser } from '@/services/singupDropdownService'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
-import Dialog from '@/components/ui/Dialog'
 import Button from '@/components/ui/Button'
 import Tag from '@/components/ui/Tag'
 import { useNavigate } from 'react-router-dom'
 import { HiCheckCircle } from 'react-icons/hi'
+import { toast, Alert } from '@/components/ui'
 
 type Person = {
     id: number
@@ -93,11 +93,36 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
+// Sample data for initial render
+const sampleData: Person[] = [
+    {
+        id: 1,
+        userName: 'jdoe',
+        roleId: 1,
+        email: 'jdoe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'Admin',
+        userType: 'Internal',
+        isActive: true,
+    },
+    {
+        id: 2,
+        userName: 'asmith',
+        roleId: 2,
+        email: 'asmith@example.com',
+        firstName: 'Alice',
+        lastName: 'Smith',
+        role: 'User',
+        userType: 'External',
+        isActive: false,
+    },
+]
+
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const [data, setData] = useState<Person[]>([]) // <-- No sample data
-    const [dialogIsOpen, setDialogIsOpen] = useState(false)
+    const [data, setData] = useState<Person[]>(sampleData)
     const [selectedUser, setSelectedUser] = useState<Person | null>(null)
     const navigate = useNavigate()
 
@@ -107,28 +132,48 @@ const Filtering = () => {
                 const res = await fetchUsers()
                 setData(res)
             } catch (err) {
+                // If fetch fails, keep sample data
                 console.error('Failed to load users:', err)
             }
         }
         loadUsers()
     }, [])
 
-
     const handleDeleteClick = (user: Person) => {
         setSelectedUser(user)
-        setDialogIsOpen(true)
+        blockAlert()
     }
 
-    const confirmDelete = async () => {
-        if (selectedUser) {
+
+    const blockAlert = () => {
+        toast.push(
+            <Alert
+                showIcon
+                type="danger"
+                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+            >
+                Removing User...
+            </Alert>,
+            {
+                offsetX: 5,         // 0 from the right edge
+                offsetY: 100,        // 16px from the top
+                transitionType: 'fade',
+                block: false,       // allow stacking in the corner
+                placement: 'top-end', // if your toast system supports it
+            }
+        )
+
+    }
+
+    const confirmDelete = async (user: Person) => {
+        if (user) {
             try {
-                await deleteUser(selectedUser.id)
-                setData(prev => prev.filter(u => u.id !== selectedUser.id))
+                await deleteUser(user.id)
+                setData(prev => prev.filter(u => u.id !== user.id))
             } catch (error) {
                 console.error('Failed to delete user:', error)
             } finally {
                 setSelectedUser(null)
-                setDialogIsOpen(false)
             }
         }
     }
@@ -164,14 +209,14 @@ const Filtering = () => {
             cell: ({ row }) => {
                 const user = row.original
                 return (
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 ">
                         <FaRegEdit
-                            className="text-blue-500 cursor-pointer"
+                            className="text-blue-500 text-base  cursor-pointer"
                             title="Edit"
                             onClick={() => handleEditClick(user)}
                         />
                         <MdDeleteOutline
-                            className="text-red-500 cursor-pointer"
+                            className="text-red-500 text-lg cursor-pointer"
                             title="Delete"
                             onClick={() => handleDeleteClick(user)}
                         />
@@ -257,29 +302,6 @@ const Filtering = () => {
                     </div>
                 </div>
             </div>
-
-            <Dialog isOpen={dialogIsOpen} onClose={() => setDialogIsOpen(false)} title="Confirm Delete">
-                <div className="flex flex-col items-center justify-center py-6">
-                    <MdDeleteOutline className="text-red-500 mb-2" size={48} />
-                    <div className="text-lg mb-4">
-                        Are you sure you want to delete <strong>{selectedUser?.userName}</strong>?
-                    </div>
-                    <div className="flex justify-center mt-4 space-x-2">
-                        <Button onClick={() => setDialogIsOpen(false)} variant="solid">
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={async () => {
-                                await confirmDelete();
-                                setDialogIsOpen(false);
-                            }}
-                            variant="danger"
-                        >         
-                            Delete
-                        </Button>
-                    </div>
-                </div>
-            </Dialog>
         </div>
     )
 }
