@@ -45,7 +45,7 @@ export const fetchTerritories = async () => {
 
         return response.data.payload.map((territory: any) => ({
             label: territory.territoryName,
-            value: territory.territoryCode,
+            value: territory.id,
         }));
     } catch (error: any) {
         console.error('Error fetching territories:', error);
@@ -70,7 +70,7 @@ export const fetchRegions = async () => {
 
         return response.data.payload.map((region: any) => ({
             label: region.regionName,
-            value: region.regionCode,
+            value: region.id,
         }));
     } catch (error: any) {
         console.error('Error fetching regions:', error);
@@ -95,7 +95,7 @@ export const fetchChannels = async () => {
 
         return response.data.payload.map((channel: any) => ({
             label: channel.channelName,
-            value: channel.channelCode,
+            value: channel.id,
         }));
     } catch (error: any) {
         console.error('Error fetching channels:', error);
@@ -121,7 +121,7 @@ export const fetchAreas = async () => {
 
         return response.data.payload.map((area: any) => ({
             label: area.areaName,
-            value: area.areaCode,
+            value: area.id,
         }));
     } catch (error: any) {
         console.error('Error fetching areas:', error);
@@ -147,7 +147,7 @@ export const fetchRanges = async () => {
 
         return response.data.payload.map((range: any) => ({
             label: range.rangeName,
-            value: range.rangeCode,
+            value: range.id,
         }));
     } catch (error: any) {
         console.error('Error fetching ranges:', error);
@@ -217,6 +217,7 @@ export const fetchUserTypes = async () => {
         );
          return response.data.payload.map((userType: any) => ({
             label: userType.userTypeName,
+            value: userType.id
         }));
     } catch (error: any) {
         console.error('Error fetching user types:', error);
@@ -241,9 +242,55 @@ export const fetchUserRoles = async () => {
         );
          return response.data.payload.map((role: any) => ({
             label: role.roleName,
+            value: role.id
         }));
     } catch (error: any) {
         console.error('Error fetching roles:', error);
         throw new Error(error.response?.data?.message || 'Failed to load roles.');
+    }
+};
+
+//sign up user
+export interface SignupPayload {
+    roleId: number;
+    departmentId: number;
+    continentId: number | null;
+    countryId: number | null;
+    channelId: number | null;
+    subChannelId: number | null;
+    regionId: number | null;
+    areaId: number | null;
+    territoryId: number | null;
+    agencyId: number | null;
+    userTypeId: number;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    perMail: string;
+    address1: string;
+    address2: string;
+    address3: string;
+    perContact: string;
+    email: string;
+    password: string;
+    mobileNo: string;
+    isActive: boolean;
+    gpsStatus: boolean;
+    superUserId: number;
+}
+
+export const signupUser = async (payload: SignupPayload) => {
+    try {
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/auth/signup`,
+            payload,
+            {
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during signup:', error, payload);
+        throw new Error(error.response?.data?.message || 'Signup failed.');
     }
 };
