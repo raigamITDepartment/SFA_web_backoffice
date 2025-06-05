@@ -10,7 +10,8 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles } from '@/services/singupDropdownService'
+import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
 
@@ -80,6 +81,9 @@ const SignUpForm = (props: SignUpFormProps) => {
     const [subChannel, setSubChannel] = useState<any>([])
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
+    const [userType, setUserType] = useState<any>([])
+    const [userRole, setUserRole] = useState<any>([])
+    const [successDialog, setSuccessDialog] = useState(false)
     const { signUp } = useAuth()
 
     const {
@@ -167,6 +171,31 @@ const SignUpForm = (props: SignUpFormProps) => {
                 setRange(rangeOptions)
             } catch (error) {
                 setMessage?.('Failed to load ranges.')
+            }
+        }
+        loadRange()
+    }, [setMessage])
+
+    
+    useEffect(() => {
+        const loadRange = async () => {
+            try {
+                const userTypes = await fetchUserTypes(token)
+                setUserType(userTypes)
+            } catch (error) {
+                setMessage?.('Failed to load user types.')
+            }
+        }
+        loadRange()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRange = async () => {
+            try {
+                const userRole = await fetchUserRoles(token)
+                setUserRole(userRole)
+            } catch (error) {
+                setMessage?.('Failed to load user types.')
             }
         }
         loadRange()
@@ -357,13 +386,13 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 control={control}
                                 rules={{ required: 'Role is required' }}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select"
-                                        value={field.value}
-                                        onChange={(selectedOption) => field.onChange(selectedOption)}
-                                    />
+                                   <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Role"
+                                            options={userRole}
+                                            {...field}
+                                        />
                                 )}
                             />
                         </FormItem>
@@ -398,11 +427,12 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 control={control}
                                 render={({ field }) => (
                                     <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select User Type"
-                                        {...field}
-                                    />
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Type"
+                                            options={userType}
+                                            {...field}
+                                        />
                                 )}
                             />
                         </FormItem>
