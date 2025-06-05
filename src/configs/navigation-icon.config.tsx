@@ -11,11 +11,14 @@ import {
     PiReadCvLogoFill,
     PiAddressBookTabsThin,
     PiShoppingCartFill,
-    PiReceiptXBold
+    PiReceiptXBold,
+    PiWarehouseFill,
+    PiInvoiceBold,
+    PiUploadFill,
+    PiKeyReturnFill
 } from 'react-icons/pi'
 import type { JSX } from 'react'
-import { report } from 'process'
-import { Outlet } from 'react-router-dom'
+
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -32,7 +35,13 @@ const navigationIcon: NavigationIcons = {
     report:<PiReadCvLogoFill/>,
     HR:<PiAddressBookTabsThin/>,
     Outlet:<PiShoppingCartFill/>,
-    research:<PiReceiptXBold/>
+    research:<PiReceiptXBold/>,
+    Agancy: <PiWarehouseFill />,
+    Invoice:<PiInvoiceBold   />,
+    Loding:<PiUploadFill/>,
+    Return:<PiKeyReturnFill/>
+
+
 }
 
 export default navigationIcon

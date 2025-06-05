@@ -1,10 +1,9 @@
-import { CONCEPTS_PREFIX_PATH } from '@/constants/route.constant'
 import {
-    NAV_ITEM_TYPE_TITLE,
+    
     NAV_ITEM_TYPE_COLLAPSE,
     NAV_ITEM_TYPE_ITEM,
 } from '@/constants/navigation.constant'
-import { ADMIN, USER } from '@/constants/roles.constant'
+//import { ADMIN, USER } from '@/constants/roles.constant'
 import type { NavigationTree } from '@/@types/navigation'
 
 const Reportnavigationconfig: NavigationTree[] = [
@@ -21,7 +20,7 @@ const Reportnavigationconfig: NavigationTree[] = [
         subMenu: [
             {
                 key: 'BookingReport',
-                path: '/Sales-menu-BookingReport',
+                path: '/Reports-menu-BookingReport',
                 title: 'Booking Sales Report',
                 translateKey: 'nav.Reports.BookingReport',
                 icon: '',
@@ -32,7 +31,7 @@ const Reportnavigationconfig: NavigationTree[] = [
             },
             {
                 key: 'ActualReport',
-                path:  '/Sales-menu-acutalReport',
+                path:  '/Reports-menu-acutalReport',
                 title: 'Actual Sales Report',
                 translateKey: 'nav.Reports.ActualReport',
                 icon: '',
@@ -44,7 +43,7 @@ const Reportnavigationconfig: NavigationTree[] = [
 
              {
                 key: 'AchItemWise)',
-                path:  '/Sales-menu-AchItemWise',
+                path:  '/Reports-menu-AchItemWise',
                 title: 'Achievement(Item Wise)',
                 translateKey: 'nav.Reports.AchItemWise',
                 icon: '',
@@ -55,7 +54,7 @@ const Reportnavigationconfig: NavigationTree[] = [
 
              {
                 key: 'AchProductwise',
-                path:  '/Sales-menu-AchProductwise',
+                path:  '/Reports-menu-AchProductwise',
                 title: 'Achievement(Product Wise)',
                 translateKey: 'nav.Reports.AchProductwise',
                 icon: '',
@@ -67,7 +66,7 @@ const Reportnavigationconfig: NavigationTree[] = [
 
              {
                 key: 'BAReport',
-                path:  '/Sales-menu-BAReport',
+                path:  '/Reports-menu-BAReport',
                 title: 'Booking & Actual Sales Report',
                 translateKey: 'nav.Reports.BAReport',
                 icon: '',
@@ -78,7 +77,7 @@ const Reportnavigationconfig: NavigationTree[] = [
 
              {
                 key: 'TvsAReport',
-                path:  '/Sales-menu-TvsAReport',
+                path:  '/Reports-menu-TvsAReport',
                 title: 'Target vs Actual Sales Report',
                 translateKey: 'nav.Reports.TvsAReport',
                 icon: '',
@@ -90,7 +89,7 @@ const Reportnavigationconfig: NavigationTree[] = [
         
              {
                 key: 'Invoices',
-                path:  '/Sales-menu-Invoices',
+                path:  '/Reports-menu-Invoices',
                 title: 'Invoices',
                 translateKey: 'nav.Reports.Invoices',
                 icon: '',
