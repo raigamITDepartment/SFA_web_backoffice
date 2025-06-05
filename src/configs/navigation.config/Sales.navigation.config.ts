@@ -1,12 +1,11 @@
-export const SALES_PREFIX_PATH = '/SalesDetails'
-import { CONCEPTS_PREFIX_PATH } from '@/constants/route.constant'
 import {
-    NAV_ITEM_TYPE_TITLE,
     NAV_ITEM_TYPE_COLLAPSE,
     NAV_ITEM_TYPE_ITEM,
 } from '@/constants/navigation.constant'
-import { ADMIN, USER } from '@/constants/roles.constant'
+//import { ADMIN, USER } from '@/constants/roles.constant'
 import type { NavigationTree } from '@/@types/navigation'
+
+
 
 const Salesnavigationconfig: NavigationTree[] = [
     {
@@ -16,7 +15,7 @@ const Salesnavigationconfig: NavigationTree[] = [
         translateKey: 'nav.SalesMenu.SalesMenu',
         icon: 'sales',
         type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: [ADMIN, USER],
+        authority: [],
         meta: {
             horizontalMenu: {
                 layout: 'columns',
@@ -26,17 +25,17 @@ const Salesnavigationconfig: NavigationTree[] = [
         subMenu: [
             {
                 key: 'CategoryAdd',
-                path: `${SALES_PREFIX_PATH}/Salesmenu/CategoryAdd`,
+                path: '/Salesmenu/CategoryAdd',
                 title: 'Category Add',
                 translateKey: 'nav.SalesMenu.CategoryAdd',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
+                    authority: [],
                 subMenu: [],
             },
             {
                 key: 'FreeIssue',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/FreeIssue`,
+                path: '/Salesmenu/FreeIssue',
                 title: 'Free Issue',
                 translateKey: 'nav.SalesMenu.FreeIssue',
                 icon: '',
@@ -46,7 +45,7 @@ const Salesnavigationconfig: NavigationTree[] = [
             },
             {
                 key: 'ItemMaster',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/ItemMaster`,
+                path: '/Salesmenu/ItemMaster',
                 title: 'Item Master',
                 translateKey: 'nav.SalesMenu.ItemMaster',
                 icon: '',
@@ -54,10 +53,9 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
             {
                 key: 'ItemAdd',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/ItemAdd`,
+                path: '/Salesmenu/ItemAdd',
                 title: 'Item Add',
                 translateKey: 'nav.SalesMenu.ItemAdd',
                 icon: '',
@@ -67,7 +65,7 @@ const Salesnavigationconfig: NavigationTree[] = [
             },
             {
                 key: 'ItemSequence',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/ItemSequence`,
+                path: '/Salesmenu/ItemSequence',
                 title: 'Item Sequence',
                 translateKey: 'nav.SalesMenu.ItemSequence',
                 icon: '',
@@ -75,10 +73,9 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
             {
                 key: 'PriceUpdate',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
+                path: '/Salesmenu/PriceUpdate',
                 title: 'Price Update',
                 translateKey: 'nav.SalesMenu.PriceUpdate',
                 icon: '',
@@ -86,12 +83,9 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
-
-
             {
-                key: 'Agancy Stock',
-                path: `${SALES_PREFIX_PATH} /Salesmenu/Stock`,
+                key: 'AgancyStock',
+                path: '/Salesmenu/Stock',
                 title: 'Stock',
                 translateKey: 'nav.SalesMenu.Stock',
                 icon: '',
@@ -99,10 +93,9 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
             {
                 key: 'MarketReturn',
-                path: `${SALES_PREFIX_PATH}/Salesmenu/MarketReturn`,
+                path: '/Salesmenu/MarketReturn',
                 title: 'Market Return',
                 translateKey: 'nav.SalesMenu.MarketReturn',
                 icon: '',
@@ -110,11 +103,9 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
-
             {
                 key: 'Working',
-                path: `${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
+                path: '/Salesmenu/WorkingDay',
                 title: 'Working Day',
                 translateKey: 'nav.SalesMenu.WorkingDay',
                 icon: '',
@@ -122,10 +113,9 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
             {
                 key: 'Invoice',
-                path: `${SALES_PREFIX_PATH}/Salesmenu/Invoice`,
+                path: '/Salesmenu/Invoice',
                 title: 'Invoice',
                 translateKey: 'nav.SalesMenu.Invoice',
                 icon: '',
@@ -135,7 +125,7 @@ const Salesnavigationconfig: NavigationTree[] = [
             },
             {
                 key: 'Target',
-                path: `${SALES_PREFIX_PATH}/Salesmenu/Target`,
+                path: '/Salesmenu/Target',
                 title: 'Target',
                 translateKey: 'nav.SalesMenu.Target',
                 icon: '',
@@ -143,12 +133,8 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-
-
-
-
-
         ],
     },
 ]
+
 export default Salesnavigationconfig
