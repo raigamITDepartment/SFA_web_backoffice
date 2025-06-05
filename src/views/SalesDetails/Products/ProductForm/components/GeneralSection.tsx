@@ -94,10 +94,11 @@ const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
                         control={control}
                         render={({ field }) => (
                             <Select
-                                placeholder="Select Channel"
+                                isMulti
+                                placeholder="Select Channel(s)"
                                 options={channelOptions}
-                                value={channelOptions.find(opt => opt.value === field.value) || null}
-                                onChange={option => field.onChange(option?.value)}
+                                value={channelOptions.filter(opt => Array.isArray(field.value) ? field.value.includes(opt.value) : false)}
+                                onChange={options => field.onChange(options ? options.map(opt => opt.value) : [])}
                             />
                         )}
                     />
@@ -109,14 +110,15 @@ const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
                     errorMessage={errors.subchannel?.message}
                 >
                     <Controller
-                        name="subChannel"
+                        name="subchannel"
                         control={control}
                         render={({ field }) => (
                             <Select
-                                placeholder="Select Sub-channel"
+                                isMulti
+                                placeholder="Select Sub-channel(s)"
                                 options={subChannelOptions}
-                                value={subChannelOptions.find(opt => opt.value === field.value) || null}
-                                onChange={option => field.onChange(option?.value)}
+                                value={subChannelOptions.filter(opt => Array.isArray(field.value) ? field.value.includes(opt.value) : false)}
+                                onChange={options => field.onChange(options ? options.map(opt => opt.value) : [])}
                             />
                         )}
                     />
