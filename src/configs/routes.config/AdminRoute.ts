@@ -4,14 +4,14 @@ import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
 
-    const UserRoute: Routes = [
+const UserRoute: Routes = [
     {
         key: 'UserModule.ModifiyUser',
         path: '/User-menu-ModifiyUser',
         component: lazy(() => import('@/views/auth/SignUp/SignUp')),
         authority: [],
     },
-   
+
 
 
     {
@@ -20,7 +20,14 @@ import type { Routes } from '@/@types/routes'
         component: lazy(() => import('@/views/admin/BookingReverse/products/ProductList/ProductList')),
         authority: [],
     },
-   
+
+    {
+        key: 'UserModule.EditUser',
+        path: '/users/:id/edit',
+        component: lazy(() => import('@/views/auth/SignUp/components/UserEdit')),
+        authority: [],
+    },
+
 
 ]
 

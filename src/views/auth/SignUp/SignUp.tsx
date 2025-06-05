@@ -40,7 +40,7 @@ export const SignUpBase = ({
             )}
             <div className="flex flex-col lg:flex-row justify-between items-start w-full">
                 {/* Left Column (4/12 width) */}
-                <div className="w-full lg:w-1/2 mb-4 lg:mb-0 lg:mr-4">
+                <div className="w-full lg:w-2/5 mb-4 lg:mb-0 lg:mr-4">
                     <SignUpForm
                         disableSubmit={disableSubmit}
                         setMessage={setMessage}
@@ -54,7 +54,7 @@ export const SignUpBase = ({
                 </div>
 
                 {/* Right Column (8/12 width) */}
-                <div className="w-full lg:w-2/3 mt-1 lg:mt-0">
+                <div className="w-full lg:w-3/5 mt-1 lg:mt-0">
                     <UserTable />
                 </div>
             </div>
