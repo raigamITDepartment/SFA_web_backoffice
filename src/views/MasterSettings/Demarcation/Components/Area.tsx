@@ -30,6 +30,7 @@ type FormSchema = {
     channel: string;
     subChannel: string;
     region: string;
+    areaCode: string;
     areaName: string;
     isActive: boolean;
 };
@@ -94,8 +95,8 @@ const Area = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
-    const [areaData, setAreaData] = useState<Area[]>([]); 
-    
+    const [areaData, setAreaData] = useState<Area[]>([]);
+
     useEffect(() => {
         const loadUsers = async () => {
             try {
@@ -217,7 +218,7 @@ const Area = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' }as any,
+                                            { label: 'National Channel', value: 'National Channel' } as any,
                                             { label: 'Bakery Channel', value: 'Bakery Channel' },
                                         ]}
                                         value={field.value}
@@ -248,7 +249,7 @@ const Area = () => {
                                         size="sm"
                                         placeholder="Select Sub-Channel"
                                         options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' } as any,
                                             { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                         ]}
                                         value={field.value}
@@ -279,11 +280,39 @@ const Area = () => {
                                         size="sm"
                                         placeholder="Select Region"
                                         options={[
-                                            { label: 'Region 1', value: 'Region 1' }as any,
+                                            { label: 'Region 1', value: 'Region 1' } as any,
                                             { label: 'Region 2', value: 'Region 2' },
                                         ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+
+                        <FormItem
+                            invalid={Boolean(errors.areaCode)}
+                            errorMessage={errors.areaCode?.message}
+                        >
+                            <Controller
+                                name="areaCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Area Code"
+                                        {...field}
                                     />
                                 }
                                 rules={{

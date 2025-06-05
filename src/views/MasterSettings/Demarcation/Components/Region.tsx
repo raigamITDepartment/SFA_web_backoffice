@@ -277,7 +277,7 @@ const Region = () => {
                                     <Input
                                         type="text"
                                         autoComplete="off"
-                                        placeholder="Region Name"
+                                        placeholder="Region Code"
                                         {...field}
                                     />
                                 }
