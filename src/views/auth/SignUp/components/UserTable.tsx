@@ -19,13 +19,16 @@ import type {
     FilterFn,
     ColumnFiltersState,
 } from '@tanstack/react-table'
-import type { InputHTMLAttributes, ReactNode, CSSProperties } from 'react'
+import type { InputHTMLAttributes } from 'react'
 import { fetchUsers, deleteUser } from '@/services/singupDropdownService'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
-import Dialog from '@/components/ui/Dialog'
 import Button from '@/components/ui/Button'
-import Tag from '@/components/ui/Tag';
+import Tag from '@/components/ui/Tag'
+import { useNavigate } from 'react-router-dom'
+import { HiCheckCircle } from 'react-icons/hi'
+import { toast, Alert } from '@/components/ui'
+import Dialog from '@/components/ui/Dialog'
 
 type Person = {
     id: number
@@ -36,6 +39,7 @@ type Person = {
     lastName?: string
     role?: string
     userType?: string
+    isActive?: boolean
 }
 
 interface DebouncedInputProps
@@ -90,12 +94,39 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
+// Sample data for initial render
+const sampleData: Person[] = [
+    {
+        id: 1,
+        userName: 'jdoe',
+        roleId: 1,
+        email: 'jdoe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'Admin',
+        userType: 'Internal',
+        isActive: true,
+    },
+    {
+        id: 2,
+        userName: 'asmith',
+        roleId: 2,
+        email: 'asmith@example.com',
+        firstName: 'Alice',
+        lastName: 'Smith',
+        role: 'User',
+        userType: 'External',
+        isActive: false,
+    },
+]
+
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const [data, setData] = useState<Person[]>([])
-    const [dialogIsOpen, setDialogIsOpen] = useState(false)
+    const [data, setData] = useState<Person[]>(sampleData)
     const [selectedUser, setSelectedUser] = useState<Person | null>(null)
+    const [dialogIsOpen, setDialogIsOpen] = useState(false)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -103,6 +134,7 @@ const Filtering = () => {
                 const res = await fetchUsers()
                 setData(res)
             } catch (err) {
+                // If fetch fails, keep sample data
                 console.error('Failed to load users:', err)
             }
         }
@@ -114,19 +146,45 @@ const Filtering = () => {
         setDialogIsOpen(true)
     }
 
-const confirmDelete = async () => {
-    if (selectedUser) {
-        try {
-            await deleteUser(selectedUser.id); 
-            setData(prev => prev.filter(u => u.id !== selectedUser.id)); 
-        } catch (error) {
-            console.error('Failed to delete user:', error);
-        } finally {
-            setSelectedUser(null);
-            setDialogIsOpen(false);
+    const handleDialogClose = () => {
+        setDialogIsOpen(false)
+        setSelectedUser(null)
+    }
+
+    const handleDialogConfirm = async () => {
+        setDialogIsOpen(false)
+        if (selectedUser) {
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    Removing User
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+
+                }
+            )
+            try {
+                await deleteUser(selectedUser.id)
+                setData(prev => prev.filter(u => u.id !== selectedUser.id))
+            } catch (error) {
+                console.error('Failed to delete user:', error)
+            } finally {
+                setSelectedUser(null)
+            }
         }
     }
-};
+
+    const handleEditClick = (user: Person) => {
+        navigate(`/users/${user.id}/edit`)
+    }
 
     const columns = useMemo<ColumnDef<Person>[]>(() => [
         { header: 'Username', accessorKey: 'userName' },
@@ -134,7 +192,6 @@ const confirmDelete = async () => {
         { header: 'Last Name', accessorKey: 'lastName' },
         { header: 'Role', accessorKey: 'role' },
         { header: 'User Type', accessorKey: 'userType' },
-        // { header: 'Role ID', accessorKey: 'roleId' },
         { header: 'Email', accessorKey: 'email' },
         {
             header: 'Status',
@@ -143,24 +200,27 @@ const confirmDelete = async () => {
                 const isActive = getValue();
                 return (
                     <div className="mr-2 rtl:ml-2">
-                                            <Tag className={isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" :  "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
-                        {isActive ? 'Active' : 'Inactive'}
-                    </Tag>
+                        <Tag className={isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
+                            {isActive ? 'Active' : 'Inactive'}
+                        </Tag>
                     </div>
                 );
             }
         },
-
         {
             header: 'Actions',
             id: 'actions',
             cell: ({ row }) => {
                 const user = row.original
                 return (
-                    <div className="flex space-x-2">
-                        <FaRegEdit className="text-blue-500 cursor-pointer" title="Edit" />
+                    <div className="flex space-x-2 ">
+                        <FaRegEdit
+                            className="text-blue-500 text-base  cursor-pointer"
+                            title="Edit"
+                            onClick={() => handleEditClick(user)}
+                        />
                         <MdDeleteOutline
-                            className="text-red-500 cursor-pointer"
+                            className="text-red-500 text-lg cursor-pointer"
                             title="Delete"
                             onClick={() => handleDeleteClick(user)}
                         />
@@ -246,12 +306,36 @@ const confirmDelete = async () => {
                     </div>
                 </div>
             </div>
-
-            <Dialog isOpen={dialogIsOpen} onClose={() => setDialogIsOpen(false)} title="Confirm Delete">
-                <p>Are you sure you want to delete <strong>{selectedUser?.userName}</strong>?</p>
-                <div className="flex justify-end mt-4 space-x-2">
-                    <Button onClick={() => setDialogIsOpen(false)} variant="secondary">Cancel</Button>
-                    <Button onClick={confirmDelete} variant="danger">Delete</Button>
+            <Dialog
+                isOpen={dialogIsOpen}
+                onClose={handleDialogClose}
+                onRequestClose={handleDialogClose}
+            >
+                <h5 className="mb-4">Remove User</h5>
+                <p>
+                    Are you sure to remove user <b>{selectedUser?.userName}</b>?
+                </p>
+                <div className="text-right mt-6">
+                    <Button
+                        className="mr-2"
+                        clickFeedback={false}
+                        customColorClass={({ active, unclickable }) =>
+                            [
+                                'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+                                
+                                unclickable && 'opacity-50 cursor-not-allowed',
+                                !active && !unclickable,
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+                        }
+                        onClick={handleDialogClose}
+                    >
+                        Cancel
+                    </Button>
+                    <Button variant="solid" onClick={handleDialogConfirm}>
+                        Confirm
+                    </Button>
                 </div>
             </Dialog>
         </div>
