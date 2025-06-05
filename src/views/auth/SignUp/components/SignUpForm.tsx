@@ -4,15 +4,17 @@ import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
 import { useAuth } from '@/auth'
 import Select from '@/components/ui/Select'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles } from '@/services/singupDropdownService'
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload } from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
+
+
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -26,48 +28,50 @@ interface SignUpFormProps extends CommonProps {
     userType?: string
 }
 
-type SignUpFormSchema = {
-    userName: string
-    firstName: string
-    lastName: string
-    password: string
-    email: string
-    mobileNumber: string
-    confirmPassword: string
-    role: string
-    department: string
-    userType: string
-    channel: string
-    subChannel: string
-    region: string
-    area: string
-    territory: string
-    range: string
-}
+export type SignUpFormSchema = {
+  email: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  confirmPassword: string;
+  mobileNumber: string;
+  role: number;
+  department: number;
+  userType: number;
+  channel?: number;
+  subChannel?: number;
+  region?: number;
+  area?: number;
+  territory?: number;
+  range?: number;
+};
+
 
 const validationSchema: ZodType<SignUpFormSchema> = z
-    .object({
-        email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
-        userName: z.string({ required_error: 'Please enter your name' }),
-        firstName: z.string({ required_error: 'Please enter your first name' }),
-        lastName: z.string({ required_error: 'Please enter your last name' }),
-        password: z.string({ required_error: 'Password Required' }),
-        mobileNumber: z.string({ required_error: 'Mobile Number Required' }).regex(/^\d+$/, 'Mobile Number must be numeric'),
-        confirmPassword: z.string({ required_error: 'Please confirm your password' }),
-        role: z.string({ required_error: 'Please select your role' }),
-        department: z.string({ required_error: 'Please select your department' }),
-        userType: z.string({ required_error: 'Please select your user type' }),
-        channel: z.string({ required_error: 'Please select your channel' }),
-        subChannel: z.string({ required_error: 'Please select your sub-channel' }),
-        region: z.string({ required_error: 'Please select your region' }),
-        area: z.string({ required_error: 'Please select your area' }),
-        territory: z.string({ required_error: 'Please select your territory' }),
-        range: z.string({ required_error: 'Please select your range' }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: 'Password not match',
-        path: ['confirmPassword'],
-    })
+ .object({
+    email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
+    userName: z.string({ required_error: 'Please enter your name' }),
+    firstName: z.string({ required_error: 'Please enter your first name' }),
+    lastName: z.string({ required_error: 'Please enter your last name' }),
+    password: z.string({ required_error: 'Password Required' }),
+    confirmPassword: z.string({ required_error: 'Please confirm your password' }),
+    mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
+    role: z.number({ required_error: 'Please select your role' }),
+    department: z.number({ required_error: 'Please select your department' }),
+    userType: z.number({ required_error: 'Please select your user type' }),
+    channel: z.number().optional(),
+    subChannel: z.number().optional(),
+    region: z.number().optional(),
+    area: z.number().optional(),
+    territory: z.number().optional(),
+    range: z.number().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Password not match',
+    path: ['confirmPassword'],
+  })
+
 
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
@@ -95,7 +99,8 @@ const SignUpForm = (props: SignUpFormProps) => {
     })
 
     const selectedDepartment = watch('department')
-    const isSales = selectedDepartment?.label?.toLowerCase() === 'sales'
+    const isSales = selectedDepartment === 2;
+
 
     useEffect(() => {
         if (!token) {
@@ -116,6 +121,11 @@ const SignUpForm = (props: SignUpFormProps) => {
     }, [token, setMessage])
 
     useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+
         const loadTerritories = async () => {
             try {
                 const territoryOptions = await fetchTerritories(token)
@@ -125,7 +135,7 @@ const SignUpForm = (props: SignUpFormProps) => {
             }
         }
         loadTerritories()
-    }, [setMessage])
+    }, [token, setMessage])
 
     useEffect(() => {
         const loadRegion = async () => {
@@ -200,28 +210,61 @@ const SignUpForm = (props: SignUpFormProps) => {
         loadRange()
     }, [setMessage])
 
-    const onSignUp = async (values: SignUpFormSchema) => {
-        const { userName, password, email, mobileNumber } = values
 
-        if (!disableSubmit) {
-            setSubmitting(true)
-            const result = await signUp({ userName, password, email })
+const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
+    console.log("handleSignup called with:", data);
+  const payload: SignupPayload = {
+    roleId: Number(data.role),
+    departmentId: Number(data.department),
+    continentId: 1, // Set defaults or collect these via form
+    countryId: null,
+    channelId: data.channel ? Number(data.channel) : null,
+    subChannelId: data.subChannel ? Number(data.subChannel) : null,
+    regionId: data.region ? Number(data.region) : null,
+    areaId: data.area ? Number(data.area) : null,
+    territoryId: data.territory ? Number(data.territory) : null,
+    agencyId: null,
+    userTypeId: Number(data.userType),
+    userName: data.userName,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    perMail: '', // default or collect from form
+    address1: '',
+    address2: '',
+    address3: '',
+    perContact: '',
+    email: data.email,
+    password: data.password,
+    mobileNo: data.mobileNumber,
+    isActive: true, // or use a form checkbox if needed
+    gpsStatus: true,
+    superUserId: 0, // adjust if required
+  };
 
-            if (result?.status === 'failed') {
-                setMessage?.(result.message)
-            } else {
-                setSuccessDialog(true)
-            }
+  try {
+    const res = await signupUser(payload);
+    console.log('Signup success:', res);
+  } catch (err: any) {
+    console.error('Signup failed:', err.message);
+  }
+};
 
-            setSubmitting(false)
-        }
-    }
+
+
 
     return (
         <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
             <div className="card">
                 <div className="card-body">
-                    <Form onSubmit={handleSubmit(onSignUp)}>
+                    <form   onSubmit={handleSubmit(
+    (data) => {
+      console.log("Form data:", data);
+      handleSignup(data);
+    },
+    (err) => {
+      console.log("Form validation errors:", err);
+    }
+  )}>
                         <FormItem
                             label="User name"
                             invalid={Boolean(errors.userName)}
@@ -371,7 +414,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select Role"
                                             options={userRole}
-                                            {...field}
+                                            value={userRole.find((option: { value: number }) => option.value === field.value)}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                 )}
                             />
@@ -391,7 +437,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         className="mb-4"
                                         placeholder="Please Select"
                                         options={departments}
-                                        {...field}
+                                        value={departments.find((option: { value: number }) => option.value === field.value)}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                        }
                                     />
                                 )}
                             />
@@ -411,7 +460,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select Type"
                                             options={userType}
-                                            {...field}
+                                            value={userType.find((option: { value: number }) => option.value === field.value)}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                 )}
                             />
@@ -432,7 +484,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select Region"
                                             options={region}
-                                            {...field}
+                                            value={region.find((option: { value: number }) => option.value === Number(field.value))}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                     )}
                                 />
@@ -454,7 +509,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select Channel"
                                             options={channel}
-                                            {...field}
+                                            value={channel.find((option: { value: number }) => option.value === Number(field.value))}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                     )}
                                 />
@@ -476,7 +534,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select"
                                             options={area}
-                                            {...field}
+                                            value={area.find((option: { value: number }) => option.value === Number(field.value))}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                     )}
                                 />
@@ -498,7 +559,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select Area"
                                             options={territory}
-                                            {...field}
+                                            value={territory.find((option: { value: number }) => option.value === Number(field.value))}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                     )}
                                 />
@@ -520,7 +584,10 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             className="mb-4"
                                             placeholder="Please Select Range"
                                             options={range}
-                                            {...field}
+                                            value={range.find((option: { value: number }) => option.value === Number(field.value))}
+                                            onChange={(option: { label: string; value: number } | null) =>
+                                                field.onChange(option?.value)
+                                            }
                                         />
                                     )}
                                 />
@@ -534,7 +601,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                         >
                             {isSubmitting ? 'Creating Account...' : 'Sign Up'}
                         </Button>
-                    </Form>
+                    </form>
                 </div>
             </div>
             {/* Success Dialog */}
