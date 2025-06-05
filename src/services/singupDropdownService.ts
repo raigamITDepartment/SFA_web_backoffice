@@ -199,3 +199,51 @@ export const deleteUser = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete user.');
     }
 };
+
+export const fetchUserTypes = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/user_type`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+         return response.data.payload.map((userType: any) => ({
+            label: userType.userTypeName,
+        }));
+    } catch (error: any) {
+        console.error('Error fetching user types:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load user types.');
+    }
+};
+
+export const fetchUserRoles = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/role`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+         return response.data.payload.map((role: any) => ({
+            label: role.roleName,
+        }));
+    } catch (error: any) {
+        console.error('Error fetching roles:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load roles.');
+    }
+};
