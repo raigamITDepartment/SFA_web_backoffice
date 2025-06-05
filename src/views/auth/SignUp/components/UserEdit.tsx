@@ -7,6 +7,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
+import { HiCheckCircle } from 'react-icons/hi'
+import { toast, Alert } from '@/components/ui'
 
 type SignUpFormSchema = {
     userName: string
@@ -58,17 +60,29 @@ function UserEdit() {
         handleSubmit,
         formState: { errors, isSubmitting },
         control,
-        watch,
     } = useForm<SignUpFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {},
     })
 
-    const selectedDepartment = watch('department')
-    const isSales = selectedDepartment?.label?.toLowerCase() === 'sales'
-
     const onSubmit = async (values: SignUpFormSchema) => {
-        alert('Submitted!')
+        toast.push(
+            <Alert
+                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+            >
+                {/* <HiCheckCircle className="text-green-500 mb-2" size={48} /> */}
+                <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
+                    User updated successfully!
+                </div>
+            </Alert>,
+            {
+                offsetX: 5,
+                offsetY: 100,
+                transitionType: 'fade',
+                block: false,
+                placement: 'top-end',
+            }
+        )
         navigate(-1)
     }
 
@@ -217,8 +231,6 @@ function UserEdit() {
                                         )}
                                     />
                                 </FormItem>
-                            </div>
-                            <div style={{ flex: 1, minWidth: 280 }}>
                                 <FormItem
                                     label="Role"
                                     invalid={Boolean(errors.role)}
@@ -276,105 +288,104 @@ function UserEdit() {
                                         )}
                                     />
                                 </FormItem>
-                                {isSales && (
-                                    <>
-                                        <FormItem
-                                            label="Select Region"
-                                            invalid={Boolean(errors.region)}
-                                            errorMessage={errors.region?.message}
-                                        >
-                                            <Controller
-                                                name="region"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        size="sm"
-                                                        className="mb-4"
-                                                        placeholder="Please Select Region"
-                                                        options={[]}
-                                                        {...field}
-                                                    />
-                                                )}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 280 }}>
+                                
+                                <FormItem
+                                    label="Select Region"
+                                    invalid={Boolean(errors.region)}
+                                    errorMessage={errors.region?.message}
+                                >
+                                    <Controller
+                                        name="region"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                size="sm"
+                                                className="mb-4"
+                                                placeholder="Please Select Region"
+                                                options={[]}
+                                                {...field}
                                             />
-                                        </FormItem>
-                                        <FormItem
-                                            label="Select Channel "
-                                            invalid={Boolean(errors.channel)}
-                                            errorMessage={errors.channel?.message}
-                                        >
-                                            <Controller
-                                                name="channel"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        size="sm"
-                                                        className="mb-4"
-                                                        placeholder="Please Select Channel"
-                                                        options={[]}
-                                                        {...field}
-                                                    />
-                                                )}
+                                        )}
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    label="Select Channel "
+                                    invalid={Boolean(errors.channel)}
+                                    errorMessage={errors.channel?.message}
+                                >
+                                    <Controller
+                                        name="channel"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                size="sm"
+                                                className="mb-4"
+                                                placeholder="Please Select Channel"
+                                                options={[]}
+                                                {...field}
                                             />
-                                        </FormItem>
-                                        <FormItem
-                                            label="Select Area"
-                                            invalid={Boolean(errors.area)}
-                                            errorMessage={errors.area?.message}
-                                        >
-                                            <Controller
-                                                name="area"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        size="sm"
-                                                        className="mb-4"
-                                                        placeholder="Please Select"
-                                                        options={[]}
-                                                        {...field}
-                                                    />
-                                                )}
+                                        )}
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    label="Select Area"
+                                    invalid={Boolean(errors.area)}
+                                    errorMessage={errors.area?.message}
+                                >
+                                    <Controller
+                                        name="area"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                size="sm"
+                                                className="mb-4"
+                                                placeholder="Please Select"
+                                                options={[]}
+                                                {...field}
                                             />
-                                        </FormItem>
-                                        <FormItem
-                                            label="Select Territory"
-                                            invalid={Boolean(errors.territory)}
-                                            errorMessage={errors.territory?.message}
-                                        >
-                                            <Controller
-                                                name="territory"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        size="sm"
-                                                        className="mb-4"
-                                                        placeholder="Please Select Area"
-                                                        options={[]}
-                                                        {...field}
-                                                    />
-                                                )}
+                                        )}
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    label="Select Territory"
+                                    invalid={Boolean(errors.territory)}
+                                    errorMessage={errors.territory?.message}
+                                >
+                                    <Controller
+                                        name="territory"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                size="sm"
+                                                className="mb-4"
+                                                placeholder="Please Select Area"
+                                                options={[]}
+                                                {...field}
                                             />
-                                        </FormItem>
-                                        <FormItem
-                                            label="Select Range "
-                                            invalid={Boolean(errors.range)}
-                                            errorMessage={errors.range?.message}
-                                        >
-                                            <Controller
-                                                name="range"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        size="sm"
-                                                        className="mb-4"
-                                                        placeholder="Please Select Range"
-                                                        options={[]}
-                                                        {...field}
-                                                    />
-                                                )}
+                                        )}
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    label="Select Range "
+                                    invalid={Boolean(errors.range)}
+                                    errorMessage={errors.range?.message}
+                                >
+                                    <Controller
+                                        name="range"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                size="sm"
+                                                className="mb-4"
+                                                placeholder="Please Select Range"
+                                                options={[]}
+                                                {...field}
                                             />
-                                        </FormItem>
-                                    </>
-                                )}
+                                        )}
+                                    />
+                                </FormItem>
                             </div>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
@@ -389,7 +400,9 @@ function UserEdit() {
                             </Button>
                             <button
                                 type="button"
-                                className="w-1/2 py-2 border border-red-500 text-red-600 rounded-md bg-white font-medium hover:bg-red-50 transition"
+                                className="w-1/2 py-2 border-2 border-red-500 text-red-600 rounded-lg bg-white font-medium
+                                    transition-all duration-100 ease-in-out
+                                    hover:bg-red-500 hover:text-white hover:shadow-lg "
                                 onClick={handleDiscard}
                             >
                                 Discard

@@ -13,6 +13,7 @@ import axios from 'axios'
 import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload } from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
+import { toast, Alert } from '@/components/ui'
 
 
 
@@ -242,14 +243,37 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
   };
 
   try {
-    const res = await signupUser(payload);
-    console.log('Signup success:', res);
+    const result = await signupUser(payload);
+    console.log('Signup success:', result);
+
+     if (result?.status === 'failed') {
+            setMessage?.(result.message);
+        } else {
+            toast.push(
+                <Alert
+                    showIcon
+                    type="success"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                >
+                    <HiCheckCircle className="text-green-500 mb-2" size={48} />
+                    <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                        User created successfully!
+                    </div>
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                }
+            );
+        }
   } catch (err: any) {
     console.error('Signup failed:', err.message);
+    setMessage?.('An error occurred during signup. Please try again.');
   }
 };
-
-
 
 
     return (
@@ -604,16 +628,6 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                     </form>
                 </div>
             </div>
-            {/* Success Dialog */}
-            <Dialog isOpen={successDialog} onClose={() => setSuccessDialog(false)} title="Success">
-                <div className="flex flex-col items-center justify-center py-6">
-                    <HiCheckCircle className="text-green-500" size={48} />
-                    <div className="mt-4 text-green-700 font-semibold text-lg">User created successfully!</div>
-                    <Button className="mt-6" variant="solid" onClick={() => setSuccessDialog(false)}>
-                        OK
-                    </Button>
-                </div>
-            </Dialog>
         </div>
     )
 }
