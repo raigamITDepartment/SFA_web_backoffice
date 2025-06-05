@@ -11,6 +11,8 @@ import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
 import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories } from '@/services/singupDropdownService'
+import Dialog from '@/components/ui/Dialog'
+import { HiCheckCircle } from 'react-icons/hi'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -23,8 +25,6 @@ interface SignUpFormProps extends CommonProps {
     range: string
     userType?: string
 }
-
-
 
 type SignUpFormSchema = {
     userName: string
@@ -80,6 +80,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const [subChannel, setSubChannel] = useState<any>([])
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
+    const [successDialog, setSuccessDialog] = useState(false)
     const { signUp } = useAuth()
 
     const {
@@ -91,14 +92,14 @@ const SignUpForm = (props: SignUpFormProps) => {
         resolver: zodResolver(validationSchema),
     })
 
-        const selectedDepartment = watch('department')
-        const isSales = selectedDepartment?.label?.toLowerCase()  === 'sales';
+    const selectedDepartment = watch('department')
+    const isSales = selectedDepartment?.label?.toLowerCase() === 'sales'
 
-        useEffect(() => {
-            if (!token) {
-                setMessage?.('No auth token found.');
-                return;
-            }
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
 
         const loadDepartments = async () => {
             try {
@@ -194,6 +195,8 @@ const SignUpForm = (props: SignUpFormProps) => {
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
+            } else {
+                setSuccessDialog(true)
             }
 
             setSubmitting(false)
@@ -338,53 +341,48 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-
-                        {/* Row: Role, Department */}
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
-                            <FormItem
-                                label="Role"
-                                invalid={Boolean(errors.role)}
-                                errorMessage={errors.role?.message}
-                                style={{ flex: 1, minWidth: 180 }}
-                            >
-                                <Controller
-                                    name="role"
-                                    control={control}
-                                    rules={{ required: 'Role is required' }}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select"
-                                            value={field.value}
-                                            onChange={(selectedOption) => field.onChange(selectedOption)}
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                            <FormItem
-                                label="Department"
-                                invalid={Boolean(errors.department)}
-                                errorMessage={errors.department?.message}
-                                style={{ flex: 1, minWidth: 180 }}
-                            >
-                                <Controller
-                                    name="department"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select"
-                                            options={departments}
-                                            {...field}
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        </div>
-
-                           <FormItem
+                        <FormItem
+                            label="Role"
+                            invalid={Boolean(errors.role)}
+                            errorMessage={errors.role?.message}
+                            style={{ flex: 1, minWidth: 180 }}
+                        >
+                            <Controller
+                                name="role"
+                                control={control}
+                                rules={{ required: 'Role is required' }}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select"
+                                        value={field.value}
+                                        onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        <FormItem
+                            label="Department"
+                            invalid={Boolean(errors.department)}
+                            errorMessage={errors.department?.message}
+                            style={{ flex: 1, minWidth: 180 }}
+                        >
+                            <Controller
+                                name="department"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select"
+                                        options={departments}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        <FormItem
                             label="User Type"
                             invalid={Boolean(errors.userType)}
                             errorMessage={errors.userType?.message}
@@ -403,7 +401,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-
                         {isSales && (
                             <FormItem
                                 label="Select Region"
@@ -424,94 +421,96 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         />
                                     )}
                                 />
-                            </FormItem>     )}
-                   
-  {isSales && (
-                        <FormItem
-                            label="Select Channel "
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="channel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Channel"
-                                        options={channel}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>  )}
- {isSales && (
-                        <FormItem
-                            label="Select Area"
-                            invalid={Boolean(errors.area)}
-                            errorMessage={errors.area?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="area"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select"
-                                        options={area}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>)}
-                     {isSales && (    <FormItem
-                            label="Select Territory"
-                            invalid={Boolean(errors.territory)}
-                            errorMessage={errors.territory?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="territory"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Area"
-                                        options={territory}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>)}
-
-
-                    {isSales && (     <FormItem
-                            label="Select Range "
-                            invalid={Boolean(errors.range)}
-                            errorMessage={errors.range?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="range"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Range"
-                                        options={range}
-                                        {...field}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                             )}
-
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Channel "
+                                invalid={Boolean(errors.channel)}
+                                errorMessage={errors.channel?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="channel"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Channel"
+                                            options={channel}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Area"
+                                invalid={Boolean(errors.area)}
+                                errorMessage={errors.area?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="area"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select"
+                                            options={area}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Territory"
+                                invalid={Boolean(errors.territory)}
+                                errorMessage={errors.territory?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="territory"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Area"
+                                            options={territory}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Range "
+                                invalid={Boolean(errors.range)}
+                                errorMessage={errors.range?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="range"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Range"
+                                            options={range}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
                         <Button
                             block
                             loading={isSubmitting}
@@ -523,6 +522,16 @@ const SignUpForm = (props: SignUpFormProps) => {
                     </Form>
                 </div>
             </div>
+            {/* Success Dialog */}
+            <Dialog isOpen={successDialog} onClose={() => setSuccessDialog(false)} title="Success">
+                <div className="flex flex-col items-center justify-center py-6">
+                    <HiCheckCircle className="text-green-500" size={48} />
+                    <div className="mt-4 text-green-700 font-semibold text-lg">User created successfully!</div>
+                    <Button className="mt-6" variant="solid" onClick={() => setSuccessDialog(false)}>
+                        OK
+                    </Button>
+                </div>
+            </Dialog>
         </div>
     )
 }

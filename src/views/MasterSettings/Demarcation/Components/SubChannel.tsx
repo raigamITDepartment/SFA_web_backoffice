@@ -244,7 +244,7 @@ const SubChannel = () => {
                                     <Input
                                         type="text"
                                         autoComplete="off"
-                                        placeholder="Sub-subChannelCode"
+                                        placeholder="Sub-Channel Code"
                                         {...field}
                                     />
                                 }

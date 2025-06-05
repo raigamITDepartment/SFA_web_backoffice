@@ -19,13 +19,15 @@ import type {
     FilterFn,
     ColumnFiltersState,
 } from '@tanstack/react-table'
-import type { InputHTMLAttributes, ReactNode, CSSProperties } from 'react'
+import type { InputHTMLAttributes } from 'react'
 import { fetchUsers, deleteUser } from '@/services/singupDropdownService'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import Dialog from '@/components/ui/Dialog'
 import Button from '@/components/ui/Button'
-import Tag from '@/components/ui/Tag';
+import Tag from '@/components/ui/Tag'
+import { useNavigate } from 'react-router-dom'
+import { HiCheckCircle } from 'react-icons/hi'
 
 type Person = {
     id: number
@@ -36,6 +38,7 @@ type Person = {
     lastName?: string
     role?: string
     userType?: string
+    isActive?: boolean
 }
 
 interface DebouncedInputProps
@@ -93,9 +96,10 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const [data, setData] = useState<Person[]>([])
+    const [data, setData] = useState<Person[]>([]) // <-- No sample data
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const [selectedUser, setSelectedUser] = useState<Person | null>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -109,24 +113,29 @@ const Filtering = () => {
         loadUsers()
     }, [])
 
+
     const handleDeleteClick = (user: Person) => {
         setSelectedUser(user)
         setDialogIsOpen(true)
     }
 
-const confirmDelete = async () => {
-    if (selectedUser) {
-        try {
-            await deleteUser(selectedUser.id); 
-            setData(prev => prev.filter(u => u.id !== selectedUser.id)); 
-        } catch (error) {
-            console.error('Failed to delete user:', error);
-        } finally {
-            setSelectedUser(null);
-            setDialogIsOpen(false);
+    const confirmDelete = async () => {
+        if (selectedUser) {
+            try {
+                await deleteUser(selectedUser.id)
+                setData(prev => prev.filter(u => u.id !== selectedUser.id))
+            } catch (error) {
+                console.error('Failed to delete user:', error)
+            } finally {
+                setSelectedUser(null)
+                setDialogIsOpen(false)
+            }
         }
     }
-};
+
+    const handleEditClick = (user: Person) => {
+        navigate(`/users/${user.id}/edit`)
+    }
 
     const columns = useMemo<ColumnDef<Person>[]>(() => [
         { header: 'Username', accessorKey: 'userName' },
@@ -134,7 +143,6 @@ const confirmDelete = async () => {
         { header: 'Last Name', accessorKey: 'lastName' },
         { header: 'Role', accessorKey: 'role' },
         { header: 'User Type', accessorKey: 'userType' },
-        // { header: 'Role ID', accessorKey: 'roleId' },
         { header: 'Email', accessorKey: 'email' },
         {
             header: 'Status',
@@ -143,14 +151,13 @@ const confirmDelete = async () => {
                 const isActive = getValue();
                 return (
                     <div className="mr-2 rtl:ml-2">
-                                            <Tag className={isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" :  "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
-                        {isActive ? 'Active' : 'Inactive'}
-                    </Tag>
+                        <Tag className={isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
+                            {isActive ? 'Active' : 'Inactive'}
+                        </Tag>
                     </div>
                 );
             }
         },
-
         {
             header: 'Actions',
             id: 'actions',
@@ -158,7 +165,11 @@ const confirmDelete = async () => {
                 const user = row.original
                 return (
                     <div className="flex space-x-2">
-                        <FaRegEdit className="text-blue-500 cursor-pointer" title="Edit" />
+                        <FaRegEdit
+                            className="text-blue-500 cursor-pointer"
+                            title="Edit"
+                            onClick={() => handleEditClick(user)}
+                        />
                         <MdDeleteOutline
                             className="text-red-500 cursor-pointer"
                             title="Delete"
@@ -248,10 +259,25 @@ const confirmDelete = async () => {
             </div>
 
             <Dialog isOpen={dialogIsOpen} onClose={() => setDialogIsOpen(false)} title="Confirm Delete">
-                <p>Are you sure you want to delete <strong>{selectedUser?.userName}</strong>?</p>
-                <div className="flex justify-end mt-4 space-x-2">
-                    <Button onClick={() => setDialogIsOpen(false)} variant="secondary">Cancel</Button>
-                    <Button onClick={confirmDelete} variant="danger">Delete</Button>
+                <div className="flex flex-col items-center justify-center py-6">
+                    <MdDeleteOutline className="text-red-500 mb-2" size={48} />
+                    <div className="text-lg mb-4">
+                        Are you sure you want to delete <strong>{selectedUser?.userName}</strong>?
+                    </div>
+                    <div className="flex justify-center mt-4 space-x-2">
+                        <Button onClick={() => setDialogIsOpen(false)} variant="solid">
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={async () => {
+                                await confirmDelete();
+                                setDialogIsOpen(false);
+                            }}
+                            variant="danger"
+                        >         
+                            Delete
+                        </Button>
+                    </div>
                 </div>
             </Dialog>
         </div>

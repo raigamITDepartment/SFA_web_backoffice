@@ -32,6 +32,7 @@ type FormSchema = {
     region: string;
     area: string;
     range: string;
+    territoryCode: string;
     territoryName: string;
     isActive: boolean;
 };
@@ -98,8 +99,8 @@ const Territory = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
-    const [territoryData, setTerritoryData] = useState<Territory[]>([]); 
-    
+    const [territoryData, setTerritoryData] = useState<Territory[]>([]);
+
     useEffect(() => {
         const loadUsers = async () => {
             try {
@@ -225,7 +226,7 @@ const Territory = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' }as any,
+                                            { label: 'National Channel', value: 'National Channel' } as any,
                                             { label: 'Bakery Channel', value: 'Bakery Channel' },
                                         ]}
                                         value={field.value}
@@ -256,7 +257,7 @@ const Territory = () => {
                                         size="sm"
                                         placeholder="Select Sub-Channel"
                                         options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' } as any,
                                             { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                         ]}
                                         value={field.value}
@@ -287,7 +288,7 @@ const Territory = () => {
                                         size="sm"
                                         placeholder="Select Region"
                                         options={[
-                                            { label: 'Region 1', value: 'Region 1' }as any,
+                                            { label: 'Region 1', value: 'Region 1' } as any,
                                             { label: 'Region 2', value: 'Region 2' },
                                         ]}
                                         value={field.value}
@@ -318,7 +319,7 @@ const Territory = () => {
                                         size="sm"
                                         placeholder="Select Area"
                                         options={[
-                                            { label: 'Area 1', value: 'Area 1' }as any,
+                                            { label: 'Area 1', value: 'Area 1' } as any,
                                             { label: 'Area 2', value: 'Area 2' },
                                         ]}
                                         value={field.value}
@@ -349,11 +350,38 @@ const Territory = () => {
                                         size="sm"
                                         placeholder="Select Range"
                                         options={[
-                                            { label: 'Range 1', value: 'Range 1' }as any,
+                                            { label: 'Range 1', value: 'Range 1' } as any,
                                             { label: 'Range 2', value: 'Range 2' },
                                         ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.territoryCode)}
+                            errorMessage={errors.territoryCode?.message}
+                        >
+                            <Controller
+                                name="territoryCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Territory Code"
+                                        {...field}
                                     />
                                 }
                                 rules={{

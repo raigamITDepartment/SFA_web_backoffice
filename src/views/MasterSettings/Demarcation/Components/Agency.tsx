@@ -33,6 +33,7 @@ type FormSchema = {
     area: string;
     territory: string;
     route: string;
+    agencyCode: string;
     agencyName: string;
     isActive: boolean;
 };
@@ -100,8 +101,8 @@ const Agency = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
-    const [agencyData, setAgencyData] = useState<Agency[]>([]); 
-    
+    const [agencyData, setAgencyData] = useState<Agency[]>([]);
+
     useEffect(() => {
         const loadUsers = async () => {
             try {
@@ -229,7 +230,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={[
-                                            { label: 'National Channel', value: 'National Channel' }as any,
+                                            { label: 'National Channel', value: 'National Channel' } as any,
                                             { label: 'Bakery Channel', value: 'Bakery Channel' },
                                         ]}
                                         value={field.value}
@@ -260,7 +261,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Sub-Channel"
                                         options={[
-                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' }as any,
+                                            { label: 'Sub-Channel 1', value: 'Sub-Channel 1' } as any,
                                             { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                         ]}
                                         value={field.value}
@@ -291,7 +292,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Region"
                                         options={[
-                                            { label: 'Region 1', value: 'Region 1' }as any,
+                                            { label: 'Region 1', value: 'Region 1' } as any,
                                             { label: 'Region 2', value: 'Region 2' },
                                         ]}
                                         value={field.value}
@@ -322,7 +323,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Area"
                                         options={[
-                                            { label: 'Area 1', value: 'Area 1' }as any,
+                                            { label: 'Area 1', value: 'Area 1' } as any,
                                             { label: 'Area 2', value: 'Area 2' },
                                         ]}
                                         value={field.value}
@@ -353,7 +354,7 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Territory"
                                         options={[
-                                            { label: 'Territory 1', value: 'Territory 1' }as any,
+                                            { label: 'Territory 1', value: 'Territory 1' } as any,
                                             { label: 'Territory 2', value: 'Territory 2' },
                                         ]}
                                         value={field.value}
@@ -384,11 +385,38 @@ const Agency = () => {
                                         size="sm"
                                         placeholder="Select Route"
                                         options={[
-                                            { label: 'Route 1', value: 'Route 1' }as any,
+                                            { label: 'Route 1', value: 'Route 1' } as any,
                                             { label: 'Route 2', value: 'Route 2' },
                                         ]}
                                         value={field.value}
                                         onChange={(selectedOption) => field.onChange(selectedOption)}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.agencyCode)}
+                            errorMessage={errors.agencyCode?.message}
+                        >
+                            <Controller
+                                name="agencyCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Agency Code"
+                                        {...field}
                                     />
                                 }
                                 rules={{
