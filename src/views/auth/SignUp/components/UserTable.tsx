@@ -274,7 +274,7 @@ const Filtering = () => {
                                 setDialogIsOpen(false);
                             }}
                             variant="danger"
-                        >
+                        >         
                             Delete
                         </Button>
                     </div>
