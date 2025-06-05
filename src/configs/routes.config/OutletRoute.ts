@@ -1,6 +1,6 @@
 import { lazy } from 'react'
-import { CONCEPTS_PREFIX_PATH } from '@/constants/route.constant'
-import { ADMIN, USER } from '@/constants/roles.constant'
+//import { CONCEPTS_PREFIX_PATH } from '@/constants/route.constant'
+//import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
 const OutletRoute: Routes = [

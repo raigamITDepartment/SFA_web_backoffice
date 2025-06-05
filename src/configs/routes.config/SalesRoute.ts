@@ -1,6 +1,6 @@
 import { lazy } from 'react'
-import  {SALES_PREFIX_PATH} from '@/constants/route.constant'
-import {CONCEPTS_PREFIX_PATH} from '@/constants/route.constant'
+
+//import {CONCEPTS_PREFIX_PATH} from '@/constants/route.constant'
 import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
@@ -10,7 +10,7 @@ const SalesRoute: Routes = [
 
     {
         key: 'SalesMenu.CategoryAdd',
-       path: `${SALES_PREFIX_PATH}/Salesmenu/CategoryAdd`,
+       path: '/Salesmenu/CategoryAdd',
       // path: '/Sales-menu-CategoryAdd',
         component: lazy(() => import('@/views/SalesDetails/CategoryAdd/CategoryAdd')),
         authority: [ADMIN, USER],
@@ -23,7 +23,7 @@ const SalesRoute: Routes = [
 
     {
         key: 'SalesMenu.FreeIssue',
-          path:  `${SALES_PREFIX_PATH} /Salesmenu/FreeIssue`,
+          path:  '/Salesmenu/FreeIssue',
         component: lazy(() => import('@/views/SalesDetails/FreeIssue')),
         authority: [],
     },
@@ -31,7 +31,7 @@ const SalesRoute: Routes = [
 
     {
         key: 'SalesMenu.ItemMaster',
-        path: `${SALES_PREFIX_PATH} /Salesmenu/ItemMaster`,
+        path: '/Salesmenu/ItemMaster',
         component: lazy(() => import('@/views/SalesDetails/Products/ProductList'),),
         authority: [],
     },
@@ -40,21 +40,21 @@ const SalesRoute: Routes = [
 
     {
         key: 'SalesMenu.ItemAdd',
-      path: `${SALES_PREFIX_PATH} /Salesmenu/ItemAdd`,
+      path: '/Salesmenu/ItemAdd',
         component: lazy(() => import('@/views/SalesDetails/Products/ProductCreate')),
         authority: [],
     },
 
     {
             key: 'SalesMenu.ItemSequence',
-            path: `${SALES_PREFIX_PATH} /Salesmenu/ItemSequence`,
+            path: '/Salesmenu/ItemSequence',
             component: lazy(() => import('@/views/SalesDetails/ItemSequence/ItemSequence')),
             authority: [],
      },
 
     {
         key: 'SalesMenu.PriceUpdate',
-        path: `${SALES_PREFIX_PATH} /Salesmenu/PriceUpdate`,
+        path: '/Salesmenu/PriceUpdate',
         component: lazy(() => import('@/views/SalesDetails/PriceUpdate/products/ProductForm/PriceUpdateForm')),
         authority: [],
     },
@@ -63,28 +63,28 @@ const SalesRoute: Routes = [
   
     {
         key: 'SalesMenu.Stock',
-        path: `${SALES_PREFIX_PATH} /Salesmenu/Stock`,
+        path: '/Salesmenu/Stock',
         component: lazy(() => import('@/views/SalesDetails/Stock/ProductList')),
         authority: [],
     },
 
     {
         key: 'SalesMenu.MarketReturn',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/MarketReturn`,
+        path: '/Salesmenu/MarketReturn',
         component: lazy(() => import('@/views/SalesDetails/MarketReturn/MarketReturn')),
         authority: [],
     },
 
     {
         key: 'SalesMenu.WorkingDay',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/WorkingDay`,
+        path:'/Salesmenu/WorkingDay',
         component: lazy(() => import('@/views/SalesDetails/WorkingDay/WorkingDay')),
         authority: [],
     },
 
     {
         key: 'SalesMenu.Invoice',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/Invoice`,
+        path:'/Salesmenu/Invoice',
         component: lazy(() => import('@/views/SalesDetails/Invoice/Invoice')),
         authority: [],
     },
@@ -92,7 +92,7 @@ const SalesRoute: Routes = [
  
     {
         key: 'SalesMenu.Target',
-        path:`${SALES_PREFIX_PATH}/Salesmenu/Target`,
+        path:'/Salesmenu/Target',
         component: lazy(() => import('@/views/SalesDetails/Target/Target')),
         authority: [],
     },

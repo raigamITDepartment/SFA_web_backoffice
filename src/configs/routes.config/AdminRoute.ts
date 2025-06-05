@@ -1,6 +1,6 @@
 import { lazy } from 'react'
-import { USER_PREFIX_PATH } from '@/constants/route.constant'
-import { ADMIN, USER } from '@/constants/roles.constant'
+//import { USER_PREFIX_PATH } from '@/constants/route.constant'
+//import { ADMIN, USER } from '@/constants/roles.constant'
 import type { Routes } from '@/@types/routes'
 
 
@@ -16,8 +16,17 @@ import type { Routes } from '@/@types/routes'
 
     {
         key: 'UserModule.BookingReverse',
-        path: '/User-menu-BookingReverse',
-        component: lazy(() => import('@/views/admin/BookingReverse/products/ProductList/ProductList')),
+        path: '/Admin-menu-BookingReverse',
+        component: lazy(() => import('@/views/Admin/BookingReverse')),
+        authority: [],
+    },
+   
+
+    
+    {
+        key: 'UserModule.AcutualReverse',
+        path: '/Admin-menu-AcutualReverse',
+        component: lazy(() => import('@/views/Admin/ActualReverse')),
         authority: [],
     },
    
