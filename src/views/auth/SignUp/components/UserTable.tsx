@@ -28,6 +28,7 @@ import Tag from '@/components/ui/Tag'
 import { useNavigate } from 'react-router-dom'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
+import Dialog from '@/components/ui/Dialog'
 
 type Person = {
     id: number
@@ -124,6 +125,7 @@ const Filtering = () => {
     const [globalFilter, setGlobalFilter] = useState('')
     const [data, setData] = useState<Person[]>(sampleData)
     const [selectedUser, setSelectedUser] = useState<Person | null>(null)
+    const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -141,35 +143,37 @@ const Filtering = () => {
 
     const handleDeleteClick = (user: Person) => {
         setSelectedUser(user)
-        blockAlert()
+        setDialogIsOpen(true)
     }
 
-
-    const blockAlert = () => {
-        toast.push(
-            <Alert
-                showIcon
-                type="danger"
-                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
-            >
-                Removing User...
-            </Alert>,
-            {
-                offsetX: 5,         // 0 from the right edge
-                offsetY: 100,        // 16px from the top
-                transitionType: 'fade',
-                block: false,       // allow stacking in the corner
-                placement: 'top-end', // if your toast system supports it
-            }
-        )
-
+    const handleDialogClose = () => {
+        setDialogIsOpen(false)
+        setSelectedUser(null)
     }
 
-    const confirmDelete = async (user: Person) => {
-        if (user) {
+    const handleDialogConfirm = async () => {
+        setDialogIsOpen(false)
+        if (selectedUser) {
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    Removing User
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+
+                }
+            )
             try {
-                await deleteUser(user.id)
-                setData(prev => prev.filter(u => u.id !== user.id))
+                await deleteUser(selectedUser.id)
+                setData(prev => prev.filter(u => u.id !== selectedUser.id))
             } catch (error) {
                 console.error('Failed to delete user:', error)
             } finally {
@@ -302,6 +306,38 @@ const Filtering = () => {
                     </div>
                 </div>
             </div>
+            <Dialog
+                isOpen={dialogIsOpen}
+                onClose={handleDialogClose}
+                onRequestClose={handleDialogClose}
+            >
+                <h5 className="mb-4">Remove User</h5>
+                <p>
+                    Are you sure to remove user <b>{selectedUser?.userName}</b>?
+                </p>
+                <div className="text-right mt-6">
+                    <Button
+                        className="mr-2"
+                        clickFeedback={false}
+                        customColorClass={({ active, unclickable }) =>
+                            [
+                                'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+                                
+                                unclickable && 'opacity-50 cursor-not-allowed',
+                                !active && !unclickable,
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+                        }
+                        onClick={handleDialogClose}
+                    >
+                        Cancel
+                    </Button>
+                    <Button variant="solid" onClick={handleDialogConfirm}>
+                        Confirm
+                    </Button>
+                </div>
+            </Dialog>
         </div>
     )
 }
