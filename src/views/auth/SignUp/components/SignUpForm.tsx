@@ -447,7 +447,7 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                             />
                         </FormItem>
                         <FormItem
-                            label="Department"
+                            label="Grade"
                             invalid={Boolean(errors.department)}
                             errorMessage={errors.department?.message}
                             style={{ flex: 1, minWidth: 180 }}
@@ -470,7 +470,7 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                             />
                         </FormItem>
                         <FormItem
-                            label="User Type"
+                            label="Access Level"
                             invalid={Boolean(errors.userType)}
                             errorMessage={errors.userType?.message}
                             style={{ flex: 1, marginLeft: '10px' }}
