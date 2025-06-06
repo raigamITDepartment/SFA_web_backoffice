@@ -32,6 +32,7 @@ type FormSchema = {
     regionCode: string;
     regionName: string;
     isActive: boolean;
+    channelName: string;
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -50,6 +51,7 @@ interface Region {
     regionCode: string;
     regionName: string;
     isActive: boolean;
+    channelName: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -109,8 +111,8 @@ const Region = () => {
     }, [])
 
     const columns = useMemo<ColumnDef<Region>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
+        { header: 'Channel', accessorKey: 'channelName' },
+        { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
         { header: 'Region Code', accessorKey: 'regionCode' },
         { header: 'Region Name', accessorKey: 'regionName' },
         {

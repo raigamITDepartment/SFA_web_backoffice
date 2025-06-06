@@ -32,9 +32,10 @@ type FormSchema = {
     region: string;
     area: string;
     territory: string;
-    routeCode: string; 
+    routeCode: string;
     routeName: string;
     isActive: boolean;
+    territoryName:string;
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -56,6 +57,7 @@ interface Route {
     routeCode: string;
     routeName: string;
     isActive: boolean;
+    territoryName:string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -114,12 +116,11 @@ const Route = () => {
     }, [])
 
     const columns = useMemo<ColumnDef<Route>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-        { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Area Code', accessorKey: 'areaCode' },
-        { header: 'Territory Code', accessorKey: 'territoryCode' },
-        { header: 'Route Code', accessorKey: 'routeCode' },
+        { header: 'Channel', accessorKey: 'channelCode' },
+        { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
+        { header: 'Region', accessorKey: 'regionCode' },
+        { header: 'Area', accessorKey: 'areaCode' },
+        { header: 'Territory', accessorKey: 'territoryName' },
         { header: 'Route Name', accessorKey: 'routeName' },
         {
             header: 'Is Active',
@@ -211,7 +212,7 @@ const Route = () => {
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'>Route Creation</h5>
+                    <h5 className='mb-2'></h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
                             invalid={Boolean(errors.channel)}
