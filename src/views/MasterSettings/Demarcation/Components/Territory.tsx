@@ -35,6 +35,11 @@ type FormSchema = {
     territoryCode: string;
     territoryName: string;
     isActive: boolean;
+    channelName:string;
+    subChannelName:string;
+    regionName:string;
+    rangeName:string;
+    areaName:string;
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -56,6 +61,11 @@ interface Territory {
     territoryCode: string;
     territoryName: string;
     isActive: boolean;
+    channelName:string;
+    subChannelName:string;
+    regionName:string;
+    rangeName:string;
+    areaName:string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -114,12 +124,11 @@ const Territory = () => {
     }, [])
 
     const columns = useMemo<ColumnDef<Territory>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-        { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Area Code', accessorKey: 'areaCode' },
-        { header: 'Range', accessorKey: 'range' },
-        { header: 'Territory Code', accessorKey: 'territoryCode' },
+        { header: 'Channel', accessorKey: 'channelName' },
+        { header: 'Sub-Channel', accessorKey: 'subChannelName' },
+        { header: 'Region', accessorKey: 'regionName' },
+        { header: 'Area', accessorKey: 'areaName' },
+        { header: 'Range', accessorKey: 'rangeName' },
         { header: 'Territory Name', accessorKey: 'territoryName' },
         {
             header: 'Is Active',

@@ -36,6 +36,7 @@ type FormSchema = {
     agencyCode: string;
     agencyName: string;
     isActive: boolean;
+    channelName:string;
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -58,6 +59,7 @@ interface Agency {
     agencyCode: string;
     agencyName: string;
     isActive: boolean;
+    channelName:string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -116,13 +118,12 @@ const Agency = () => {
     }, [])
 
     const columns = useMemo<ColumnDef<Agency>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
-        { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-        { header: 'Region Code', accessorKey: 'regionCode' },
-        { header: 'Area Code', accessorKey: 'areaCode' },
-        { header: 'Territory Code', accessorKey: 'territoryCode' },
-        { header: 'Route Code', accessorKey: 'routeCode' },
-        { header: 'Agency Code', accessorKey: 'agencyCode' },
+        { header: 'Channel', accessorKey: 'channelName' },
+        { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
+        { header: 'Region', accessorKey: 'regionCode' },
+        { header: 'Area', accessorKey: 'areaCode' },
+        { header: 'Territory', accessorKey: 'territoryCode' },
+        { header: 'Route', accessorKey: 'routeCode' },
         { header: 'Agency Name', accessorKey: 'agencyName' },
         {
             header: 'Is Active',
