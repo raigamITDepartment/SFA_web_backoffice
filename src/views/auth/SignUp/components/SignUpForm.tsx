@@ -10,7 +10,7 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload } from '@/services/singupDropdownService'
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades } from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
@@ -26,7 +26,7 @@ interface SignUpFormProps extends CommonProps {
     area: string
     territory: string
     range: string
-    userType?: string
+    userLevel?: string
 }
 
 export type SignUpFormSchema = {
@@ -38,14 +38,15 @@ export type SignUpFormSchema = {
   confirmPassword: string;
   mobileNumber: string;
   role: number;
-  department: number;
-  userType: number;
+  subRole: number;
+  userLevel: number;
   channel?: number;
   subChannel?: number;
   region?: number;
   area?: number;
   territory?: number;
   range?: number;
+  departmentId?: number;
 };
 
 
@@ -59,8 +60,8 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     confirmPassword: z.string({ required_error: 'Please confirm your password' }),
     mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
     role: z.number({ required_error: 'Please select your role' }),
-    department: z.number({ required_error: 'Please select your department' }),
-    userType: z.number({ required_error: 'Please select your user type' }),
+    subRole: z.number({ required_error: 'Please select your department' }),
+    userLevel: z.number({ required_error: 'Please select your user type' }),
     channel: z.number().optional(),
     subChannel: z.number().optional(),
     region: z.number().optional(),
@@ -79,6 +80,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const token = sessionStorage.getItem('accessToken')
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([])
+    const [subRoles, setSubRoles] = useState<any>([])
     const [territory, setTerritory] = useState<any>([])
     const [region, setRegion] = useState<any>([])
     const [channel, setChannel] = useState<any>([])
@@ -99,8 +101,8 @@ const SignUpForm = (props: SignUpFormProps) => {
         resolver: zodResolver(validationSchema),
     })
 
-    const selectedDepartment = watch('department')
-    const isSales = selectedDepartment === 2;
+    const selectedSubRole = watch('subRole')
+    const isSales = selectedSubRole === 7;
 
 
     useEffect(() => {
@@ -119,6 +121,24 @@ const SignUpForm = (props: SignUpFormProps) => {
         }
 
         loadDepartments()
+    }, [token, setMessage])
+
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+
+        const loadSubRoles = async () => {
+            try {
+                const subRoleOptions = await fetchGrades(token)
+                setSubRoles(subRoleOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub roles.')
+            }
+        }
+
+        loadSubRoles()
     }, [token, setMessage])
 
     useEffect(() => {
@@ -213,10 +233,10 @@ const SignUpForm = (props: SignUpFormProps) => {
 
 
 const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
-    console.log("handleSignup called with:", data);
+
   const payload: SignupPayload = {
     roleId: Number(data.role),
-    departmentId: Number(data.department),
+    subRoleId: Number(data.subRole),
     continentId: 1, // Set defaults or collect these via form
     countryId: null,
     channelId: data.channel ? Number(data.channel) : null,
@@ -225,7 +245,7 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
     areaId: data.area ? Number(data.area) : null,
     territoryId: data.territory ? Number(data.territory) : null,
     agencyId: null,
-    userTypeId: Number(data.userType),
+    userLevelId: Number(data.userLevel),
     userName: data.userName,
     firstName: data.firstName,
     lastName: data.lastName,
@@ -240,8 +260,10 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
     isActive: true, // or use a form checkbox if needed
     gpsStatus: true,
     superUserId: 0, // adjust if required
+    departmentId:1
   };
 
+  //register new user
   try {
     const result = await signupUser(payload);
     console.log('Signup success:', result);
@@ -271,8 +293,25 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
         }
   } catch (err: any) {
     console.error('Signup failed:', err.message);
-    setMessage?.('An error occurred during signup. Please try again.');
+        toast.push(
+        <Alert
+            showIcon
+            type="danger"
+            className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+        >
+            An error occurred during signup. Please try again.
+        </Alert>,
+        {
+            offsetX: 5,
+            offsetY: 100,
+            transitionType: 'fade',
+            block: false,
+            placement: 'top-end',
+
+        }
+    )
   }
+
 };
 
 
@@ -448,20 +487,20 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                         </FormItem>
                         <FormItem
                             label="Grade"
-                            invalid={Boolean(errors.department)}
-                            errorMessage={errors.department?.message}
+                            invalid={Boolean(errors.subRole)}
+                            errorMessage={errors.subRole?.message}
                             style={{ flex: 1, minWidth: 180 }}
                         >
                             <Controller
-                                name="department"
+                                name="subRole"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select"
-                                        options={departments}
-                                        value={departments.find((option: { value: number }) => option.value === field.value)}
+                                        options={subRoles}
+                                        value={subRoles.find((option: { value: number }) => option.value === field.value)}
                                             onChange={(option: { label: string; value: number } | null) =>
                                                 field.onChange(option?.value)
                                         }
@@ -471,12 +510,12 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                         </FormItem>
                         <FormItem
                             label="Access Level"
-                            invalid={Boolean(errors.userType)}
-                            errorMessage={errors.userType?.message}
+                            invalid={Boolean(errors.userLevel)}
+                            errorMessage={errors.userLevel?.message}
                             style={{ flex: 1, marginLeft: '10px' }}
                         >
                             <Controller
-                                name="userType"
+                                name="userLevel"
                                 control={control}
                                 render={({ field }) => (
                                     <Select

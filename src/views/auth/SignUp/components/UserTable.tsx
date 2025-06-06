@@ -160,7 +160,7 @@ const Filtering = () => {
                     type="danger"
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Removing User
+                    Deactivating User
                 </Alert>,
                 {
                     offsetX: 5,
@@ -313,7 +313,9 @@ const Filtering = () => {
             >
                 <h5 className="mb-4">Remove User</h5>
                 <p>
-                    Are you sure to remove user <b>{selectedUser?.userName}</b>?
+                    <p>
+                        Are you sure you want to {selectedUser?.isActive ? 'Deactivate' : 'Activate'} <b>{selectedUser?.userName}</b>?
+                    </p>
                 </p>
                 <div className="text-right mt-6">
                     <Button
