@@ -107,7 +107,7 @@ const SubChannel = () => {
     }, [])
 
     const columns = useMemo<ColumnDef<SubChannel>[]>(() => [
-        { header: 'Channel Code', accessorKey: 'channelCode' },
+        { header: 'Channel Code', accessorKey: 'channelId' },
         { header: 'Channel Name', accessorKey: 'channelName' },
         { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
         { header: 'Sub-Channel Name', accessorKey: 'subChannelName' },

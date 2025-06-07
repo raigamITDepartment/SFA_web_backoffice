@@ -38,7 +38,7 @@ export type SignUpFormSchema = {
   confirmPassword: string;
   mobileNumber: string;
   role: number;
-  subRole: number;
+  grade: number;
   userLevel: number;
   channel?: number;
   subChannel?: number;
@@ -46,7 +46,6 @@ export type SignUpFormSchema = {
   area?: number;
   territory?: number;
   range?: number;
-  departmentId?: number;
 };
 
 
@@ -60,7 +59,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     confirmPassword: z.string({ required_error: 'Please confirm your password' }),
     mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
     role: z.number({ required_error: 'Please select your role' }),
-    subRole: z.number({ required_error: 'Please select your department' }),
+    grade: z.number({ required_error: 'Please select your department' }),
     userLevel: z.number({ required_error: 'Please select your user type' }),
     channel: z.number().optional(),
     subChannel: z.number().optional(),
@@ -80,7 +79,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const token = sessionStorage.getItem('accessToken')
     const [isSubmitting, setSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([])
-    const [subRoles, setSubRoles] = useState<any>([])
+    const [grade, setGrade] = useState<any>([])
     const [territory, setTerritory] = useState<any>([])
     const [region, setRegion] = useState<any>([])
     const [channel, setChannel] = useState<any>([])
@@ -101,7 +100,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         resolver: zodResolver(validationSchema),
     })
 
-    const selectedSubRole = watch('subRole')
+    const selectedSubRole = watch('grade')
     const isSales = selectedSubRole === 7;
 
 
@@ -129,16 +128,16 @@ const SignUpForm = (props: SignUpFormProps) => {
             return;
         }
 
-        const loadSubRoles = async () => {
+        const loadGrades = async () => {
             try {
-                const subRoleOptions = await fetchGrades(token)
-                setSubRoles(subRoleOptions)
+                const grades = await fetchGrades(token)
+                setGrade(grades)
             } catch (error) {
                 setMessage?.('Failed to load sub roles.')
             }
         }
 
-        loadSubRoles()
+        loadGrades()
     }, [token, setMessage])
 
     useEffect(() => {
@@ -236,7 +235,7 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
 
   const payload: SignupPayload = {
     roleId: Number(data.role),
-    subRoleId: Number(data.subRole),
+    subRoleId: Number(data.grade),
     continentId: 1, // Set defaults or collect these via form
     countryId: null,
     channelId: data.channel ? Number(data.channel) : null,
@@ -260,7 +259,6 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
     isActive: true, // or use a form checkbox if needed
     gpsStatus: true,
     superUserId: 0, // adjust if required
-    departmentId:1
   };
 
   //register new user
@@ -487,20 +485,20 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                         </FormItem>
                         <FormItem
                             label="Grade"
-                            invalid={Boolean(errors.subRole)}
-                            errorMessage={errors.subRole?.message}
+                            invalid={Boolean(errors.grade)}
+                            errorMessage={errors.grade?.message}
                             style={{ flex: 1, minWidth: 180 }}
                         >
                             <Controller
-                                name="subRole"
+                                name="grade"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         className="mb-4"
                                         placeholder="Please Select"
-                                        options={subRoles}
-                                        value={subRoles.find((option: { value: number }) => option.value === field.value)}
+                                        options={grade}
+                                        value={grade.find((option: { value: number }) => option.value === field.value)}
                                             onChange={(option: { label: string; value: number } | null) =>
                                                 field.onChange(option?.value)
                                         }
