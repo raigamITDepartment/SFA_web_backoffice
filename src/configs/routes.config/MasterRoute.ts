@@ -25,6 +25,56 @@ const MasterRoute: Routes = [
         ),
         authority: [],
     },
+     
+     {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-Channel',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/ChannelEdit'),
+        ),
+        authority: [],
+    },
+ {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-SubChannel',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/SubChannelEdit'),
+        ),
+        authority: [],
+    },
+     {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-Region',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/RegionEdit'),
+        ),
+        authority: [],
+    }, {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-Area',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/AreaEdit'),
+        ),
+        authority: [],
+    }, 
+    {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-Territory',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/TerritoryEdit'),
+        ),
+        authority: [],
+    },
+ {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-Route',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/RouteEdit'),
+        ),
+        authority: [],
+    },
+ {
+        key: 'MasterMenu.collapse.Demarcation',
+        path:  '/Master-menu-Demarcation-Agency',
+        component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/AgencyEdit'),
+        ),
+        authority: [],
+    },
+
 
 ]
 

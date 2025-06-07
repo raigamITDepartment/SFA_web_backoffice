@@ -31,18 +31,28 @@ type SignUpFormSchema = {
 
 const validationSchema = z
     .object({
-        email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
+        email: z
+            .string({ required_error: 'Please enter your email' })
+            .email('Invalid email address'),
         userName: z.string({ required_error: 'Please enter your name' }),
         firstName: z.string({ required_error: 'Please enter your first name' }),
         lastName: z.string({ required_error: 'Please enter your last name' }),
         password: z.string({ required_error: 'Password Required' }),
-        mobileNumber: z.string({ required_error: 'Mobile Number Required' }).regex(/^\d+$/, 'Mobile Number must be numeric'),
-        confirmPassword: z.string({ required_error: 'Please confirm your password' }),
+        mobileNumber: z
+            .string({ required_error: 'Mobile Number Required' })
+            .regex(/^\d+$/, 'Mobile Number must be numeric'),
+        confirmPassword: z.string({
+            required_error: 'Please confirm your password',
+        }),
         role: z.string({ required_error: 'Please select your role' }),
-        department: z.string({ required_error: 'Please select your department' }),
+        department: z.string({
+            required_error: 'Please select your department',
+        }),
         userType: z.string({ required_error: 'Please select your user type' }),
         channel: z.string({ required_error: 'Please select your channel' }),
-        subChannel: z.string({ required_error: 'Please select your sub-channel' }),
+        subChannel: z.string({
+            required_error: 'Please select your sub-channel',
+        }),
         region: z.string({ required_error: 'Please select your region' }),
         area: z.string({ required_error: 'Please select your area' }),
         territory: z.string({ required_error: 'Please select your territory' }),
@@ -67,9 +77,7 @@ function UserEdit() {
 
     const onSubmit = async (values: SignUpFormSchema) => {
         toast.push(
-            <Alert
-                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
-            >
+            <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
                 {/* <HiCheckCircle className="text-green-500 mb-2" size={48} /> */}
                 <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
                     User updated successfully!
@@ -81,7 +89,7 @@ function UserEdit() {
                 transitionType: 'fade',
                 block: false,
                 placement: 'top-end',
-            }
+            },
         )
         navigate(-1)
     }
@@ -91,12 +99,33 @@ function UserEdit() {
     }
 
     return (
-        <div style={{ width: '100%', minHeight: '100vh', background: '#f9f9f9', padding: '40px 0' }}>
-            <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 8, boxShadow: '0 2px 16px rgba(0,0,0,0.08)' }}>
+        <div
+            style={{
+                width: '100%',
+                minHeight: '100vh',
+                background: '#f9f9f9',
+                padding: '40px 0',
+            }}
+        >
+            <div
+                style={{
+                    maxWidth: 900,
+                    margin: '0 auto',
+                    background: '#fff',
+                    borderRadius: 8,
+                    boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
+                }}
+            >
                 <div className="card-body" style={{ padding: 32 }}>
                     <h2 className="text-2xl font-bold mb-6">Edit User</h2>
                     <Form onSubmit={handleSubmit(onSubmit)}>
-                        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: 24,
+                                flexWrap: 'wrap',
+                            }}
+                        >
                             <div style={{ flex: 1, minWidth: 280 }}>
                                 <FormItem
                                     label="User name"
@@ -215,7 +244,9 @@ function UserEdit() {
                                 <FormItem
                                     label="Confirm Password"
                                     invalid={Boolean(errors.confirmPassword)}
-                                    errorMessage={errors.confirmPassword?.message}
+                                    errorMessage={
+                                        errors.confirmPassword?.message
+                                    }
                                 >
                                     <Controller
                                         name="confirmPassword"
@@ -290,7 +321,6 @@ function UserEdit() {
                                 </FormItem>
                             </div>
                             <div style={{ flex: 1, minWidth: 280 }}>
-                                
                                 <FormItem
                                     label="Select Region"
                                     invalid={Boolean(errors.region)}
@@ -388,7 +418,14 @@ function UserEdit() {
                                 </FormItem>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: 16,
+                                marginTop: 24,
+                            }}
+                        >
                             <Button
                                 block
                                 loading={isSubmitting}

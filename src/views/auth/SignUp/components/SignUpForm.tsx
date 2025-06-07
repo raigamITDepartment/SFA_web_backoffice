@@ -10,12 +10,21 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload } from '@/services/singupDropdownService'
+import {
+    fetchAreas,
+    fetchChannels,
+    fetchDepartments,
+    fetchRanges,
+    fetchRegions,
+    fetchTerritories,
+    fetchUserTypes,
+    fetchUserRoles,
+    signupUser,
+    SignupPayload,
+} from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
-
-
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -30,49 +39,55 @@ interface SignUpFormProps extends CommonProps {
 }
 
 export type SignUpFormSchema = {
-  email: string;
-  userName: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  confirmPassword: string;
-  mobileNumber: string;
-  role: number;
-  department: number;
-  userType: number;
-  channel?: number;
-  subChannel?: number;
-  region?: number;
-  area?: number;
-  territory?: number;
-  range?: number;
-};
-
+    email: string
+    userName: string
+    firstName: string
+    lastName: string
+    password: string
+    confirmPassword: string
+    mobileNumber: string
+    role: number
+    department: number
+    userType: number
+    channel?: number
+    subChannel?: number
+    region?: number
+    area?: number
+    territory?: number
+    range?: number
+}
 
 const validationSchema: ZodType<SignUpFormSchema> = z
- .object({
-    email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
-    userName: z.string({ required_error: 'Please enter your name' }),
-    firstName: z.string({ required_error: 'Please enter your first name' }),
-    lastName: z.string({ required_error: 'Please enter your last name' }),
-    password: z.string({ required_error: 'Password Required' }),
-    confirmPassword: z.string({ required_error: 'Please confirm your password' }),
-    mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
-    role: z.number({ required_error: 'Please select your role' }),
-    department: z.number({ required_error: 'Please select your department' }),
-    userType: z.number({ required_error: 'Please select your user type' }),
-    channel: z.number().optional(),
-    subChannel: z.number().optional(),
-    region: z.number().optional(),
-    area: z.number().optional(),
-    territory: z.number().optional(),
-    range: z.number().optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password not match',
-    path: ['confirmPassword'],
-  })
-
+    .object({
+        email: z
+            .string({ required_error: 'Please enter your email' })
+            .email('Invalid email address'),
+        userName: z.string({ required_error: 'Please enter your name' }),
+        firstName: z.string({ required_error: 'Please enter your first name' }),
+        lastName: z.string({ required_error: 'Please enter your last name' }),
+        password: z.string({ required_error: 'Password Required' }),
+        confirmPassword: z.string({
+            required_error: 'Please confirm your password',
+        }),
+        mobileNumber: z.string({
+            required_error: 'Please enter your mobile number',
+        }),
+        role: z.number({ required_error: 'Please select your role' }),
+        department: z.number({
+            required_error: 'Please select your department',
+        }),
+        userType: z.number({ required_error: 'Please select your user type' }),
+        channel: z.number().optional(),
+        subChannel: z.number().optional(),
+        region: z.number().optional(),
+        area: z.number().optional(),
+        territory: z.number().optional(),
+        range: z.number().optional(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: 'Password not match',
+        path: ['confirmPassword'],
+    })
 
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
@@ -100,13 +115,12 @@ const SignUpForm = (props: SignUpFormProps) => {
     })
 
     const selectedDepartment = watch('department')
-    const isSales = selectedDepartment === 2;
-
+    const isSales = selectedDepartment === 2
 
     useEffect(() => {
         if (!token) {
-            setMessage?.('No auth token found.');
-            return;
+            setMessage?.('No auth token found.')
+            return
         }
 
         const loadDepartments = async () => {
@@ -123,8 +137,8 @@ const SignUpForm = (props: SignUpFormProps) => {
 
     useEffect(() => {
         if (!token) {
-            setMessage?.('No auth token found.');
-            return;
+            setMessage?.('No auth token found.')
+            return
         }
 
         const loadTerritories = async () => {
@@ -186,7 +200,6 @@ const SignUpForm = (props: SignUpFormProps) => {
         loadRange()
     }, [setMessage])
 
-    
     useEffect(() => {
         const loadRange = async () => {
             try {
@@ -211,84 +224,90 @@ const SignUpForm = (props: SignUpFormProps) => {
         loadRange()
     }, [setMessage])
 
-
-const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
-    console.log("handleSignup called with:", data);
-  const payload: SignupPayload = {
-    roleId: Number(data.role),
-    departmentId: Number(data.department),
-    continentId: 1, // Set defaults or collect these via form
-    countryId: null,
-    channelId: data.channel ? Number(data.channel) : null,
-    subChannelId: data.subChannel ? Number(data.subChannel) : null,
-    regionId: data.region ? Number(data.region) : null,
-    areaId: data.area ? Number(data.area) : null,
-    territoryId: data.territory ? Number(data.territory) : null,
-    agencyId: null,
-    userTypeId: Number(data.userType),
-    userName: data.userName,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    perMail: '', // default or collect from form
-    address1: '',
-    address2: '',
-    address3: '',
-    perContact: '',
-    email: data.email,
-    password: data.password,
-    mobileNo: data.mobileNumber,
-    isActive: true, // or use a form checkbox if needed
-    gpsStatus: true,
-    superUserId: 0, // adjust if required
-  };
-
-  try {
-    const result = await signupUser(payload);
-    console.log('Signup success:', result);
-
-     if (result?.status === 'failed') {
-            setMessage?.(result.message);
-        } else {
-            toast.push(
-                <Alert
-                    showIcon
-                    type="success"
-                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
-                >
-                    <HiCheckCircle className="text-green-500 mb-2" size={48} />
-                    <div className="mt-2 text-green-700 font-semibold text-lg text-center">
-                        User created successfully!
-                    </div>
-                </Alert>,
-                {
-                    offsetX: 5,
-                    offsetY: 100,
-                    transitionType: 'fade',
-                    block: false,
-                    placement: 'top-end',
-                }
-            );
+    const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
+        console.log('handleSignup called with:', data)
+        const payload: SignupPayload = {
+            roleId: Number(data.role),
+            departmentId: Number(data.department),
+            continentId: 1, // Set defaults or collect these via form
+            countryId: null,
+            channelId: data.channel ? Number(data.channel) : null,
+            subChannelId: data.subChannel ? Number(data.subChannel) : null,
+            regionId: data.region ? Number(data.region) : null,
+            areaId: data.area ? Number(data.area) : null,
+            territoryId: data.territory ? Number(data.territory) : null,
+            agencyId: null,
+            userTypeId: Number(data.userType),
+            userName: data.userName,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            perMail: '', // default or collect from form
+            address1: '',
+            address2: '',
+            address3: '',
+            perContact: '',
+            email: data.email,
+            password: data.password,
+            mobileNo: data.mobileNumber,
+            isActive: true, // or use a form checkbox if needed
+            gpsStatus: true,
+            superUserId: 0, // adjust if required
         }
-  } catch (err: any) {
-    console.error('Signup failed:', err.message);
-    setMessage?.('An error occurred during signup. Please try again.');
-  }
-};
 
+        try {
+            const result = await signupUser(payload)
+            console.log('Signup success:', result)
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+            } else {
+                toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <HiCheckCircle
+                            className="text-green-500 mb-2"
+                            size={48}
+                        />
+                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                            User created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 100,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    },
+                )
+            }
+        } catch (err: any) {
+            console.error('Signup failed:', err.message)
+            setMessage?.('An error occurred during signup. Please try again.')
+        }
+    }
 
     return (
-        <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
+        <div
+            className={className}
+            style={{ maxWidth: '500px', marginLeft: '0 auto' }}
+        >
             <div className="card">
                 <div className="card-body">
-                    <form   onSubmit={handleSubmit(
-    (data) => {
-      console.log("Form data:", data);
-      handleSignup(data);
-    },
-    (err) => {
-      console.log("Form validation errors:", err);
-    }
-  )}>
+                    <form
+                        onSubmit={handleSubmit(
+                            (data) => {
+                                console.log('Form data:', data)
+                                handleSignup(data)
+                            },
+                            (err) => {
+                                console.log('Form validation errors:', err)
+                            },
+                        )}
+                    >
                         <FormItem
                             label="User name"
                             invalid={Boolean(errors.userName)}
@@ -433,16 +452,22 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                 control={control}
                                 rules={{ required: 'Role is required' }}
                                 render={({ field }) => (
-                                   <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Role"
-                                            options={userRole}
-                                            value={userRole.find((option: { value: number }) => option.value === field.value)}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Role"
+                                        options={userRole}
+                                        value={userRole.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
                                 )}
                             />
                         </FormItem>
@@ -461,10 +486,16 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                         className="mb-4"
                                         placeholder="Please Select"
                                         options={departments}
-                                        value={departments.find((option: { value: number }) => option.value === field.value)}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                        }
+                                        value={departments.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                             />
@@ -480,15 +511,21 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                 control={control}
                                 render={({ field }) => (
                                     <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Type"
-                                            options={userType}
-                                            value={userType.find((option: { value: number }) => option.value === field.value)}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Type"
+                                        options={userType}
+                                        value={userType.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
                                 )}
                             />
                         </FormItem>
@@ -508,10 +545,17 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                             className="mb-4"
                                             placeholder="Please Select Region"
                                             options={region}
-                                            value={region.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
+                                            value={region.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
                                         />
                                     )}
                                 />
@@ -533,10 +577,17 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                             className="mb-4"
                                             placeholder="Please Select Channel"
                                             options={channel}
-                                            value={channel.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
+                                            value={channel.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
                                         />
                                     )}
                                 />
@@ -558,10 +609,17 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                             className="mb-4"
                                             placeholder="Please Select"
                                             options={area}
-                                            value={area.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
+                                            value={area.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
                                         />
                                     )}
                                 />
@@ -583,10 +641,17 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                             className="mb-4"
                                             placeholder="Please Select Area"
                                             options={territory}
-                                            value={territory.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
+                                            value={territory.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
                                         />
                                     )}
                                 />
@@ -608,10 +673,17 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                                             className="mb-4"
                                             placeholder="Please Select Range"
                                             options={range}
-                                            value={range.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
+                                            value={range.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
                                         />
                                     )}
                                 />
