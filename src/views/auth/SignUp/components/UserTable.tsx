@@ -22,7 +22,7 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { fetchUsers, deleteUser } from '@/services/singupDropdownService'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdDeleteOutline, MdBlock, MdCheckCircleOutline  } from 'react-icons/md'
 import Button from '@/components/ui/Button'
 import Tag from '@/components/ui/Tag'
 import { useNavigate } from 'react-router-dom'
@@ -157,10 +157,10 @@ const Filtering = () => {
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={selectedUser?.isActive ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Deactivating User
+                    {selectedUser?.isActive ? 'Deactivating' : 'Activating'} User 
                 </Alert>,
                 {
                     offsetX: 5,
@@ -168,9 +168,8 @@ const Filtering = () => {
                     transitionType: 'fade',
                     block: false,
                     placement: 'top-end',
-
                 }
-            )
+            );
             try {
                 await deleteUser(selectedUser.id)
                 setData(prev => prev.filter(u => u.id !== selectedUser.id))
@@ -190,8 +189,8 @@ const Filtering = () => {
         { header: 'Username', accessorKey: 'userName' },
         { header: 'First Name', accessorKey: 'firstName' },
         { header: 'Last Name', accessorKey: 'lastName' },
-        { header: 'Role', accessorKey: 'role' },
-        { header: 'User Type', accessorKey: 'userType' },
+        // { header: 'Role', accessorKey: 'role' },
+        // { header: 'User Type', accessorKey: 'userType' },
         { header: 'Email', accessorKey: 'email' },
         {
             header: 'Status',
@@ -208,26 +207,36 @@ const Filtering = () => {
             }
         },
         {
-            header: 'Actions',
-            id: 'actions',
-            cell: ({ row }) => {
-                const user = row.original
-                return (
-                    <div className="flex space-x-2 ">
-                        <FaRegEdit
-                            className="text-blue-500 text-base  cursor-pointer"
-                            title="Edit"
-                            onClick={() => handleEditClick(user)}
-                        />
-                        <MdDeleteOutline
-                            className="text-red-500 text-lg cursor-pointer"
-                            title="Delete"
-                            onClick={() => handleDeleteClick(user)}
-                        />
-                    </div>
-                )
+                header: 'Actions',
+                id: 'actions',
+                cell: ({ row }) => {
+                    const user = row.original;
+                    return (
+                        <div className="flex space-x-2">
+                            {user.isActive && (
+                                <FaRegEdit
+                                    className="text-blue-500 text-base cursor-pointer"
+                                    title="Edit"
+                                    onClick={() => handleEditClick(user)}
+                                />
+                            )}
+                            {user.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate User"
+                                    onClick={() => handleDeleteClick(user)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate User"
+                                    onClick={() => handleDeleteClick(user)}
+                                />
+                            )}
+                        </div>
+                    );
+                }
             }
-        }
     ], [])
 
     const table = useReactTable({

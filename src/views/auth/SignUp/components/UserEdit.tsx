@@ -125,17 +125,18 @@ function UserEdit(props: SignUpFormProps) {
                 const userDetails = await getUserById(id)
                 setUserData(userDetails);
                 reset({
-                    userLevel: userDetails.userTypeId, 
+                    userLevel: userDetails.userLevelId, 
                     role: userDetails.roleId,        
                     userName: userDetails.userName,
                     firstName: userDetails.firstName,
                     lastName: userDetails.lastName,
                     email: userDetails.email,
-                    subRole: userDetails.email,
+                    subRole: userDetails.subRoleId,
                     region: userDetails.regionId,
                     channel: userDetails.channelId,
                     area: userDetails.areaId,
                     range: userDetails.email,
+                    mobileNumber:userDetails.mobileNo
                 });
             } catch (error) {
                 setMessage?.('Failed to load user data.')
@@ -442,204 +443,6 @@ function UserEdit(props: SignUpFormProps) {
                                         )}
                                     />
                                 </FormItem>
-                                <FormItem
-                                    label="Role"
-                                    invalid={Boolean(errors.role)}
-                                    errorMessage={errors.role?.message}
-                                    style={{ flex: 1, minWidth: 180 }}
-                                >
-                                    <Controller
-                                        name="role"
-                                        control={control}
-                                        rules={{ required: 'Role is required' }}
-                                        render={({ field }) => (
-                                        <Select
-                                                    size="sm"
-                                                    className="mb-4"
-                                                    placeholder="Please Select Role"
-                                                    options={userRole}
-                                                    value={userRole.find((option: { value: number }) => option.value === field.value)}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                    }
-                                                />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Grade"
-                                    invalid={Boolean(errors.subRole)}
-                                    errorMessage={errors.subRole?.message}
-                                    style={{ flex: 1, minWidth: 180 }}
-                                >
-                                    <Controller
-                                        name="subRole"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select"
-                                                options={subRoles}
-                                                value={subRoles.find((option: { value: number }) => option.value === field.value)}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                }
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                        label="Access Level"
-                                        invalid={Boolean(errors.userLevel)}
-                                        errorMessage={errors.userLevel?.message}
-                                        style={{ flex: 1, marginLeft: '10px' }}
-                                    >
-                                        <Controller
-                                            name="userLevel"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select
-                                                        size="sm"
-                                                        className="mb-4"
-                                                        placeholder="Please Select Type"
-                                                        options={userType}
-                                                        value={userType.find((option: { value: number }) => option.value === field.value)}
-                                                        onChange={(option: { label: string; value: number } | null) =>
-                                                            field.onChange(option?.value)
-                                                        }
-                                                    />
-                                            )}
-                                        />
-                                </FormItem>
-                            </div>
-                            <div style={{ flex: 1, minWidth: 280 }}>
-                                
-                                {isSales && (
-                                    <FormItem
-                                        label="Select Region"
-                                        invalid={Boolean(errors.region)}
-                                        errorMessage={errors.region?.message}
-                                        style={{ flex: 1, marginLeft: '10px' }}
-                                    >
-                                        <Controller
-                                            name="region"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select
-                                                    size="sm"
-                                                    className="mb-4"
-                                                    placeholder="Please Select Region"
-                                                    options={region}
-                                                    value={region.find((option: { value: number }) => option.value === Number(field.value))}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                                {isSales && (
-                                    <FormItem
-                                        label="Select Channel "
-                                        invalid={Boolean(errors.channel)}
-                                        errorMessage={errors.channel?.message}
-                                        style={{ flex: 1, marginLeft: '10px' }}
-                                    >
-                                        <Controller
-                                            name="channel"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select
-                                                    size="sm"
-                                                    className="mb-4"
-                                                    placeholder="Please Select Channel"
-                                                    options={channel}
-                                                    value={channel.find((option: { value: number }) => option.value === Number(field.value))}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                                {isSales && (
-                                    <FormItem
-                                        label="Select Area"
-                                        invalid={Boolean(errors.area)}
-                                        errorMessage={errors.area?.message}
-                                        style={{ flex: 1, marginLeft: '10px' }}
-                                    >
-                                        <Controller
-                                            name="area"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select
-                                                    size="sm"
-                                                    className="mb-4"
-                                                    placeholder="Please Select"
-                                                    options={area}
-                                                    value={area.find((option: { value: number }) => option.value === Number(field.value))}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                                {isSales && (
-                                    <FormItem
-                                        label="Select Territory"
-                                        invalid={Boolean(errors.territory)}
-                                        errorMessage={errors.territory?.message}
-                                        style={{ flex: 1, marginLeft: '10px' }}
-                                    >
-                                        <Controller
-                                            name="territory"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select
-                                                    size="sm"
-                                                    className="mb-4"
-                                                    placeholder="Please Select Area"
-                                                    options={territory}
-                                                    value={territory.find((option: { value: number }) => option.value === Number(field.value))}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                                {isSales && (
-                                    <FormItem
-                                        label="Select Range "
-                                        invalid={Boolean(errors.range)}
-                                        errorMessage={errors.range?.message}
-                                        style={{ flex: 1, marginLeft: '10px' }}
-                                    >
-                                        <Controller
-                                            name="range"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select
-                                                    size="sm"
-                                                    className="mb-4"
-                                                    placeholder="Please Select Range"
-                                                    options={range}
-                                                    value={range.find((option: { value: number }) => option.value === Number(field.value))}
-                                                    onChange={(option: { label: string; value: number } | null) =>
-                                                        field.onChange(option?.value)
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
                             </div>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>

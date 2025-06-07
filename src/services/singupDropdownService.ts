@@ -184,7 +184,7 @@ export const deleteUser = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/user?id=${id}`,
+            `${AuthService_URL}/api/v1/userDemarcation/user/deactivateUser/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -291,7 +291,6 @@ export interface SignupPayload {
     agencyId: number | null;
     userLevelId: number;
     userName: string;
-    departmentId:number;
     firstName: string;
     lastName: string;
     perMail: string;
