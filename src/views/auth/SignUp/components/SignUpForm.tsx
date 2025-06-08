@@ -10,12 +10,22 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import axios from 'axios'
-import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades } from '@/services/singupDropdownService'
+import {
+    fetchAreas,
+    fetchChannels,
+    fetchDepartments,
+    fetchRanges,
+    fetchRegions,
+    fetchTerritories,
+    fetchUserTypes,
+    fetchUserRoles,
+    signupUser,
+    SignupPayload,
+    fetchGrades,
+} from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
-
-
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -30,49 +40,55 @@ interface SignUpFormProps extends CommonProps {
 }
 
 export type SignUpFormSchema = {
-  email: string;
-  userName: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  confirmPassword: string;
-  mobileNo: string;
-  role: number;
-  grade: number;
-  userLevel: number;
-  channel?: number;
-  subChannel?: number;
-  region?: number;
-  area?: number;
-  territory?: number;
-  range?: number;
-};
-
+    email: string
+    userName: string
+    firstName: string
+    lastName: string
+    password: string
+    confirmPassword: string
+    mobileNo: string
+    role: number
+    grade: number
+    userLevel: number
+    channel?: number
+    subChannel?: number
+    region?: number
+    area?: number
+    territory?: number
+    agancy?: number
+    range?: number
+}
 
 const validationSchema: ZodType<SignUpFormSchema> = z
- .object({
-    email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
-    userName: z.string({ required_error: 'Please enter your name' }),
-    firstName: z.string({ required_error: 'Please enter your first name' }),
-    lastName: z.string({ required_error: 'Please enter your last name' }),
-    password: z.string({ required_error: 'Password Required' }),
-    confirmPassword: z.string({ required_error: 'Please confirm your password' }),
-    mobileNo: z.string({ required_error: 'Please enter your mobile number' }),
-    role: z.number({ required_error: 'Please select your role' }),
-    grade: z.number({ required_error: 'Please select your department' }),
-    userLevel: z.number({ required_error: 'Please select your user type' }),
-    channel: z.number().optional(),
-    subChannel: z.number().optional(),
-    region: z.number().optional(),
-    area: z.number().optional(),
-    territory: z.number().optional(),
-    range: z.number().optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password not match',
-    path: ['confirmPassword'],
-  })
-
+    .object({
+        email: z
+            .string({ required_error: 'Please enter your email' })
+            .email('Invalid email address'),
+        userName: z.string({ required_error: 'Please enter your name' }),
+        firstName: z.string({ required_error: 'Please enter your first name' }),
+        lastName: z.string({ required_error: 'Please enter your last name' }),
+        password: z.string({ required_error: 'Password Required' }),
+        confirmPassword: z.string({
+            required_error: 'Please confirm your password',
+        }),
+        mobileNo: z.string({
+            required_error: 'Please enter your mobile number',
+        }),
+        role: z.number({ required_error: 'Please select your role' }),
+        grade: z.number({ required_error: 'Please select your department' }),
+        userLevel: z.number({ required_error: 'Please select your user type' }),
+        channel: z.number().optional(),
+        subChannel: z.number().optional(),
+        region: z.number().optional(),
+        area: z.number().optional(),
+        territory: z.number().optional(),
+        range: z.number().optional(),
+        agancy: z.number().optional(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: 'Password not match',
+        path: ['confirmPassword'],
+    })
 
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
@@ -86,6 +102,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const [subChannel, setSubChannel] = useState<any>([])
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
+    const [agancy, setAgancy] = useState<any>([])
     const [userType, setUserType] = useState<any>([])
     const [userRole, setUserRole] = useState<any>([])
     const [successDialog, setSuccessDialog] = useState(false)
@@ -101,13 +118,12 @@ const SignUpForm = (props: SignUpFormProps) => {
     })
 
     const selectedSubRole = watch('grade')
-    const isSales = selectedSubRole === 13;
-
+    const isSales = selectedSubRole === 13
 
     useEffect(() => {
         if (!token) {
-            setMessage?.('No auth token found.');
-            return;
+            setMessage?.('No auth token found.')
+            return
         }
 
         const loadDepartments = async () => {
@@ -124,8 +140,8 @@ const SignUpForm = (props: SignUpFormProps) => {
 
     useEffect(() => {
         if (!token) {
-            setMessage?.('No auth token found.');
-            return;
+            setMessage?.('No auth token found.')
+            return
         }
 
         const loadGrades = async () => {
@@ -142,8 +158,8 @@ const SignUpForm = (props: SignUpFormProps) => {
 
     useEffect(() => {
         if (!token) {
-            setMessage?.('No auth token found.');
-            return;
+            setMessage?.('No auth token found.')
+            return
         }
 
         const loadTerritories = async () => {
@@ -204,7 +220,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         }
         loadRange()
     }, [setMessage])
- 
+
     useEffect(() => {
         const loadRange = async () => {
             try {
@@ -229,10 +245,9 @@ const SignUpForm = (props: SignUpFormProps) => {
         loadRange()
     }, [setMessage])
 
-
     const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
-        if (isSubmitting) return; // Prevent double submit
-        setIsSubmitting(true);
+        if (isSubmitting) return // Prevent double submit
+        setIsSubmitting(true)
 
         const payload: SignupPayload = {
             roleId: Number(data.role),
@@ -249,64 +264,68 @@ const SignUpForm = (props: SignUpFormProps) => {
             userName: data.userName,
             firstName: data.firstName,
             lastName: data.lastName,
-            perMail: data.email, 
-            address1: 'temp addr 1', 
+            perMail: data.email,
+            address1: 'temp addr 1',
             address2: 'temp addr 2',
             address3: '',
-            perContact: data.mobileNo, 
+            perContact: data.mobileNo,
             email: data.email,
             password: data.password,
             mobileNo: data.mobileNo,
             isActive: true,
             gpsStatus: true,
-            superUserId: 1 
-        };
-
+            superUserId: 1,
+        }
 
         //register new user
         try {
-            console.log("Sending payload:", JSON.stringify(payload, null, 2));
+            console.log('Sending payload:', JSON.stringify(payload, null, 2))
 
-            const result = await signupUser(payload);
-            console.log('Signup success:', result);
+            const result = await signupUser(payload)
+            console.log('Signup success:', result)
 
             if (result?.status === 'failed') {
-                    setMessage?.(result.message);
-                } else {
-                    toast.push(
-                        <Alert
-                            showIcon
-                            type="success"
-                            className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
-                        >
-                            <HiCheckCircle className="text-green-500 mb-2" size={48} />
-                            <div className="mt-2 text-green-700 font-semibold text-lg text-center">
-                                User created successfully!
-                            </div>
-                        </Alert>,
-                        {
-                            offsetX: 5,
-                            offsetY: 100,
-                            transitionType: 'fade',
-                            block: false,
-                            placement: 'top-end',
-                        }
-                    );
-                }
-        } catch (err: any) {
-            console.error('Signup failed:', err.message);
-              const backendMessage =
-                err?.response?.data?.payload && typeof err.response.data.payload === 'object'
-                ? Object.values(err.response.data.payload).join(', ')
-                : err?.response?.data?.message || 'An error occurred during signup. Please try again.';
-
+                setMessage?.(result.message)
+            } else {
                 toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <HiCheckCircle
+                            className="text-green-500 mb-2"
+                            size={48}
+                        />
+                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                            User created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 100,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    },
+                )
+            }
+        } catch (err: any) {
+            console.error('Signup failed:', err.message)
+            const backendMessage =
+                err?.response?.data?.payload &&
+                typeof err.response.data.payload === 'object'
+                    ? Object.values(err.response.data.payload).join(', ')
+                    : err?.response?.data?.message ||
+                      'An error occurred during signup. Please try again.'
+
+            toast.push(
                 <Alert
                     showIcon
                     type="danger"
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                     {backendMessage}
+                    {backendMessage}
                 </Alert>,
                 {
                     offsetX: 5,
@@ -314,29 +333,31 @@ const SignUpForm = (props: SignUpFormProps) => {
                     transitionType: 'fade',
                     block: false,
                     placement: 'top-end',
-
-                }
+                },
             )
-        }finally{
-            setIsSubmitting(false);
+        } finally {
+            setIsSubmitting(false)
         }
-
-    };
-
+    }
 
     return (
-        <div className={className} style={{ maxWidth: '500px', marginLeft: '0 auto' }}>
+        <div
+            className={className}
+            style={{ maxWidth: '500px', marginLeft: '0 auto' }}
+        >
             <div className="card">
                 <div className="card-body">
-                    <form   onSubmit={handleSubmit(
-    (data) => {
-      console.log("Form data:", data);
-      handleSignup(data);
-    },
-    (err) => {
-      console.log("Form validation errors:", err);
-    }
-  )}>
+                    <form
+                        onSubmit={handleSubmit(
+                            (data) => {
+                                console.log('Form data:', data)
+                                handleSignup(data)
+                            },
+                            (err) => {
+                                console.log('Form validation errors:', err)
+                            },
+                        )}
+                    >
                         <FormItem
                             label="User name"
                             invalid={Boolean(errors.userName)}
@@ -481,16 +502,22 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 control={control}
                                 rules={{ required: 'Role is required' }}
                                 render={({ field }) => (
-                                   <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Role"
-                                            options={userRole}
-                                            value={userRole.find((option: { value: number }) => option.value === field.value)}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Role"
+                                        options={userRole}
+                                        value={userRole.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
                                 )}
                             />
                         </FormItem>
@@ -509,10 +536,16 @@ const SignUpForm = (props: SignUpFormProps) => {
                                         className="mb-4"
                                         placeholder="Please Select"
                                         options={grade}
-                                        value={grade.find((option: { value: number }) => option.value === field.value)}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                        }
+                                        value={grade.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                             />
@@ -528,143 +561,252 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 control={control}
                                 render={({ field }) => (
                                     <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Type"
-                                            options={userType}
-                                            value={userType.find((option: { value: number }) => option.value === field.value)}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Type"
+                                        options={userType}
+                                        value={userType.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
                                 )}
                             />
                         </FormItem>
-                        {isSales && (
-                            <FormItem
-                                label="Select Region"
-                                invalid={Boolean(errors.region)}
-                                errorMessage={errors.region?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
-                            >
-                                <Controller
-                                    name="region"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Region"
-                                            options={region}
-                                            value={region.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        )}
-                        {isSales && (
-                            <FormItem
-                                label="Select Channel "
-                                invalid={Boolean(errors.channel)}
-                                errorMessage={errors.channel?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
-                            >
-                                <Controller
-                                    name="channel"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Channel"
-                                            options={channel}
-                                            value={channel.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        )}
-                        {isSales && (
-                            <FormItem
-                                label="Select Area"
-                                invalid={Boolean(errors.area)}
-                                errorMessage={errors.area?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
-                            >
-                                <Controller
-                                    name="area"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select"
-                                            options={area}
-                                            value={area.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        )}
-                        {isSales && (
-                            <FormItem
-                                label="Select Territory"
-                                invalid={Boolean(errors.territory)}
-                                errorMessage={errors.territory?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
-                            >
-                                <Controller
-                                    name="territory"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Area"
-                                            options={territory}
-                                            value={territory.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        )}
-                        {isSales && (
-                            <FormItem
-                                label="Select Range "
-                                invalid={Boolean(errors.range)}
-                                errorMessage={errors.range?.message}
-                                style={{ flex: 1, marginLeft: '10px' }}
-                            >
-                                <Controller
-                                    name="range"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="sm"
-                                            className="mb-4"
-                                            placeholder="Please Select Range"
-                                            options={range}
-                                            value={range.find((option: { value: number }) => option.value === Number(field.value))}
-                                            onChange={(option: { label: string; value: number } | null) =>
-                                                field.onChange(option?.value)
-                                            }
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-                        )}
+
+                        {/* {isSales && ( */}
+                        <FormItem
+                            label="Select Channel "
+                            invalid={Boolean(errors.channel)}
+                            errorMessage={errors.channel?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="channel"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Channel"
+                                        options={channel}
+                                        value={channel.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        {/* )} */}
+
+                        {/* {isSales && ( */}
+                        <FormItem
+                            label="Select Sub Channel "
+                            invalid={Boolean(errors.subChannel)}
+                            errorMessage={errors.subChannel?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="subChannel"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Channel"
+                                        options={subChannel}
+                                        value={subChannel.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        {/* )} */}
+
+                        {/* {isSales && ( */}
+
+                        <FormItem
+                            label="Select Range "
+                            invalid={Boolean(errors.range)}
+                            errorMessage={errors.range?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="range"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Range"
+                                        options={range}
+                                        value={range.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+
+                        <FormItem
+                            label="Select Region"
+                            invalid={Boolean(errors.region)}
+                            errorMessage={errors.region?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="region"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Region"
+                                        options={region}
+                                        value={region.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        {/* )} */}
+
+                        {/* {isSales && ( */}
+                        <FormItem
+                            label="Select Area"
+                            invalid={Boolean(errors.area)}
+                            errorMessage={errors.area?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="area"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select"
+                                        options={area}
+                                        value={area.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        {/* )} */}
+                        {/* {isSales && ( */}
+                        <FormItem
+                            label="Select Territory"
+                            invalid={Boolean(errors.territory)}
+                            errorMessage={errors.territory?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="territory"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select Area"
+                                        options={territory}
+                                        value={territory.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        {/* )} */}
+                        {/* {isSales && ( */}
+                        <FormItem
+                            label="Select Agancy"
+                            invalid={Boolean(errors.agancy)}
+                            errorMessage={errors.agancy?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="agancy"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        className="mb-4"
+                                        placeholder="Please Select agancy"
+                                        options={agancy}
+                                        value={agancy.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+                        {/* )} */}
                         <Button
                             block
                             loading={isSubmitting}
