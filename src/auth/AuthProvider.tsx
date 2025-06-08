@@ -83,7 +83,13 @@ function AuthProvider({ children }: AuthProviderProps) {
                 sessionStorage.setItem('loginTime', loginTime.toString());
                 sessionStorage.setItem('sessionTimeout', sessionTimeout.toString());
 
+                sessionStorage.setItem('role', user.role);
+                sessionStorage.setItem('subRole', user.subRole);
+                sessionStorage.setItem('user', JSON.stringify(user));
+
                 console.log('token',token);
+                console.log('User from API:', user);
+
 
                 // Call sign-in handler
                 handleSignIn({ accessToken: token }, user);
