@@ -46,9 +46,9 @@ const _UserDropdown = () => {
                         <div className="font-bold text-gray-900 dark:text-gray-100">
                             {userName || 'Anonymous'}
                         </div>
-                        <div className="text-xs">
+                        {/* <div className="text-xs">
                             {email || 'No email available'}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </Dropdown.Item>
