@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/auth'
+
 
 const SessionTimeout: React.FC = () => {
     const navigate = useNavigate()
+    const { signOut } = useAuth()
 
     useEffect(() => {
         const checkSessionExpiry = () => {
@@ -13,13 +16,13 @@ const SessionTimeout: React.FC = () => {
             if (loginTime && sessionTimeout && now - loginTime > sessionTimeout) {
                 sessionStorage.clear()
                 alert('Session expired. Please login again.')
-                navigate('/login')
+                signOut()
             }
         }
 
         const interval = setInterval(checkSessionExpiry, 60 * 1000)
         return () => clearInterval(interval)
-    }, [navigate])
+    }, [signOut])
 
     return null
 }

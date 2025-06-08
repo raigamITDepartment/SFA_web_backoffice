@@ -14,6 +14,8 @@ export interface Meta {
     header?: PageHeaderProps
     footer?: boolean
     layout?: LayoutType
+    allowedRoles?: string[]  
+    allowedSubRoles?: string[]
 }
 
 export type Route = {

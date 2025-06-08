@@ -11,12 +11,20 @@ const AgancyRoute: Routes = [
         path: '/AgancyModule-Invoice-ActualInvoice',
         component: lazy(() => import('@/views/AgancyModule/ActualBill/Viewbills')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
     {
         key: 'PostInvoice',
         path: '/AgancyModule-Invoice-PostInvoice',
         component: lazy(() => import('@/views/AgancyModule/PostBill/Postbill')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
 
       {
@@ -24,6 +32,10 @@ const AgancyRoute: Routes = [
         path: '/AgancyModule-Invoice-ManualInvoice',
         component: lazy(() => import('@/views/AgancyModule/ManualBill/CreateAgancybill')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
 
      {
@@ -31,6 +43,10 @@ const AgancyRoute: Routes = [
         path: '/AgancyModule-Invoice-ViewInvoice',
         component: lazy(() => import('@/views/AgancyModule/ViewInvoices/Invoices')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
  
       {
@@ -38,6 +54,10 @@ const AgancyRoute: Routes = [
         path: '/LoadingList-LoadingListView',
         component: lazy(() => import('@/views/AgancyModule/LoadingList/LoadingList')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
 
      {
@@ -45,6 +65,10 @@ const AgancyRoute: Routes = [
          path: '/Return-GoodReturn',
         component: lazy(() => import('@/views/AgancyModule/Return/GoodReturn')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
 
     {

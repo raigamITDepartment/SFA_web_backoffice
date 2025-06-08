@@ -8,6 +8,8 @@ import appConfig from '@/configs/app.config'
 import { useAuth } from '@/auth'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import type { LayoutType } from '@/@types/theme'
+import Unauthorized from '../../views/auth/Unauthorized'
+
 
 interface ViewsProps {
     pageContainerType?: 'default' | 'gutterless' | 'contained'
@@ -33,18 +35,23 @@ const AllRoutes = (props: AllRoutesProps) => {
                         key={route.key + index}
                         path={route.path}
                         element={
-                            <AuthorityGuard
-                                userAuthority={user.authority}
-                                authority={route.authority}
+                            <ProtectedRoute
+                                allowedRoles={route.meta?.allowedRoles}
+                                allowedSubRoles={route.meta?.allowedSubRoles}
                             >
-                                <PageContainer {...props} {...route.meta}>
-                                    <AppRoute
-                                        routeKey={route.key}
-                                        component={route.component}
-                                        {...route.meta}
-                                    />
-                                </PageContainer>
-                            </AuthorityGuard>
+                                <AuthorityGuard
+                                    userAuthority={user.authority}
+                                    authority={route.authority}
+                                >
+                                    <PageContainer {...props} {...route.meta}>
+                                        <AppRoute
+                                            routeKey={route.key}
+                                            component={route.component}
+                                            {...route.meta}
+                                        />
+                                    </PageContainer>
+                                </AuthorityGuard>
+                            </ProtectedRoute>
                         }
                     />
                 ))}
@@ -65,6 +72,7 @@ const AllRoutes = (props: AllRoutesProps) => {
                     />
                 ))}
             </Route>
+            <Route path="/unauthorized" element={<Unauthorized />} />
         </Routes>
     )
 }

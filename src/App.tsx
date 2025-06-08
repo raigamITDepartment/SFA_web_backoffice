@@ -6,6 +6,7 @@ import Views from '@/views'
 import appConfig from './configs/app.config'
 import SessionTimeout from './SessionTimeout'
 
+
 if (appConfig.enableMock) {
     import('./mock')
 }
