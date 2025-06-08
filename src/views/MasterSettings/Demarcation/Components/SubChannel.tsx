@@ -161,6 +161,7 @@ const SubChannel = () => {
     const handleEditClick = () => {
         navigate(`/Master-menu-Demarcation-SubChannel`)
     }
+  
 
     const columns = useMemo<ColumnDef<SubChannel>[]>(
         () => [

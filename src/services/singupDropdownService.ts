@@ -184,7 +184,7 @@ export const deleteUser = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/user?id=${id}`,
+            `${AuthService_URL}/api/v1/userDemarcation/user/deactivateUser/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -250,10 +250,37 @@ export const fetchUserRoles = async () => {
     }
 };
 
+
+export const fetchGrades = async (token: string) => {
+
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/subRole`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+        return response.data.payload.map((subRole: any) => ({
+            label: subRole.subRoleName,
+            value: subRole.id,
+        }));
+    } catch (error: any) {
+        console.error('Error fetching sub roles:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load sub roles.');
+    }
+};
+
 //sign up user
 export interface SignupPayload {
     roleId: number;
-    departmentId: number;
+    subRoleId: number;
     continentId: number | null;
     countryId: number | null;
     channelId: number | null;
@@ -262,7 +289,7 @@ export interface SignupPayload {
     areaId: number | null;
     territoryId: number | null;
     agencyId: number | null;
-    userTypeId: number;
+    userLevelId: number;
     userName: string;
     firstName: string;
     lastName: string;
@@ -292,5 +319,29 @@ export const signupUser = async (payload: SignupPayload) => {
     } catch (error: any) {
         console.error('Error during signup:', error, payload);
         throw new Error(error.response?.data?.message || 'Signup failed.');
+    }
+};
+
+//edit user
+export const getUserById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/user/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching user by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch user by Id.');
     }
 };

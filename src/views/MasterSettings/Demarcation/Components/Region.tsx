@@ -32,12 +32,13 @@ import { fetchRegions } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 
 type FormSchema = {
-    channel: string
-    subChannel: string
-    regionCode: string
-    regionName: string
-    isActive: boolean
-}
+    channel: string;
+    subChannel: string;
+    regionCode: string;
+    regionName: string;
+    isActive: boolean;
+    channelName: string;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -50,11 +51,12 @@ const pageSizeOptions = [
 ]
 
 interface Region {
-    channelCode: string
-    subChannelCode: string
-    regionCode: string
-    regionName: string
-    isActive: boolean
+    channelCode: string;
+    subChannelCode: string;
+    regionCode: string;
+    regionName: string;
+    isActive: boolean;
+    channelName: string;
 }
 
 interface DebouncedInputProps

@@ -32,15 +32,20 @@ import { fetchTerritories } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 
 type FormSchema = {
-    channel: string
-    subChannel: string
-    region: string
-    area: string
-    range: string
-    territoryCode: string
-    territoryName: string
-    isActive: boolean
-}
+    channel: string;
+    subChannel: string;
+    region: string;
+    area: string;
+    range: string;
+    territoryCode: string;
+    territoryName: string;
+    isActive: boolean;
+    channelName:string;
+    subChannelName:string;
+    regionName:string;
+    rangeName:string;
+    areaName:string;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -53,14 +58,19 @@ const pageSizeOptions = [
 ]
 
 interface Territory {
-    channelCode: string
-    subChannelCode: string
-    regionCode: string
-    areaCode: string
-    range: string
-    territoryCode: string
-    territoryName: string
-    isActive: boolean
+    channelCode: string;
+    subChannelCode: string;
+    regionCode: string;
+    areaCode: string;
+    range: string;
+    territoryCode: string;
+    territoryName: string;
+    isActive: boolean;
+    channelName:string;
+    subChannelName:string;
+    regionName:string;
+    rangeName:string;
+    areaName:string;
 }
 
 interface DebouncedInputProps
@@ -219,6 +229,7 @@ const Territory = () => {
         ],
         [],
     )
+   
 
     const data = territoryData
 

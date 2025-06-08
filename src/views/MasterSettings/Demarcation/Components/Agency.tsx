@@ -32,16 +32,17 @@ import { fetchAgencies } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 
 type FormSchema = {
-    channel: string
-    subChannel: string
-    region: string
-    area: string
-    territory: string
-    route: string
-    agencyCode: string
-    agencyName: string
-    isActive: boolean
-}
+    channel: string;
+    subChannel: string;
+    region: string;
+    area: string;
+    territory: string;
+    route: string;
+    agencyCode: string;
+    agencyName: string;
+    isActive: boolean;
+    channelName:string;
+};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -54,15 +55,16 @@ const pageSizeOptions = [
 ]
 
 interface Agency {
-    channelCode: string
-    subChannelCode: string
-    regionCode: string
-    areaCode: string
-    territoryCode: string
-    routeCode: string
-    agencyCode: string
-    agencyName: string
-    isActive: boolean
+    channelCode: string;
+    subChannelCode: string;
+    regionCode: string;
+    areaCode: string;
+    territoryCode: string;
+    routeCode: string;
+    agencyCode: string;
+    agencyName: string;
+    isActive: boolean;
+    channelName:string;
 }
 
 interface DebouncedInputProps
