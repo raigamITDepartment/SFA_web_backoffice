@@ -2,6 +2,8 @@ import React from 'react';
 import Select from '@/components/ui/Select';
 import { Button } from '@/components/ui';
 import { useForm, Controller } from 'react-hook-form';
+import { fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades } from '@/services/singupDropdownService'
+
 
 export type FormSchema = {
     channel: string;
