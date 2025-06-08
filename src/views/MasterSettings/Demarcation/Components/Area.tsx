@@ -160,8 +160,8 @@ const Area = () => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-Area`)
+    const handleEditClick =  (ARCode: Area) => {
+        navigate(`/Master-menu-Demarcation-/${ARCode.areaCode}/Area`)
     }
     const columns = useMemo<ColumnDef<Area>[]>(
         () => [
