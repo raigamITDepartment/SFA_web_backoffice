@@ -304,6 +304,7 @@ export interface SignupPayload {
     isActive: boolean;
     gpsStatus: boolean;
     superUserId: number;
+    
 }
 
 export const signupUser = async (payload: SignupPayload) => {

@@ -36,7 +36,7 @@ export type SignUpFormSchema = {
   lastName: string;
   password: string;
   confirmPassword: string;
-  mobileNumber: string;
+  mobileNo: string;
   role: number;
   grade: number;
   userLevel: number;
@@ -57,7 +57,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     lastName: z.string({ required_error: 'Please enter your last name' }),
     password: z.string({ required_error: 'Password Required' }),
     confirmPassword: z.string({ required_error: 'Please confirm your password' }),
-    mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
+    mobileNo: z.string({ required_error: 'Please enter your mobile number' }),
     role: z.number({ required_error: 'Please select your role' }),
     grade: z.number({ required_error: 'Please select your department' }),
     userLevel: z.number({ required_error: 'Please select your user type' }),
@@ -77,7 +77,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, setMessage } = props
     const token = sessionStorage.getItem('accessToken')
-    const [isSubmitting, setSubmitting] = useState<boolean>(false)
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([])
     const [grade, setGrade] = useState<any>([])
     const [territory, setTerritory] = useState<any>([])
@@ -231,54 +231,78 @@ const SignUpForm = (props: SignUpFormProps) => {
     }, [setMessage])
 
 
-const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
+    const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
+        if (isSubmitting) return; // Prevent double submit
+        setIsSubmitting(true);
 
-  const payload: SignupPayload = {
-    roleId: Number(data.role),
-    subRoleId: Number(data.grade),
-    continentId: 1, // Set defaults or collect these via form
-    countryId: null,
-    channelId: data.channel ? Number(data.channel) : null,
-    subChannelId: data.subChannel ? Number(data.subChannel) : null,
-    regionId: data.region ? Number(data.region) : null,
-    areaId: data.area ? Number(data.area) : null,
-    territoryId: data.territory ? Number(data.territory) : null,
-    agencyId: null,
-    userLevelId: Number(data.userLevel),
-    userName: data.userName,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    perMail: '', // default or collect from form
-    address1: '',
-    address2: '',
-    address3: '',
-    perContact: '',
-    email: data.email,
-    password: data.password,
-    mobileNo: data.mobileNumber,
-    isActive: true, // or use a form checkbox if needed
-    gpsStatus: true,
-    superUserId: 0, // adjust if required
-  };
+        const payload: SignupPayload = {
+            roleId: Number(data.role),
+            subRoleId: Number(data.grade),
+            continentId: 1,
+            countryId: null,
+            channelId: data.channel ?? null,
+            subChannelId: data.subChannel ?? null,
+            regionId: data.region ?? null,
+            areaId: data.area ?? null,
+            territoryId: data.territory ?? null,
+            agencyId: null,
+            userLevelId: Number(data.userLevel),
+            userName: data.userName,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            perMail: data.email, 
+            address1: 'temp addr 1', 
+            address2: 'temp addr 2',
+            address3: '',
+            perContact: data.mobileNo, 
+            email: data.email,
+            password: data.password,
+            mobileNo: data.mobileNo,
+            isActive: true,
+            gpsStatus: true,
+            superUserId: 1 
+        };
 
-  //register new user
-  try {
-    const result = await signupUser(payload);
-    console.log('Signup success:', result);
 
-     if (result?.status === 'failed') {
-            setMessage?.(result.message);
-        } else {
-            toast.push(
+        //register new user
+        try {
+            console.log("Sending payload:", JSON.stringify(payload, null, 2));
+
+            const result = await signupUser(payload);
+            console.log('Signup success:', result);
+
+            if (result?.status === 'failed') {
+                    setMessage?.(result.message);
+                } else {
+                    toast.push(
+                        <Alert
+                            showIcon
+                            type="success"
+                            className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                        >
+                            <HiCheckCircle className="text-green-500 mb-2" size={48} />
+                            <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                                User created successfully!
+                            </div>
+                        </Alert>,
+                        {
+                            offsetX: 5,
+                            offsetY: 100,
+                            transitionType: 'fade',
+                            block: false,
+                            placement: 'top-end',
+                        }
+                    );
+                }
+        } catch (err: any) {
+            console.error('Signup failed:', err.message);
+                toast.push(
                 <Alert
                     showIcon
-                    type="success"
-                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    <HiCheckCircle className="text-green-500 mb-2" size={48} />
-                    <div className="mt-2 text-green-700 font-semibold text-lg text-center">
-                        User created successfully!
-                    </div>
+                    An error occurred during signup. Please try again.
                 </Alert>,
                 {
                     offsetX: 5,
@@ -286,31 +310,14 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                     transitionType: 'fade',
                     block: false,
                     placement: 'top-end',
+
                 }
-            );
+            )
+        }finally{
+            setIsSubmitting(false);
         }
-  } catch (err: any) {
-    console.error('Signup failed:', err.message);
-        toast.push(
-        <Alert
-            showIcon
-            type="danger"
-            className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
-        >
-            An error occurred during signup. Please try again.
-        </Alert>,
-        {
-            offsetX: 5,
-            offsetY: 100,
-            transitionType: 'fade',
-            block: false,
-            placement: 'top-end',
 
-        }
-    )
-  }
-
-};
+    };
 
 
     return (
@@ -404,11 +411,11 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                         </FormItem>
                         <FormItem
                             label="Mobile Number"
-                            invalid={Boolean(errors.mobileNumber)}
-                            errorMessage={errors.mobileNumber?.message}
+                            invalid={Boolean(errors.mobileNo)}
+                            errorMessage={errors.mobileNo?.message}
                         >
                             <Controller
-                                name="mobileNumber"
+                                name="mobileNo"
                                 control={control}
                                 render={({ field }) => (
                                     <Input
@@ -659,6 +666,7 @@ const handleSignup: SubmitHandler<SignUpFormSchema> = async (data) => {
                             loading={isSubmitting}
                             variant="solid"
                             type="submit"
+                            disabled={isSubmitting}
                         >
                             {isSubmitting ? 'Creating Account...' : 'Sign Up'}
                         </Button>
