@@ -101,7 +101,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     })
 
     const selectedSubRole = watch('grade')
-    const isSales = selectedSubRole === 7;
+    const isSales = selectedSubRole === 13;
 
 
     useEffect(() => {
@@ -204,8 +204,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         }
         loadRange()
     }, [setMessage])
-
-    
+ 
     useEffect(() => {
         const loadRange = async () => {
             try {
@@ -296,13 +295,18 @@ const SignUpForm = (props: SignUpFormProps) => {
                 }
         } catch (err: any) {
             console.error('Signup failed:', err.message);
+              const backendMessage =
+                err?.response?.data?.payload && typeof err.response.data.payload === 'object'
+                ? Object.values(err.response.data.payload).join(', ')
+                : err?.response?.data?.message || 'An error occurred during signup. Please try again.';
+
                 toast.push(
                 <Alert
                     showIcon
                     type="danger"
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    An error occurred during signup. Please try again.
+                     {backendMessage}
                 </Alert>,
                 {
                     offsetX: 5,

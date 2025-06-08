@@ -168,8 +168,8 @@ const Agency = () => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-Agency`)
+    const handleEditClick = (RGCode :Agency) => {
+        navigate(`/Master-menu-Demarcation-/${RGCode.agencyCode}/Agency`)
     }
 
     const columns = useMemo<ColumnDef<Agency>[]>(
