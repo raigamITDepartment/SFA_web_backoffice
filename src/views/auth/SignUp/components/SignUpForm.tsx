@@ -239,7 +239,7 @@ const SignUpForm = (props: SignUpFormProps) => {
             roleId: Number(data.role),
             subRoleId: Number(data.grade),
             continentId: 1,
-            countryId: null,
+            countryId: 1,
             channelId: data.channel ?? null,
             subChannelId: data.subChannel ?? null,
             regionId: data.region ?? null,
