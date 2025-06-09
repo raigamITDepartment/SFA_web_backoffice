@@ -9,6 +9,9 @@ import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
+import { toast, Alert } from '@/components/ui'
+import Dialog from '@/components/ui/Dialog'
+import { HiCheckCircle } from 'react-icons/hi'
 
 import {
     useReactTable,
@@ -24,8 +27,10 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom'
 
 type FormSchema = {
+    id:number;
     distributorName: string;
     address1: string;
     address2: string;
@@ -46,6 +51,7 @@ const pageSizeOptions = [
 ];
 
 interface Distributor {
+    id:number;
     distributorName: string;
     address1: string;
     address2: string;
@@ -96,6 +102,17 @@ const DistributorCreation = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
+    const [dialogIsOpen, setDialogIsOpen] = useState(false);
+    const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
+    const [successDialog, setSuccessDialog] = useState(false);
+    const [data, setData] = useState<Distributor[]>([
+        { id: 1, distributorName: 'Distributor 1', address1: 'Address 1-1', address2: 'Address 1-2', address3: 'Address 1-3', mobile: '1234567890', email: 'distributor1@example.com', isActive: true },
+        { id: 2, distributorName: 'Distributor 2', address1: 'Address 2-1', address2: 'Address 2-2', address3: 'Address 2-3', mobile: '1234567891', email: 'distributor2@example.com', isActive: false },
+        { id: 3, distributorName: 'Distributor 3', address1: 'Address 3-1', address2: 'Address 3-2', address3: 'Address 3-3', mobile: '1234567892', email: 'distributor3@example.com', isActive: true },
+        { id: 4, distributorName: 'Distributor 4', address1: 'Address 4-1', address2: 'Address 4-2', address3: 'Address 4-3', mobile: '1234567893', email: 'distributor4@example.com', isActive: false },
+        { id: 5, distributorName: 'Distributor 5', address1: 'Address 5-1', address2: 'Address 5-2', address3: 'Address 5-3', mobile: '1234567894', email: 'distributor5@example.com', isActive: true },
+    ]);
+    const navigate = useNavigate();
 
     const columns = useMemo<ColumnDef<Distributor>[]>(() => [
         { header: 'Distributor Name', accessorKey: 'distributorName' },
@@ -125,15 +142,7 @@ const DistributorCreation = () => {
                 </div>
             ),
         },
-    ], []);
-
-    const [data] = useState<Distributor[]>([
-        { distributorName: 'Distributor 1', address1: 'Address 1-1', address2: 'Address 1-2', address3: 'Address 1-3', mobile: '1234567890', email: 'distributor1@example.com', isActive: true },
-        { distributorName: 'Distributor 2', address1: 'Address 2-1', address2: 'Address 2-2', address3: 'Address 2-3', mobile: '1234567891', email: 'distributor2@example.com', isActive: false },
-        { distributorName: 'Distributor 3', address1: 'Address 3-1', address2: 'Address 3-2', address3: 'Address 3-3', mobile: '1234567892', email: 'distributor3@example.com', isActive: true },
-        { distributorName: 'Distributor 4', address1: 'Address 4-1', address2: 'Address 4-2', address3: 'Address 4-3', mobile: '1234567893', email: 'distributor4@example.com', isActive: false },
-        { distributorName: 'Distributor 5', address1: 'Address 5-1', address2: 'Address 5-2', address3: 'Address 5-3', mobile: '1234567894', email: 'distributor5@example.com', isActive: true },
-    ]);
+    ], [data]);
 
     const totalData = data.length;
 
@@ -167,19 +176,48 @@ const DistributorCreation = () => {
     };
 
     const handleEdit = (distributor: Distributor) => {
-        // Implement edit functionality here
-        console.log('Edit:', distributor);
+        navigate(`/Master-menu-DistributorMapping/edit/${distributor.id}`);
     };
 
     const handleDelete = (distributor: Distributor) => {
-        // Implement delete functionality here
-        console.log('Delete:', distributor);
+        setSelectedDistributor(distributor);
+        setDialogIsOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogIsOpen(false);
+        setSelectedDistributor(null);
+    };
+
+    const handleDialogConfirm = () => {
+        setDialogIsOpen(false);
+        if (selectedDistributor) {
+            setData(prev => prev.filter(d => d.id !== selectedDistributor.id));
+            toast.push(
+                <Alert
+                    showIcon
+                    type={selectedDistributor.isActive ? 'danger' : 'success'}
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    {selectedDistributor.isActive ? 'Deactivating' : 'Activating'} Distributor
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                }
+            );
+            setSelectedDistributor(null);
+        }
     };
 
     const {
         handleSubmit,
         formState: { errors },
         control,
+        reset,
     } = useForm<FormSchema>({
         defaultValues: {
             distributorName: '',
@@ -188,13 +226,37 @@ const DistributorCreation = () => {
             address3: '',
             mobile: '',
             email: '',
-            isActive: true, // Set default value to true
+            isActive: true,
         },
     });
 
     const onSubmit = async (values: FormSchema) => {
         await new Promise((r) => setTimeout(r, 500));
-        alert(JSON.stringify(values, null, 2));
+        setData(prev => [
+            ...prev,
+            {
+                ...values,
+                id: prev.length ? Math.max(...prev.map(d => d.id)) + 1 : 1,
+            }
+        ]);
+        setSuccessDialog(true);
+        toast.push(
+            <Alert
+                showIcon
+                type="success"
+                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+            >
+                Distributor created successfully!
+            </Alert>,
+            {
+                offsetX: 5,
+                offsetY: 100,
+                transitionType: 'fade',
+                block: false,
+                placement: 'top-end',
+            }
+        );
+        reset();
     };
 
     return (
@@ -444,6 +506,49 @@ const DistributorCreation = () => {
                     </div>
                 </Card>
             </div>
+            <Dialog
+                isOpen={dialogIsOpen}
+                onClose={handleDialogClose}
+                onRequestClose={handleDialogClose}
+            >
+                <h5 className="mb-4">Remove Distributor</h5>
+                <p>
+                    Are you sure you want to {selectedDistributor?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    <b>{selectedDistributor?.distributorName}</b>?
+                </p>
+                <div className="text-right mt-6">
+                    <Button
+                        className="mr-2"
+                        clickFeedback={false}
+                        customColorClass={({ active, unclickable }) =>
+                            [
+                                'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+                                unclickable && 'opacity-50 cursor-not-allowed',
+                                !active && !unclickable,
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+                        }
+                        onClick={handleDialogClose}
+                    >
+                        Cancel
+                    </Button>
+                    <Button variant="solid" onClick={handleDialogConfirm}>
+                        Confirm
+                    </Button>
+                </div>
+            </Dialog>
+            <Dialog isOpen={successDialog} onClose={() => setSuccessDialog(false)}>
+                <div className="flex flex-col items-center p-6">
+                    <HiCheckCircle className="text-green-500 mb-2" size={48} />
+                    <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                        Distributor created successfully!
+                    </div>
+                    <Button className="mt-6" variant="solid" onClick={() => setSuccessDialog(false)}>
+                        OK
+                    </Button>
+                </div>
+            </Dialog>
         </div>
     );
 };
