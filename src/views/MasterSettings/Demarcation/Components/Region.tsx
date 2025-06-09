@@ -165,8 +165,8 @@ const Region = () => {
     }
     const columns = useMemo<ColumnDef<Region>[]>(
         () => [
-            { header: 'Channel Code', accessorKey: 'channelCode' },
-            { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
+            { header: 'Channel', accessorKey: 'channelName' },
+            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
             { header: 'Region Code', accessorKey: 'regionCode' },
             { header: 'Region Name', accessorKey: 'regionName' },
             {
