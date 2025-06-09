@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Table from '@/components/ui/Table';
@@ -9,6 +9,10 @@ import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
+import { toast, Alert } from '@/components/ui';
+import Dialog from '@/components/ui/Dialog';
+import { useNavigate } from 'react-router-dom';
+import { HiCheckCircle } from 'react-icons/hi';
 
 import {
     useReactTable,
@@ -42,6 +46,7 @@ const pageSizeOptions = [
 ];
 
 interface DistributorAgencyMapping {
+    id: number;
     distributorName: string;
     agencyName: string;
     isActive: boolean;
@@ -87,9 +92,21 @@ const DistributorAgencyMapping = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
-    const [error, setError] = useState<string | null>(null);
+    const [dialogIsOpen, setDialogIsOpen] = useState(false);
+    const [selectedMapping, setSelectedMapping] = useState<DistributorAgencyMapping | null>(null);
+    const [successDialog, setSuccessDialog] = useState(false);
+    const showToastRef = useRef(false);
+    const [data, setData] = useState<DistributorAgencyMapping[]>([
+        { id: 1, distributorName: 'Distributor 1', agencyName: 'Agency 1', isActive: true },
+        { id: 2, distributorName: 'Distributor 2', agencyName: 'Agency 2', isActive: false },
+        { id: 3, distributorName: 'Distributor 3', agencyName: 'Agency 3', isActive: true },
+        { id: 4, distributorName: 'Distributor 4', agencyName: 'Agency 4', isActive: false },
+        { id: 5, distributorName: 'Distributor 5', agencyName: 'Agency 5', isActive: true },
+    ]);
+    const navigate = useNavigate();
 
     const columns = useMemo<ColumnDef<DistributorAgencyMapping>[]>(() => [
+        { header: 'ID', accessorKey: 'id' },
         { header: 'Distributor Name', accessorKey: 'distributorName' },
         { header: 'Agency Name', accessorKey: 'agencyName' },
         {
@@ -113,15 +130,7 @@ const DistributorAgencyMapping = () => {
                 </div>
             ),
         },
-    ], []);
-
-    const [data] = useState<DistributorAgencyMapping[]>([
-        { distributorName: 'Distributor 1', agencyName: 'Agency 1', isActive: true },
-        { distributorName: 'Distributor 2', agencyName: 'Agency 2', isActive: false },
-        { distributorName: 'Distributor 3', agencyName: 'Agency 3', isActive: true },
-        { distributorName: 'Distributor 4', agencyName: 'Agency 4', isActive: false },
-        { distributorName: 'Distributor 5', agencyName: 'Agency 5', isActive: true },
-    ]);
+    ], [data]);
 
     const totalData = data.length;
 
@@ -150,35 +159,92 @@ const DistributorAgencyMapping = () => {
         table.setPageSize(newSize);
     };
 
-    const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e);
-    };
-
     const handleEdit = (mapping: DistributorAgencyMapping) => {
-        // Implement edit functionality here
-        console.log('Edit:', mapping);
+        navigate(`/Master-menu-DistributorMapping/agency-edit/${mapping.id}`);
     };
 
     const handleDelete = (mapping: DistributorAgencyMapping) => {
-        // Implement delete functionality here
-        console.log('Delete:', mapping);
+        setSelectedMapping(mapping);
+        setDialogIsOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogIsOpen(false);
+        setSelectedMapping(null);
+    };
+
+    const handleDialogConfirm = () => {
+        setDialogIsOpen(false);
+        if (selectedMapping) {
+            setData(prev => prev.filter(d => d.id !== selectedMapping.id));
+            toast.push(
+                <Alert
+                    showIcon
+                    type={selectedMapping.isActive ? 'danger' : 'success'}
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    {selectedMapping.isActive ? 'Deactivating' : 'Activating'} Mapping
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                }
+            );
+            setSelectedMapping(null);
+        }
     };
 
     const {
         handleSubmit,
         formState: { errors },
         control,
+        reset,
     } = useForm<FormSchema>({
         defaultValues: {
             distributorName: '',
             agencyName: '',
-            isActive: true, // Set default value to true
+            isActive: true,
         },
     });
 
     const onSubmit = async (values: FormSchema) => {
         await new Promise((r) => setTimeout(r, 500));
-        alert(JSON.stringify(values, null, 2));
+        setData(prev => [
+            ...prev,
+            {
+                ...values,
+                id: prev.length ? Math.max(...prev.map(d => d.id)) + 1 : 1,
+            }
+        ]);
+        setSuccessDialog(true);
+        showToastRef.current = true;
+        reset();
+    };
+
+    const handleSuccessDialogClose = () => {
+        setSuccessDialog(false);
+        if (showToastRef.current) {
+            toast.push(
+                <Alert
+                    showIcon
+                    type="success"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    Mapping created!...
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                }
+            );
+            showToastRef.current = false;
+        }
     };
 
     return (
@@ -199,7 +265,7 @@ const DistributorAgencyMapping = () => {
                                         size="sm"
                                         placeholder="Select Distributor"
                                         options={[
-                                            { label: 'Distributor 1', value: 'Distributor 1' }as any,
+                                            { label: 'Distributor 1', value: 'Distributor 1' } as any,
                                             { label: 'Distributor 2', value: 'Distributor 2' },
                                             { label: 'Distributor 3', value: 'Distributor 3' },
                                             { label: 'Distributor 4', value: 'Distributor 4' },
@@ -233,7 +299,7 @@ const DistributorAgencyMapping = () => {
                                         size="sm"
                                         placeholder="Select Agency"
                                         options={[
-                                            { label: 'Agency 1', value: 'Agency 1' }as any,
+                                            { label: 'Agency 1', value: 'Agency 1' } as any,
                                             { label: 'Agency 2', value: 'Agency 2' },
                                             { label: 'Agency 3', value: 'Agency 3' },
                                             { label: 'Agency 4', value: 'Agency 4' },
@@ -334,6 +400,49 @@ const DistributorAgencyMapping = () => {
                     </div>
                 </Card>
             </div>
+            <Dialog
+                isOpen={dialogIsOpen}
+                onClose={handleDialogClose}
+                onRequestClose={handleDialogClose}
+            >
+                <h5 className="mb-4">Remove Mapping</h5>
+                <p>
+                    Are you sure you want to {selectedMapping?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    <b>{selectedMapping?.distributorName} - {selectedMapping?.agencyName}</b>?
+                </p>
+                <div className="text-right mt-6">
+                    <Button
+                        className="mr-2"
+                        clickFeedback={false}
+                        customColorClass={({ active, unclickable }) =>
+                            [
+                                'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+                                unclickable && 'opacity-50 cursor-not-allowed',
+                                !active && !unclickable,
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+                        }
+                        onClick={handleDialogClose}
+                    >
+                        Cancel
+                    </Button>
+                    <Button variant="solid" onClick={handleDialogConfirm}>
+                        Confirm
+                    </Button>
+                </div>
+            </Dialog>
+            <Dialog isOpen={successDialog} onClose={handleSuccessDialogClose}>
+                <div className="flex flex-col items-center p-6">
+                    <HiCheckCircle className="text-green-500 mb-2" size={48} />
+                    <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                        Mapping created successfully!
+                    </div>
+                    <Button className="mt-6" variant="solid" onClick={handleSuccessDialogClose}>
+                        OK
+                    </Button>
+                </div>
+            </Dialog>
         </div>
     );
 };
