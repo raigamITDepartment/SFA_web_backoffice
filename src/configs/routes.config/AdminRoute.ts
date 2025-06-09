@@ -10,14 +10,16 @@ const UserRoute: Routes = [
         path: '/User-menu-ModifiyUser',
         component: lazy(() => import('@/views/auth/SignUp/SignUp')),
         authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
     },
-
-
 
     {
         key: 'UserModule.BookingReverse',
         path: '/Admin-menu-BookingReverse',
-        component: lazy(() => import('@/views/Admin/BookingReverse')),
+        component: lazy(() => import('@/views/Admin 2/BookingReverse')),
         authority: [],
     },
    
@@ -26,7 +28,7 @@ const UserRoute: Routes = [
     {
         key: 'UserModule.AcutualReverse',
         path: '/Admin-menu-AcutualReverse',
-        component: lazy(() => import('@/views/Admin/ActualReverse')),
+        component: lazy(() => import('@/views/Admin 2/ActualReverse')),
         authority: [],
     },
 

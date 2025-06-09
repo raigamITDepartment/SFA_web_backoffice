@@ -16,6 +16,7 @@ import type {
 import type { ReactNode, Ref } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
+
 type AuthProviderProps = { children: ReactNode }
 
 export type IsolatedNavigatorRef = {
@@ -39,7 +40,9 @@ function AuthProvider({ children }: AuthProviderProps) {
     const setSessionSignedIn = useSessionUser(
         (state) => state.setSessionSignedIn,
     )
-    const { token, setToken } = useToken()
+    const { token, setToken } = useToken();
+    const loginTime = new Date().getTime(); 
+    const sessionTimeout = 30 * 60 * 1000;
 
     const authenticated = Boolean(token && signedIn)
     const navigatorRef = useRef<IsolatedNavigatorRef>(null)
@@ -77,7 +80,16 @@ function AuthProvider({ children }: AuthProviderProps) {
 
                 // Save token in localStorage
                 sessionStorage.setItem('accessToken', token);
+                sessionStorage.setItem('loginTime', loginTime.toString());
+                sessionStorage.setItem('sessionTimeout', sessionTimeout.toString());
+
+                sessionStorage.setItem('role', user.role);
+                sessionStorage.setItem('subRole', user.subRole);
+                sessionStorage.setItem('user', JSON.stringify(user));
+
                 console.log('token',token);
+                console.log('User from API:', user);
+
 
                 // Call sign-in handler
                 handleSignIn({ accessToken: token }, user);

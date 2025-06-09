@@ -9,61 +9,273 @@ import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { getUserById, fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades } from '@/services/singupDropdownService';
+import type { CommonProps } from '@/@types/common';
+import type { ZodType } from 'zod'
 
-type SignUpFormSchema = {
-    userName: string
-    firstName: string
-    lastName: string
-    password: string
-    email: string
-    mobileNumber: string
-    confirmPassword: string
+interface SignUpFormProps extends CommonProps {
+    disableSubmit?: boolean
+    setMessage?: (message: string) => void
     role: string
-    department: string
-    userType: string
-    channel: string
-    subChannel: string
+    gender: string
     region: string
     area: string
     territory: string
     range: string
+    userLevel?: string
 }
 
-const validationSchema = z
-    .object({
-        email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
-        userName: z.string({ required_error: 'Please enter your name' }),
-        firstName: z.string({ required_error: 'Please enter your first name' }),
-        lastName: z.string({ required_error: 'Please enter your last name' }),
-        password: z.string({ required_error: 'Password Required' }),
-        mobileNumber: z.string({ required_error: 'Mobile Number Required' }).regex(/^\d+$/, 'Mobile Number must be numeric'),
-        confirmPassword: z.string({ required_error: 'Please confirm your password' }),
-        role: z.string({ required_error: 'Please select your role' }),
-        department: z.string({ required_error: 'Please select your department' }),
-        userType: z.string({ required_error: 'Please select your user type' }),
-        channel: z.string({ required_error: 'Please select your channel' }),
-        subChannel: z.string({ required_error: 'Please select your sub-channel' }),
-        region: z.string({ required_error: 'Please select your region' }),
-        area: z.string({ required_error: 'Please select your area' }),
-        territory: z.string({ required_error: 'Please select your territory' }),
-        range: z.string({ required_error: 'Please select your range' }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: 'Password not match',
-        path: ['confirmPassword'],
-    })
+export type SignUpFormSchema = {
+  email: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  confirmPassword: string;
+  mobileNumber: string;
+  role: number;
+  subRole: number;
+  userLevel: number;
+  channel?: number;
+  subChannel?: number;
+  region?: number;
+  area?: number;
+  territory?: number;
+  range?: number;
+  departmentId?: number;
+};
 
-function UserEdit() {
+const validationSchema: ZodType<SignUpFormSchema> = z
+ .object({
+    email: z.string({ required_error: 'Please enter your email' }).email('Invalid email address'),
+    userName: z.string({ required_error: 'Please enter your name' }),
+    firstName: z.string({ required_error: 'Please enter your first name' }),
+    lastName: z.string({ required_error: 'Please enter your last name' }),
+    password: z.string({ required_error: 'Password Required' }),
+    confirmPassword: z.string({ required_error: 'Please confirm your password' }),
+    mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
+    role: z.number({ required_error: 'Please select your role' }),
+    subRole: z.number({ required_error: 'Please select your department' }),
+    userLevel: z.number({ required_error: 'Please select your user type' }),
+    channel: z.number().optional(),
+    subChannel: z.number().optional(),
+    region: z.number().optional(),
+    area: z.number().optional(),
+    territory: z.number().optional(),
+    range: z.number().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Password not match',
+    path: ['confirmPassword'],
+  })
+
+
+function UserEdit(props: SignUpFormProps) {
     const navigate = useNavigate()
+    const { id } = useParams();
+    const [userData, setUserData] = useState(null);
+    const [subRoles, setSubRoles] = useState<any>([])
+    const [territory, setTerritory] = useState<any>([])
+    const [region, setRegion] = useState<any>([])
+    const [channel, setChannel] = useState<any>([])
+    const [area, setArea] = useState<any>([])
+    const [range, setRange] = useState<any>([])
+    const [userType, setUserType] = useState<any>([])
+    const [userRole, setUserRole] = useState<any>([])
+    const [departments, setDepartments] = useState<any>([])
+    const token = sessionStorage.getItem('accessToken')
+    const { disableSubmit = false, className, setMessage } = props
+
 
     const {
-        handleSubmit,
-        formState: { errors, isSubmitting },
+        watch,
         control,
+        handleSubmit,
+        setValue,
+        formState: { errors, isSubmitting },
+        reset, 
     } = useForm<SignUpFormSchema>({
-        resolver: zodResolver(validationSchema),
-        defaultValues: {},
-    })
+    resolver: zodResolver(validationSchema),
+    defaultValues: {
+        subRole: userData?.subRole || undefined,
+        // other fields here
+    },
+    });
+
+
+    const selectedSubRole = watch('subRole')
+    const isSales = selectedSubRole === 7;
+
+    console.log(selectedSubRole);
+
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+        if (!id) {
+            setMessage?.('No user ID found.');
+            return;
+        }
+
+        const loadUserDetails = async () => {
+            try {
+                const userDetails = await getUserById(id)
+                setUserData(userDetails);
+                reset({
+                    userLevel: userDetails.userLevelId, 
+                    role: userDetails.roleId,        
+                    userName: userDetails.userName,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    email: userDetails.email,
+                    subRole: userDetails.subRoleId,
+                    region: userDetails.regionId,
+                    channel: userDetails.channelId,
+                    area: userDetails.areaId,
+                    range: userDetails.email,
+                    mobileNumber:userDetails.mobileNo
+                });
+            } catch (error) {
+                setMessage?.('Failed to load user data.')
+            }
+        }
+
+        loadUserDetails()
+    }, [token, id, setMessage]);
+
+     useEffect(() => {
+            if (!token) {
+                setMessage?.('No auth token found.');
+                return;
+            }
+    
+            const loadDepartments = async () => {
+                try {
+                    const departmentOptions = await fetchDepartments(token)
+                    setDepartments(departmentOptions)
+                } catch (error) {
+                    setMessage?.('Failed to load departments.')
+                }
+            }
+    
+            loadDepartments()
+        }, [token, setMessage])
+    
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+
+        const loadSubRoles = async () => {
+            try {
+                const subRoleOptions = await fetchGrades(token)
+                setSubRoles(subRoleOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub roles.')
+            }
+        }
+
+        loadSubRoles()
+    }, [token, setMessage])
+
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+
+        const loadTerritories = async () => {
+            try {
+                const territoryOptions = await fetchTerritories(token)
+                setTerritory(territoryOptions)
+            } catch (error) {
+                setMessage?.('Failed to load territories.')
+            }
+        }
+        loadTerritories()
+    }, [token, setMessage])
+
+    useEffect(() => {
+        
+        const loadRegion = async () => {
+            try {
+                const regionOptions = await fetchRegions(token)
+                setRegion(regionOptions)
+            } catch (error) {
+                setMessage?.('Failed to load regions.')
+            }
+        }
+        loadRegion()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadArea = async () => {
+            try {
+                const areaOptions = await fetchAreas(token)
+                setArea(areaOptions)
+            } catch (error) {
+                setMessage?.('Failed to load areas.')
+            }
+        }
+        loadArea()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRange = async () => {
+            try {
+                const rangeOptions = await fetchRanges(token)
+                setRange(rangeOptions)
+            } catch (error) {
+                setMessage?.('Failed to load ranges.')
+            }
+        }
+        loadRange()
+    }, [setMessage])
+
+    
+    useEffect(() => {
+        const loadRange = async () => {
+            try {
+                const userTypes = await fetchUserTypes(token)
+                setUserType(userTypes)
+            } catch (error) {
+                setMessage?.('Failed to load user types.')
+            }
+        }
+        loadRange()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRange = async () => {
+            try {
+                const userRole = await fetchUserRoles(token)
+                setUserRole(userRole)
+            } catch (error) {
+                setMessage?.('Failed to load user types.')
+            }
+        }
+        loadRange()
+    }, [setMessage])
+
+
+    console.log("user data " ,userData)
+
 
     const onSubmit = async (values: SignUpFormSchema) => {
         toast.push(
@@ -226,161 +438,6 @@ function UserEdit() {
                                                 type="password"
                                                 autoComplete="off"
                                                 placeholder="Confirm Password"
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Role"
-                                    invalid={Boolean(errors.role)}
-                                    errorMessage={errors.role?.message}
-                                >
-                                    <Controller
-                                        name="role"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Department"
-                                    invalid={Boolean(errors.department)}
-                                    errorMessage={errors.department?.message}
-                                >
-                                    <Controller
-                                        name="department"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="User Type"
-                                    invalid={Boolean(errors.userType)}
-                                    errorMessage={errors.userType?.message}
-                                >
-                                    <Controller
-                                        name="userType"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select User Type"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                            </div>
-                            <div style={{ flex: 1, minWidth: 280 }}>
-                                
-                                <FormItem
-                                    label="Select Region"
-                                    invalid={Boolean(errors.region)}
-                                    errorMessage={errors.region?.message}
-                                >
-                                    <Controller
-                                        name="region"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select Region"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Select Channel "
-                                    invalid={Boolean(errors.channel)}
-                                    errorMessage={errors.channel?.message}
-                                >
-                                    <Controller
-                                        name="channel"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select Channel"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Select Area"
-                                    invalid={Boolean(errors.area)}
-                                    errorMessage={errors.area?.message}
-                                >
-                                    <Controller
-                                        name="area"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Select Territory"
-                                    invalid={Boolean(errors.territory)}
-                                    errorMessage={errors.territory?.message}
-                                >
-                                    <Controller
-                                        name="territory"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select Area"
-                                                options={[]}
-                                                {...field}
-                                            />
-                                        )}
-                                    />
-                                </FormItem>
-                                <FormItem
-                                    label="Select Range "
-                                    invalid={Boolean(errors.range)}
-                                    errorMessage={errors.range?.message}
-                                >
-                                    <Controller
-                                        name="range"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                size="sm"
-                                                className="mb-4"
-                                                placeholder="Please Select Range"
-                                                options={[]}
                                                 {...field}
                                             />
                                         )}
