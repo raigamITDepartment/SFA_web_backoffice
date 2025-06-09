@@ -170,11 +170,11 @@ const Route = () => {
     }
     const columns = useMemo<ColumnDef<Route>[]>(
         () => [
-            { header: 'Channel Code', accessorKey: 'channelCode' },
-            { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-            { header: 'Region Code', accessorKey: 'regionCode' },
-            { header: 'Area Code', accessorKey: 'areaCode' },
-            { header: 'Territory Code', accessorKey: 'territoryCode' },
+            { header: 'Channel', accessorKey: 'channelCode' },
+            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
+            { header: 'Region', accessorKey: 'regionCode' },
+            { header: 'Area', accessorKey: 'areaCode' },
+            { header: 'Territory', accessorKey: 'territoryName' },
             { header: 'Route Code', accessorKey: 'routeCode' },
             { header: 'Route Name', accessorKey: 'routeName' },
             {

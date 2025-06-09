@@ -580,7 +580,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             />
                         </FormItem>
 
-                        {/* {isSales && ( */}
+                        {isSales && (
                         <FormItem
                             label="Select Channel "
                             invalid={Boolean(errors.channel)}
@@ -611,9 +611,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-                        {/* )} */}
+                         )} 
 
-                        {/* {isSales && ( */}
+                        {isSales && (
                         <FormItem
                             label="Select Sub Channel "
                             invalid={Boolean(errors.subChannel)}
@@ -644,9 +644,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-                        {/* )} */}
+                         )} 
 
-                        {/* {isSales && ( */}
+                        {isSales && ( 
 
                         <FormItem
                             label="Select Range "
@@ -678,7 +678,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-
+                        )} 
+                        {isSales && ( 
                         <FormItem
                             label="Select Region"
                             invalid={Boolean(errors.region)}
@@ -709,9 +710,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-                        {/* )} */}
+                        )} 
 
-                        {/* {isSales && ( */}
+                        {isSales && (
                         <FormItem
                             label="Select Area"
                             invalid={Boolean(errors.area)}
@@ -742,8 +743,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-                        {/* )} */}
-                        {/* {isSales && ( */}
+                        )} 
+                     {isSales && (
                         <FormItem
                             label="Select Territory"
                             invalid={Boolean(errors.territory)}
@@ -774,8 +775,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-                        {/* )} */}
-                        {/* {isSales && ( */}
+                         )} 
+                      {isSales && ( 
                         <FormItem
                             label="Select Agancy"
                             invalid={Boolean(errors.agancy)}
@@ -806,7 +807,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 )}
                             />
                         </FormItem>
-                        {/* )} */}
+                        )} 
                         <Button
                             block
                             loading={isSubmitting}

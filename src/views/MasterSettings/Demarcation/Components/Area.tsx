@@ -57,6 +57,7 @@ interface Area {
     areaCode: string
     areaName: string
     isActive: boolean
+    regionName: string
 }
 
 interface DebouncedInputProps
@@ -165,9 +166,9 @@ const Area = () => {
     }
     const columns = useMemo<ColumnDef<Area>[]>(
         () => [
-            { header: 'Channel Code', accessorKey: 'channelCode' },
-            { header: 'Sub-Channel Code', accessorKey: 'subChannelCode' },
-            { header: 'Region Code', accessorKey: 'regionCode' },
+            { header: 'Channel', accessorKey: 'channelCode' },
+            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
+            { header: 'Region', accessorKey: 'regionName' },
             { header: 'Area Code', accessorKey: 'areaCode' },
             { header: 'Area Name', accessorKey: 'areaName' },
             {
