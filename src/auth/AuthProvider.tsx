@@ -42,7 +42,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     )
     const { token, setToken } = useToken();
     const loginTime = new Date().getTime(); 
-    const sessionTimeout = 30 * 60 * 1000;
+    const sessionTimeout = 60 * 60 * 1000;
 
     const authenticated = Boolean(token && signedIn)
     const navigatorRef = useRef<IsolatedNavigatorRef>(null)
