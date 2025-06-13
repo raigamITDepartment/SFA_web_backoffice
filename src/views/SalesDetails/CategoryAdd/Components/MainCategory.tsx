@@ -7,10 +7,8 @@ import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
-// import InputGroup from '@/components/ui/InputGroup';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
-
 import {
     useReactTable,
     getCoreRowModel,
@@ -25,11 +23,13 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type FormSchema = {
     MainCategoryCode: string;
     MainCategoryName: string;
     isActive: boolean;
+    CategoryType?: string;
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -46,6 +46,7 @@ interface MainCategory {
     MainCategoryCode: string;
     MainCategoryName: string;
     isActive?: boolean;
+    CategoryType?: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -90,9 +91,18 @@ const MainCategory = () => {
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
     const [channelName, setChannelName] = useState<string>('');
+    const navigate = useNavigate();
+
     const columns = useMemo<ColumnDef<MainCategory>[]>(() => [
-        { header: 'MainCategory Code', accessorKey: 'MainCategoryCode' },
-        { header: 'MainCategory Name', accessorKey: 'MainCategoryName' },
+        { header: 'Main Category Code', accessorKey: 'MainCategoryCode' },
+        { header: 'Main Category Name', accessorKey: 'MainCategoryName' },
+        {
+            header: 'Category Type',
+            accessorKey: 'CategoryType',
+            cell: ({ row }) => (
+                <span>{row.original.CategoryType || '-'}</span>
+            ),
+        },
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -109,18 +119,23 @@ const MainCategory = () => {
             accessorKey: 'action',
             cell: ({ row }) => (
                 <div className="flex ">
-                    <FaRegEdit onClick={() => handleEdit(row.original)} className="cursor-pointer mr-4 text-primary-deep text-lg" />
-                    <MdDeleteOutline onClick={() => handleDelete(row.original)} className="cursor-pointer text-red-600 text-xl" />
+                    <FaRegEdit
+                        onClick={() => handleEdit(row.original)}
+                        className="cursor-pointer mr-4 text-primary-deep text-lg"
+                    />
+                    <MdDeleteOutline
+                        onClick={() => handleDelete(row.original)}
+                        className="cursor-pointer text-red-600 text-xl"
+                    />
                 </div>
             ),
         },
     ], []);
 
     const [data] = useState<MainCategory[]>([
-        { MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true },
-        { MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false },
-        { MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true },
-
+        { MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true, CategoryType: 'Type 1' },
+        { MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false, CategoryType: 'Type 2' },
+        { MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true, CategoryType: 'Type 1' },
     ]);
 
     const totalData = data.length;
@@ -155,8 +170,8 @@ const MainCategory = () => {
     };
 
     const handleEdit = (MainCategory: MainCategory) => {
-        // Implement edit functionality here
-        console.log('Edit:', MainCategory);
+        // Navigate to MainCategoryEdit page
+        navigate('/Salesmenu/MainCategoryEdit');
     };
 
     const handleDelete = (MainCategory: MainCategory) => {
@@ -175,9 +190,9 @@ const MainCategory = () => {
         control,
     } = useForm<FormSchema>({
         defaultValues: {
-
             MainCategoryName: '',
-            isActive: true, // Set default value to true
+            isActive: true,
+            CategoryType: '',
         },
     });
 
@@ -189,14 +204,10 @@ const MainCategory = () => {
     return (
         <div>
             <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-
-
                 <div className='flex-row lg:w-1/3 xl:w-1/3 h-1/2'>
-
                     <Card bordered={false} className='mb-4'>
                         <h5 className='mb-2'>Category Creation</h5>
                         <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-
                             <FormItem
                                 invalid={Boolean(errors.MainCategoryName)}
                                 errorMessage={errors.MainCategoryName?.message}
@@ -211,6 +222,29 @@ const MainCategory = () => {
                                             autoComplete="off"
                                             placeholder="Category Name"
                                             {...field}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+
+                            <FormItem
+                                invalid={Boolean(errors.CategoryType)}
+                                errorMessage={errors.CategoryType?.message}
+                            >
+                                <Controller
+                                    name="CategoryType"
+                                    control={control}
+                                    rules={{ required: 'Required' }}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="md"
+                                            placeholder="Category Type"
+                                            options={[
+                                                { label: 'Type 1', value: 'Type 1' } as any,
+                                                { label: 'Type 2', value: 'Type 2' },
+                                            ]}
+                                            value={field.value}
+                                            onChange={field.onChange}
                                         />
                                     )}
                                 />
@@ -233,11 +267,6 @@ const MainCategory = () => {
                             </FormItem>
                         </Form>
                     </Card>
-
-                    <Card bordered={false}>
-
-                    </Card>
-
                 </div>
 
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
