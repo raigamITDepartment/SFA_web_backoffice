@@ -26,6 +26,7 @@ import {
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
+import CreatableSelect from 'react-select/creatable'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -57,6 +58,7 @@ export type SignUpFormSchema = {
     territory?: number
     agancy?: number
     range?: number
+    
 }
 
 const validationSchema: ZodType<SignUpFormSchema> = z
@@ -314,10 +316,10 @@ const SignUpForm = (props: SignUpFormProps) => {
             console.error('Signup failed:', err.message)
             const backendMessage =
                 err?.response?.data?.payload &&
-                typeof err.response.data.payload === 'object'
+                    typeof err.response.data.payload === 'object'
                     ? Object.values(err.response.data.payload).join(', ')
                     : err?.response?.data?.message ||
-                      'An error occurred during signup. Please try again.'
+                    'An error occurred during signup. Please try again.'
 
             toast.push(
                 <Alert
@@ -581,233 +583,268 @@ const SignUpForm = (props: SignUpFormProps) => {
                         </FormItem>
 
                         {isSales && (
-                        <FormItem
-                            label="Select Channel "
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="channel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Channel"
-                                        options={channel}
-                                        value={channel.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                         )} 
+                            <FormItem
+                                label="Select Channel "
+                                invalid={Boolean(errors.channel)}
+                                errorMessage={errors.channel?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="channel"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Channel"
+                                            options={channel}
+                                            value={channel.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
 
                         {isSales && (
-                        <FormItem
-                            label="Select Sub Channel "
-                            invalid={Boolean(errors.subChannel)}
-                            errorMessage={errors.subChannel?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="subChannel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Channel"
-                                        options={subChannel}
-                                        value={subChannel.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                         )} 
-
-                        {isSales && ( 
-
-                        <FormItem
-                            label="Select Range "
-                            invalid={Boolean(errors.range)}
-                            errorMessage={errors.range?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="range"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Range"
-                                        options={range}
-                                        value={range.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                        )} 
-                        {isSales && ( 
-                        <FormItem
-                            label="Select Region"
-                            invalid={Boolean(errors.region)}
-                            errorMessage={errors.region?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="region"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Region"
-                                        options={region}
-                                        value={region.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                        )} 
+                            <FormItem
+                                label="Select Sub Channel "
+                                invalid={Boolean(errors.subChannel)}
+                                errorMessage={errors.subChannel?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="subChannel"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Channel"
+                                            options={subChannel}
+                                            value={subChannel.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
 
                         {isSales && (
-                        <FormItem
-                            label="Select Area"
-                            invalid={Boolean(errors.area)}
-                            errorMessage={errors.area?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="area"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select"
-                                        options={area}
-                                        value={area.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                        )} 
-                     {isSales && (
-                        <FormItem
-                            label="Select Territory"
-                            invalid={Boolean(errors.territory)}
-                            errorMessage={errors.territory?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="territory"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select Area"
-                                        options={territory}
-                                        value={territory.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                         )} 
-                      {isSales && ( 
-                        <FormItem
-                            label="Select Agancy"
-                            invalid={Boolean(errors.agancy)}
-                            errorMessage={errors.agancy?.message}
-                            style={{ flex: 1, marginLeft: '10px' }}
-                        >
-                            <Controller
-                                name="agancy"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        className="mb-4"
-                                        placeholder="Please Select agancy"
-                                        options={agancy}
-                                        value={agancy.find(
-                                            (option: { value: number }) =>
-                                                option.value ===
-                                                Number(field.value),
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-                        )} 
+
+                            <FormItem
+                                label="Select Range "
+                                invalid={Boolean(errors.range)}
+                                errorMessage={errors.range?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="range"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Range"
+                                            options={range}
+                                            value={range.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Region"
+                                invalid={Boolean(errors.region)}
+                                errorMessage={errors.region?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="region"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Region"
+                                            options={region}
+                                            value={region.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+
+                        {isSales && (
+                            <FormItem
+                                label="Select Area"
+                                invalid={Boolean(errors.area)}
+                                errorMessage={errors.area?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="area"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select"
+                                            options={area}
+                                            value={area.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Multi Select Area"
+                                invalid={Boolean(errors.area)}
+                                errorMessage={errors.area?.message}
+                            >
+                                <Controller
+                                    name="area"
+                                    control={control}
+                                    render={({ field }) =>
+                                        <Select
+                                            isMulti
+                                            componentAs={CreatableSelect}
+                                            options={area}
+                                            value={area.filter(
+                                                (option: { value: number }) =>
+                                                    Array.isArray(field.value)
+                                                        ? field.value.includes(option.value)
+                                                        : false
+                                            )}
+                                            onChange={(selected) => {
+                                                // selected can be array of options
+                                                field.onChange(
+                                                    Array.isArray(selected)
+                                                        ? selected.map((opt) => opt.value)
+                                                        : []
+                                                )
+                                            }}
+                                        />
+                                    }
+                                />
+                            </FormItem>
+
+
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Territory"
+                                invalid={Boolean(errors.territory)}
+                                errorMessage={errors.territory?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="territory"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select Area"
+                                            options={territory}
+                                            value={territory.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+                        {isSales && (
+                            <FormItem
+                                label="Select Agancy"
+                                invalid={Boolean(errors.agancy)}
+                                errorMessage={errors.agancy?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="agancy"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            className="mb-4"
+                                            placeholder="Please Select agancy"
+                                            options={agancy}
+                                            value={agancy.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
                         <Button
                             block
                             loading={isSubmitting}
