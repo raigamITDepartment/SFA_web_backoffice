@@ -1,11 +1,11 @@
 import React from 'react'
 
-function Postbill() {
+function CancelBill() {
   return (
     <div>
-      Postbill
+      
     </div>
   )
 }
 
-export default Postbill
+export default CancelBill

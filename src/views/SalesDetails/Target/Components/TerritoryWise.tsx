@@ -10,9 +10,7 @@ import Tag from '@/components/ui/Tag';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
 import Dialog from '@/components/ui/Dialog'
-import type { MouseEvent } from 'react'
 import DatePicker from '@/components/ui/DatePicker'
-import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     useReactTable,
@@ -26,8 +24,6 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { Button, toast, Alert } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox';
-import type { ChangeEvent } from 'react';
 import { HiCheckCircle } from 'react-icons/hi';
 
 type FormSchema = {
@@ -42,7 +38,7 @@ type FormSchema = {
     dateRange?: [Date?, Date?];
 };
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table;
+const { Tr, Th, Td, THead, TBody } = Table;
 
 const pageSizeOptions = [
     { value: 10, label: '10 / page' },
@@ -62,6 +58,11 @@ interface Territory {
     pcTarget: string;
     dateRange: string;
     isActive?: boolean;
+    channel?: string;
+    subChannel?: string;
+    region?: string;
+    area?: string;
+    range?: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -101,12 +102,16 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 const TerritoryWise = () => {
+    // Filter states for select options
+    const [channelFilter, setChannelFilter] = useState('');
+    const [subChannelFilter, setSubChannelFilter] = useState('');
+    const [regionFilter, setRegionFilter] = useState('');
+    const [areaFilter, setAreaFilter] = useState('');
+    const [rangeFilter, setRangeFilter] = useState('');
+
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
-    const [error, setError] = useState<string | null>(null);
-    const [dialogIsOpen, setIsOpen] = useState(false)
-    const [dialogData, setDialogData] = useState<FormSchema | null>(null)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedTerritory, setSelectedTerritory] = useState<Territory | null>(null);
     const [successDialog, setSuccessDialog] = useState(false);
@@ -121,6 +126,11 @@ const TerritoryWise = () => {
             pcTarget: '500',
             dateRange: '2024-06-01 ~ 2024-06-30',
             isActive: true,
+            channel: 'National Channel',
+            subChannel: 'Sub-Channel 1',
+            region: 'Region 1',
+            area: 'Area 1',
+            range: 'Range 1',
         },
         {
             areaCode: 'A02',
@@ -130,6 +140,11 @@ const TerritoryWise = () => {
             pcTarget: '600',
             dateRange: '2024-06-01 ~ 2024-06-30',
             isActive: false,
+            channel: 'Bakery Channel',
+            subChannel: 'Sub-Channel 2',
+            region: 'Region 2',
+            area: 'Area 2',
+            range: 'Range 2',
         },
         {
             areaCode: 'A03',
@@ -139,8 +154,24 @@ const TerritoryWise = () => {
             pcTarget: '400',
             dateRange: '2024-06-01 ~ 2024-06-30',
             isActive: true,
+            channel: 'National Channel',
+            subChannel: 'Sub-Channel 1',
+            region: 'Region 1',
+            area: 'Area 1',
+            range: 'Range 2',
         },
     ]);
+
+    // Filtered territories based on select filters
+    const filteredTerritories = useMemo(() => {
+        return territories.filter(t =>
+            (!channelFilter || t.channel === channelFilter) &&
+            (!subChannelFilter || t.subChannel === subChannelFilter) &&
+            (!regionFilter || t.region === regionFilter) &&
+            (!areaFilter || t.area === areaFilter) &&
+            (!rangeFilter || t.range === rangeFilter)
+        );
+    }, [territories, channelFilter, subChannelFilter, regionFilter, areaFilter, rangeFilter]);
 
     const columns = useMemo<ColumnDef<Territory>[]>(() => [
         { header: 'Area Code', accessorKey: 'areaCode' },
@@ -191,7 +222,7 @@ const TerritoryWise = () => {
     ], []);
 
     const table = useReactTable({
-        data: territories,
+        data: filteredTerritories,
         columns,
         filterFns: { fuzzy: fuzzyFilter },
         state: { columnFilters, globalFilter },
@@ -213,10 +244,6 @@ const TerritoryWise = () => {
         const newSize = Number(value);
         setPageSize(newSize);
         table.setPageSize(newSize);
-    };
-
-    const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e);
     };
 
     const handleEdit = (territory: Territory) => {
@@ -271,6 +298,7 @@ const TerritoryWise = () => {
         control,
         reset,
         setValue,
+        watch,
     } = useForm<FormSchema>({
         defaultValues: {
             channel: '',
@@ -285,8 +313,16 @@ const TerritoryWise = () => {
         },
     });
 
+    // Watch select values and update filter states
+    useEffect(() => {
+        setChannelFilter(watch('channel'));
+        setSubChannelFilter(watch('subChannel'));
+        setRegionFilter(watch('region'));
+        setAreaFilter(watch('area'));
+        setRangeFilter(watch('range'));
+    }, [watch('channel'), watch('subChannel'), watch('region'), watch('area'), watch('range')]);
+
     const onSubmit = async (values: FormSchema) => {
-        
         setTerritories(prev => [
             ...prev,
             {
@@ -299,6 +335,11 @@ const TerritoryWise = () => {
                     ? `${values.dateRange[0]?.toLocaleDateString?.() ?? ''} ~ ${values.dateRange[1]?.toLocaleDateString?.() ?? ''}`
                     : '',
                 isActive: values.isActive,
+                channel: values.channel,
+                subChannel: values.subChannel,
+                region: values.region,
+                area: values.area,
+                range: values.range,
             },
         ]);
         setSuccessDialog(true);
@@ -313,7 +354,6 @@ const TerritoryWise = () => {
                     <h5 className='mb-2'>Territory Wise Target</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            
                             <FormItem
                                 invalid={Boolean(errors.channel)}
                                 errorMessage={errors.channel?.message}
@@ -330,7 +370,10 @@ const TerritoryWise = () => {
                                                 { label: 'Bakery Channel', value: 'Bakery Channel' },
                                             ]}
                                             value={field.value}
-                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                setChannelFilter(selectedOption ?? '');
+                                            }}
                                         />
                                     }
                                     rules={{
@@ -361,7 +404,10 @@ const TerritoryWise = () => {
                                                 { label: 'Sub-Channel 2', value: 'Sub-Channel 2' },
                                             ]}
                                             value={field.value}
-                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                setSubChannelFilter(selectedOption ?? '');
+                                            }}
                                         />
                                     }
                                     rules={{
@@ -392,7 +438,10 @@ const TerritoryWise = () => {
                                                 { label: 'Region 2', value: 'Region 2' },
                                             ]}
                                             value={field.value}
-                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                setRegionFilter(selectedOption ?? '');
+                                            }}
                                         />
                                     }
                                     rules={{
@@ -423,7 +472,10 @@ const TerritoryWise = () => {
                                                 { label: 'Area 2', value: 'Area 2' },
                                             ]}
                                             value={field.value}
-                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                setAreaFilter(selectedOption ?? '');
+                                            }}
                                         />
                                     }
                                     rules={{
@@ -454,7 +506,10 @@ const TerritoryWise = () => {
                                                 { label: 'Range 2', value: 'Range 2' },
                                             ]}
                                             value={field.value}
-                                            onChange={(selectedOption) => field.onChange(selectedOption)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                setRangeFilter(selectedOption ?? '');
+                                            }}
                                         />
                                     }
                                     rules={{
@@ -470,66 +525,57 @@ const TerritoryWise = () => {
                                 />
                             </FormItem>
                         </div>
+
                         <FormItem>
                             <span className="font-bold ">Territory List:</span>
-                            <div className="flex items-center gap-4 mt-6">
-                                <FormItem className="mb-0">
-                                    <Controller
-                                        name="territoryName"
-                                        control={control}
-                                        render={({ field }) =>
-                                            <Input
-                                                disabled
-                                                type="text"
-                                                autoComplete="off"
-                                                placeholder="Territory Name"
-                                                {...field}
-                                            />
-                                        }
-                                    />
-                                </FormItem>
-                                <FormItem className="mb-0">
-                                    <Controller
-                                        name="targetValue"
-                                        control={control}
-                                        render={({ field }) =>
-                                            <Input
-                                                type="text"
-                                                autoComplete="off"
-                                                placeholder="Target Value"
-                                                {...field}
-                                            />
-                                        }
-                                    />
-                                </FormItem>
-                                <div className="flex items-center gap-2">
-                                    <FormItem className="mb-0">
-                                        <Controller
-                                            name="dateRange"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <DatePickerRange
-                                                    placeholder="Select dates range"
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                />
-                                            )}
+                            <div className="flex flex-col gap-2 mt-6">
+                                {filteredTerritories.length === 0 && (
+                                    <div className="text-gray-400 italic">No territories found.</div>
+                                )}
+                                {filteredTerritories.map((territory) => (
+                                    <div key={territory.territoryCode} className="flex items-center gap-4">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            autoComplete="off"
+                                            placeholder="Territory Name"
+                                            value={territory.territoryName}
+                                            className="mb-0"
                                         />
-                                    </FormItem>
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        className="lg:w-25 xl:w-25 sm:w-full text-red-600 border-red-600 border-2 hover:border-3 hover:border-red-400 hover:ring-0 hover:text-red-600 hover:text-sm"
-                                        onClick={() => {
-                                            setValue('targetValue', '');
-                                            setValue('dateRange', undefined);
-                                        }}
-                                    >
-                                        Clear
-                                    </Button>
-                                </div>
+                                        <Input
+                                            type="text"
+                                            autoComplete="off"
+                                            placeholder="Target Value"
+                                            value={territory.targetValue}
+                                            className="mb-0"
+                                        // onChange={...} // Add if you want to allow editing
+                                        />
+                                        <DatePickerRange
+                                            placeholder="Select dates range"
+                                            value={territory.dateRange}
+                                        // onChange={...} // Add if you want to allow editing
+                                        />
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            className="lg:w-25 xl:w-25 sm:w-full text-red-600 border-red-600 border-2 hover:border-3 hover:border-red-400 hover:ring-0 hover:text-red-600 hover:text-sm"
+                                            onClick={() => {
+                                                setTerritories(prev =>
+                                                    prev.map(t =>
+                                                        t.territoryCode === territory.territoryCode
+                                                            ? { ...t, targetValue: '', dateRange: '' }
+                                                            : t
+                                                    )
+                                                );
+                                            }}
+                                        >
+                                            Clear
+                                        </Button>
+                                    </div>
+                                ))}
                             </div>
                         </FormItem>
+
                         <FormItem>
                             <div className="flex justify-center gap-4">
                                 <Button
@@ -541,7 +587,7 @@ const TerritoryWise = () => {
                                     Submit
                                 </Button>
                                 <Button
-                                    className="lg:w-70 xl:w-70 sm:w-full text-red-600 border-red-600 border-2 hover:border-3 hover:border-red-400 hover:ring-0 hover:text-red-600 hover:text-sm"
+                                    className="lg:w-70 xl:w-70 sm:w-full"
                                     type="button"
                                     block
                                     clickFeedback={false}
@@ -599,7 +645,7 @@ const TerritoryWise = () => {
                             <Pagination
                                 pageSize={table.getState().pagination.pageSize}
                                 currentPage={table.getState().pagination.pageIndex + 1}
-                                total={territories.length}
+                                total={filteredTerritories.length}
                                 onChange={onPaginationChange}
                             />
                             <div style={{ minWidth: 130 }}>
