@@ -11,7 +11,7 @@ import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getUserById, fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades } from '@/services/singupDropdownService';
+import { getUserById, fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades, updateUser } from '@/services/singupDropdownService';
 import type { CommonProps } from '@/@types/common';
 import type { ZodType } from 'zod'
 
@@ -33,18 +33,7 @@ export type SignUpFormSchema = {
   firstName: string;
   lastName: string;
   password: string;
-  confirmPassword: string;
   mobileNumber: string;
-  role: number;
-  subRole: number;
-  userLevel: number;
-  channel?: number;
-  subChannel?: number;
-  region?: number;
-  area?: number;
-  territory?: number;
-  range?: number;
-  departmentId?: number;
 };
 
 const validationSchema: ZodType<SignUpFormSchema> = z
@@ -54,21 +43,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     firstName: z.string({ required_error: 'Please enter your first name' }),
     lastName: z.string({ required_error: 'Please enter your last name' }),
     password: z.string({ required_error: 'Password Required' }),
-    confirmPassword: z.string({ required_error: 'Please confirm your password' }),
     mobileNumber: z.string({ required_error: 'Please enter your mobile number' }),
-    role: z.number({ required_error: 'Please select your role' }),
-    subRole: z.number({ required_error: 'Please select your department' }),
-    userLevel: z.number({ required_error: 'Please select your user type' }),
-    channel: z.number().optional(),
-    subChannel: z.number().optional(),
-    region: z.number().optional(),
-    area: z.number().optional(),
-    territory: z.number().optional(),
-    range: z.number().optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password not match',
-    path: ['confirmPassword'],
   })
 
 
@@ -105,11 +80,6 @@ function UserEdit(props: SignUpFormProps) {
     });
 
 
-    const selectedSubRole = watch('subRole')
-    const isSales = selectedSubRole === 7;
-
-    console.log(selectedSubRole);
-
     useEffect(() => {
         if (!token) {
             setMessage?.('No auth token found.');
@@ -124,18 +94,11 @@ function UserEdit(props: SignUpFormProps) {
             try {
                 const userDetails = await getUserById(id)
                 setUserData(userDetails);
-                reset({
-                    userLevel: userDetails.userLevelId, 
-                    role: userDetails.roleId,        
+                reset({      
                     userName: userDetails.userName,
                     firstName: userDetails.firstName,
                     lastName: userDetails.lastName,
                     email: userDetails.email,
-                    subRole: userDetails.subRoleId,
-                    region: userDetails.regionId,
-                    channel: userDetails.channelId,
-                    area: userDetails.areaId,
-                    range: userDetails.email,
                     mobileNumber:userDetails.mobileNo
                 });
             } catch (error) {
@@ -277,12 +240,30 @@ function UserEdit(props: SignUpFormProps) {
     console.log("user data " ,userData)
 
 
-    const onSubmit = async (values: SignUpFormSchema) => {
+const onSubmit = async (values: SignUpFormSchema) => {
+    if (!userData || !id) {
+        setMessage?.('User data or ID not loaded.');
+        return;
+    }
+
+    try {
+        const payload = {
+            id: parseInt(id),
+            userName: values.userName,
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            password: values.password,
+            mobileNo: values.mobileNumber,
+            isActive:  true,   
+            gpsStatus:  true,
+            superUserId:  1,
+        };
+
+        await updateUser(payload, token);
+
         toast.push(
-            <Alert
-                className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
-            >
-                {/* <HiCheckCircle className="text-green-500 mb-2" size={48} /> */}
+            <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
                 <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
                     User updated successfully!
                 </div>
@@ -294,9 +275,14 @@ function UserEdit(props: SignUpFormProps) {
                 block: false,
                 placement: 'top-end',
             }
-        )
-        navigate(-1)
+        );
+        navigate(-1);
+    } catch (error: any) {
+        console.error('Failed to update user:', error);
+        setMessage?.(error?.message || 'Failed to update user');
     }
+}
+
 
     const handleDiscard = () => {
         navigate(-1)

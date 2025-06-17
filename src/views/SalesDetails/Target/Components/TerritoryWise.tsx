@@ -13,6 +13,7 @@ import Dialog from '@/components/ui/Dialog'
 import type { MouseEvent } from 'react'
 import DatePicker from '@/components/ui/DatePicker'
 import { useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
     useReactTable,
     getCoreRowModel,
@@ -24,9 +25,10 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
-import { Button } from '@/components/ui';
+import { Button, toast, Alert } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { HiCheckCircle } from 'react-icons/hi';
 
 type FormSchema = {
     channel: string;
@@ -37,6 +39,7 @@ type FormSchema = {
     territoryName: string;
     isActive: boolean;
     targetValue?: string;
+    dateRange?: [Date?, Date?];
 };
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
@@ -58,6 +61,7 @@ interface Territory {
     targetValue: string;
     pcTarget: string;
     dateRange: string;
+    isActive?: boolean;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -103,6 +107,40 @@ const TerritoryWise = () => {
     const [error, setError] = useState<string | null>(null);
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogData, setDialogData] = useState<FormSchema | null>(null)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedTerritory, setSelectedTerritory] = useState<Territory | null>(null);
+    const [successDialog, setSuccessDialog] = useState(false);
+    const navigate = useNavigate();
+
+    const [territories, setTerritories] = useState<Territory[]>([
+        {
+            areaCode: 'A01',
+            territoryCode: 'T01',
+            territoryName: 'Colombo North',
+            targetValue: '100000',
+            pcTarget: '500',
+            dateRange: '2024-06-01 ~ 2024-06-30',
+            isActive: true,
+        },
+        {
+            areaCode: 'A02',
+            territoryCode: 'T02',
+            territoryName: 'Kandy Central',
+            targetValue: '120000',
+            pcTarget: '600',
+            dateRange: '2024-06-01 ~ 2024-06-30',
+            isActive: false,
+        },
+        {
+            areaCode: 'A03',
+            territoryCode: 'T03',
+            territoryName: 'Galle South',
+            targetValue: '90000',
+            pcTarget: '400',
+            dateRange: '2024-06-01 ~ 2024-06-30',
+            isActive: true,
+        },
+    ]);
 
     const columns = useMemo<ColumnDef<Territory>[]>(() => [
         { header: 'Area Code', accessorKey: 'areaCode' },
@@ -116,48 +154,41 @@ const TerritoryWise = () => {
             ),
         },
         {
-            header: 'PC Target',
-            accessorKey: 'pcTarget',
-            cell: ({ row }) => (
-                <span>{row.original.pcTarget}</span>
-            ),
-        },
-        {
             header: 'Date Range',
             accessorKey: 'dateRange',
             cell: ({ row }) => (
                 <span className="min-w-[160px] inline-block">{row.original.dateRange}</span>
             ),
         },
+        {
+            header: 'Is Active',
+            accessorKey: 'isActive',
+            cell: ({ row }) => (
+                <div className="ml-4 rtl:ml-2">
+                    <Tag className={row.original.isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
+                        {row.original.isActive ? "Active" : "Inactive"}
+                    </Tag>
+                </div>
+            ),
+        },
+        {
+            header: 'Action',
+            accessorKey: 'action',
+            cell: ({ row }) => (
+                <div className="flex ">
+                    <FaRegEdit
+                        onClick={() => handleEdit(row.original)}
+                        className="cursor-pointer mr-4 text-primary-deep text-lg"
+                    />
+                    <MdDeleteOutline
+                        onClick={() => handleDelete(row.original)}
+                        className="cursor-pointer text-red-600 text-lg hover:text-red-800"
+                        title="Delete"
+                    />
+                </div>
+            ),
+        },
     ], []);
-
-    // Use state for table data
-    const [territories, setTerritories] = useState<Territory[]>([
-        {
-            areaCode: 'A01',
-            territoryCode: 'T01',
-            territoryName: 'Colombo North',
-            targetValue: '100000',
-            pcTarget: '500',
-            dateRange: '2024-06-01 ~ 2024-06-30',
-        },
-        {
-            areaCode: 'A02',
-            territoryCode: 'T02',
-            territoryName: 'Kandy Central',
-            targetValue: '120000',
-            pcTarget: '600',
-            dateRange: '2024-06-01 ~ 2024-06-30',
-        },
-        {
-            areaCode: 'A03',
-            territoryCode: 'T03',
-            territoryName: 'Galle South',
-            targetValue: '90000',
-            pcTarget: '400',
-            dateRange: '2024-06-01 ~ 2024-06-30',
-        },
-    ]);
 
     const table = useReactTable({
         data: territories,
@@ -189,13 +220,49 @@ const TerritoryWise = () => {
     };
 
     const handleEdit = (territory: Territory) => {
-        // Implement edit functionality here
-        console.log('Edit:', territory);
+        navigate('/Salesmenu/TerritoryWiseEdit');
     };
 
+    // Delete logic with dialog and toast
     const handleDelete = (territory: Territory) => {
-        // Implement delete functionality here
-        console.log('Delete:', territory);
+        setSelectedTerritory(territory);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteDialogClose = () => {
+        setDeleteDialogOpen(false);
+        setSelectedTerritory(null);
+    };
+
+    const handleDeleteDialogConfirm = () => {
+        setDeleteDialogOpen(false);
+        if (selectedTerritory) {
+            setTerritories(prev =>
+                prev.filter(t => t.territoryCode !== selectedTerritory.territoryCode)
+            );
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    Territory target for <b>{selectedTerritory.territoryName}</b> removed!
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                }
+            );
+            setSelectedTerritory(null);
+        }
+    };
+
+    // Success dialog for create
+    const handleSuccessDialogClose = () => {
+        setSuccessDialog(false);
     };
 
     const {
@@ -203,6 +270,7 @@ const TerritoryWise = () => {
         formState: { errors },
         control,
         reset,
+        setValue,
     } = useForm<FormSchema>({
         defaultValues: {
             channel: '',
@@ -211,26 +279,31 @@ const TerritoryWise = () => {
             area: '',
             range: '',
             territoryName: '',
-            isActive: true, // Set default value to true
+            isActive: true,
+            targetValue: '',
+            dateRange: undefined,
         },
     });
 
     const onSubmit = async (values: FormSchema) => {
-        setDialogData(values) // Optionally pass form data to dialog
-        openDialog()
-    }
-
-    const openDialog = () => {
-        setIsOpen(true)
-    }
-
-    const onDialogClose = (e: MouseEvent) => {
-        setIsOpen(false)
-    }
-
-    const onDialogOk = (e: MouseEvent) => {
-        setIsOpen(false)
-    }
+        
+        setTerritories(prev => [
+            ...prev,
+            {
+                areaCode: 'A' + (prev.length + 1).toString().padStart(2, '0'),
+                territoryCode: 'T' + (prev.length + 1).toString().padStart(2, '0'),
+                territoryName: values.territoryName || `Territory ${prev.length + 1}`,
+                targetValue: values.targetValue || '',
+                pcTarget: '',
+                dateRange: values.dateRange
+                    ? `${values.dateRange[0]?.toLocaleDateString?.() ?? ''} ~ ${values.dateRange[1]?.toLocaleDateString?.() ?? ''}`
+                    : '',
+                isActive: values.isActive,
+            },
+        ]);
+        setSuccessDialog(true);
+        reset();
+    };
 
     return (
         <div>
@@ -240,6 +313,7 @@ const TerritoryWise = () => {
                     <h5 className='mb-2'>Territory Wise Target</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            
                             <FormItem
                                 invalid={Boolean(errors.channel)}
                                 errorMessage={errors.channel?.message}
@@ -395,12 +469,10 @@ const TerritoryWise = () => {
                                     }}
                                 />
                             </FormItem>
-
                         </div>
                         <FormItem>
                             <span className="font-bold ">Territory List:</span>
                             <div className="flex items-center gap-4 mt-6">
-
                                 <FormItem className="mb-0">
                                     <Controller
                                         name="territoryName"
@@ -430,9 +502,31 @@ const TerritoryWise = () => {
                                         }
                                     />
                                 </FormItem>
-                                <div>
-                                    {/* <RangePicker /> */}
-                                    <DatePickerRange placeholder="Select dates range" />
+                                <div className="flex items-center gap-2">
+                                    <FormItem className="mb-0">
+                                        <Controller
+                                            name="dateRange"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <DatePickerRange
+                                                    placeholder="Select dates range"
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
+                                            )}
+                                        />
+                                    </FormItem>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        className="lg:w-25 xl:w-25 sm:w-full text-red-600 border-red-600 border-2 hover:border-3 hover:border-red-400 hover:ring-0 hover:text-red-600 hover:text-sm"
+                                        onClick={() => {
+                                            setValue('targetValue', '');
+                                            setValue('dateRange', undefined);
+                                        }}
+                                    >
+                                        Clear
+                                    </Button>
                                 </div>
                             </div>
                         </FormItem>
@@ -447,18 +541,10 @@ const TerritoryWise = () => {
                                     Submit
                                 </Button>
                                 <Button
-                                    className="lg:w-70 xl:w-70 sm:w-full"
+                                    className="lg:w-70 xl:w-70 sm:w-full text-red-600 border-red-600 border-2 hover:border-3 hover:border-red-400 hover:ring-0 hover:text-red-600 hover:text-sm"
                                     type="button"
                                     block
                                     clickFeedback={false}
-                                    customColorClass={({ active, unclickable }) =>
-                                        [
-                                            'hover:text-red-800 dark:hover:bg-red-600 border-0 hover:ring-0',
-                                            active ? 'bg-red-200' : 'bg-red-100',
-                                            unclickable && 'opacity-50 cursor-not-allowed',
-                                            !active && !unclickable && 'hover:bg-red-200',
-                                        ].filter(Boolean).join(' ')
-                                    }
                                     onClick={() => {
                                         reset();
                                     }}
@@ -467,7 +553,6 @@ const TerritoryWise = () => {
                                 </Button>
                             </div>
                         </FormItem>
-
                     </Form>
                 </Card>
 
@@ -529,6 +614,52 @@ const TerritoryWise = () => {
                         </div>
                     </div>
                 </Card>
+
+                {/* Delete Confirmation Dialog */}
+                <Dialog
+                    isOpen={deleteDialogOpen}
+                    onClose={handleDeleteDialogClose}
+                    onRequestClose={handleDeleteDialogClose}
+                >
+                    <h5 className="mb-4">Remove Territorywise Target</h5>
+                    <p>
+                        Are you sure you want to remove the territorywise target value for{' '}
+                        <b>{selectedTerritory?.territoryName}</b>?
+                    </p>
+                    <div className="text-right mt-6">
+                        <Button
+                            className="mr-2 text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 hover:text-red-600"
+                            clickFeedback={false}
+                            onClick={handleDeleteDialogClose}
+                        >
+                            Cancel
+                        </Button>
+                        <Button variant="solid" onClick={handleDeleteDialogConfirm}>
+                            Confirm
+                        </Button>
+                    </div>
+                </Dialog>
+
+                {/* Success Dialog for Create */}
+                <Dialog
+                    isOpen={successDialog}
+                    onClose={handleSuccessDialogClose}
+                    onRequestClose={handleSuccessDialogClose}
+                >
+                    <div className="flex flex-col items-center justify-center py-6">
+                        <HiCheckCircle className="text-4xl text-emerald-500 mb-2" />
+                        <div className="font-semibold text-lg mb-2">Territory Created!</div>
+                        <div className="text-gray-600 dark:text-gray-300 mb-4 text-center">
+                            The new territory targets have been successfully added.
+                        </div>
+                        <Button
+                            variant="solid"
+                            onClick={handleSuccessDialogClose}
+                        >
+                            OK
+                        </Button>
+                    </div>
+                </Dialog>
             </div>
         </div>
     );

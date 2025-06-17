@@ -11,8 +11,6 @@ const Default = () => {
     return (
         
         <div>
-
-          <div>Category Add </div>
             <Tabs defaultValue="tab1">
                 <TabList>
                     <TabNav value="tab1">Main Category</TabNav>

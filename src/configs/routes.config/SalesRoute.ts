@@ -96,6 +96,20 @@ const SalesRoute: Routes = [
         component: lazy(() => import('@/views/SalesDetails/Target/Target')),
         authority: [],
     },
+    {
+        key: 'SalesMenu.TerritoryWiseEdit',
+        path: '/Salesmenu/TerritoryWiseEdit',
+        component: lazy(() => import('@/views/SalesDetails/Target/Components/Edit/TerritoryWiseEdit')),
+        authority: [],
+    },
+
+    {
+        key: 'SalesMenu.MainCategoryEdit',
+        path: '/Salesmenu/MainCategoryEdit',
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd/Components/Edit/MainCategoryEdit')),
+        authority: [],
+    },
+    
 
 ]
 
