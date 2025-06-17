@@ -84,7 +84,7 @@ export const fetchChannels = async () => {
 
         if (!token) throw new Error('No access token found.');
         const response = await axios.get(
-            `${AuthService_URL}//api/v1/userDemarcation/channel`,
+            `${AuthService_URL}/api/v1/userDemarcation/channel`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -100,6 +100,31 @@ export const fetchChannels = async () => {
     } catch (error: any) {
         console.error('Error fetching channels:', error);
         throw new Error(error.response?.data?.message || 'Failed to load channels.');
+    }
+}
+
+export const fetchSubChannels = async () => {
+    try {
+           const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/subChannel`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload.map((subChannel: any) => ({
+            label: subChannel.subChannelName,
+            value: subChannel.id,
+        }));
+    } catch (error: any) {
+        console.error('Error fetching sub channels:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load sub channels.');
     }
 }
 
@@ -152,6 +177,32 @@ export const fetchRanges = async () => {
     } catch (error: any) {
         console.error('Error fetching ranges:', error);
         throw new Error(error.response?.data?.message || 'Failed to load ranges.');
+    }
+}
+
+export const fetchAgencies = async () => {
+    try {
+
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/agency`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload.map((agency: any) => ({
+            label: agency.agencyName,
+            value: agency.id,
+        }));
+    } catch (error: any) {
+        console.error('Error fetching agencies:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load agencies.');
     }
 }
 
@@ -250,7 +301,6 @@ export const fetchUserRoles = async () => {
     }
 };
 
-
 export const fetchGrades = async (token: string) => {
 
     try {
@@ -277,6 +327,31 @@ export const fetchGrades = async (token: string) => {
     }
 };
 
+export const getTerritoriesByAreaId = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/territory/byAreaId/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+         return response.data.payload.map((territory: any) => ({
+            label: territory.territoryName,
+            value: territory.id
+        }));
+    } catch (error: any) {
+        console.error('Error fetching territory by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch territory by area Id.');
+    }
+};
+
 //sign up user
 export interface SignupPayload {
     roleId: number;
@@ -286,7 +361,7 @@ export interface SignupPayload {
     channelId: number | null;
     subChannelId: number | null;
     regionId: number | null;
-    areaId: number | null;
+    areaList: number[]
     territoryId: number | null;
     agencyId: number | null;
     userLevelId: number;
@@ -346,3 +421,35 @@ export const getUserById = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to fetch user by Id.');
     }
 };
+
+export interface UpdateUserPayload {
+    id: number;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    mobileNo: string;
+    isActive: boolean;
+    gpsStatus: boolean;
+    superUserId: number;
+}
+export const updateUser = async (payload: UpdateUserPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/user`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during user update:', error, payload);
+        throw new Error(error.response?.data?.message || 'User update failed.');
+    }
+};
+
