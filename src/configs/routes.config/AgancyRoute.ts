@@ -9,7 +9,7 @@ const AgancyRoute: Routes = [
     {
         key: 'ActualInvoice',
         path: '/AgancyModule-Invoice-ActualInvoice',
-        component: lazy(() => import('@/views/AgancyModule/ActualBill/Viewbills')),
+        component: lazy(() => import('@/views/AgancyModule/Invoice/ActualBill/Viewbills')),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -19,7 +19,7 @@ const AgancyRoute: Routes = [
     {
         key: 'PostInvoice',
         path: '/AgancyModule-Invoice-PostInvoice',
-        component: lazy(() => import('@/views/AgancyModule/PostBill/Postbill')),
+        component: lazy(() => import('@/views/AgancyModule/Invoice/PostBill/Postbill')),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -30,7 +30,7 @@ const AgancyRoute: Routes = [
       {
         key: 'ManualInvoice',
         path: '/AgancyModule-Invoice-ManualInvoice',
-        component: lazy(() => import('@/views/AgancyModule/ManualBill/CreateAgancybill')),
+        component: lazy(() => import('@/views/AgancyModule/Invoice/ManualBill/CreateAgancybill')),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -41,7 +41,7 @@ const AgancyRoute: Routes = [
      {
         key: 'ViewInvoice',
         path: '/AgancyModule-Invoice-ViewInvoice',
-        component: lazy(() => import('@/views/AgancyModule/ViewInvoices/Invoices')),
+        component: lazy(() => import('@/views/AgancyModule/Invoice/ViewInvoices/Invoices')),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],

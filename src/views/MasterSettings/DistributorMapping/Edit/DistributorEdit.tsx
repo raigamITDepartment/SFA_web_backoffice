@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
 import Checkbox from '@/components/ui/Checkbox'
 import Button from '@/components/ui/Button'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -18,6 +17,7 @@ type FormSchema = {
     address3: string;
     mobile: string;
     email: string;
+    sapAgencyCode: string; // New field added
     isActive: boolean;
 }
 
@@ -35,6 +35,7 @@ function DistributorEdit() {
             address3: '',
             mobile: '',
             email: '',
+            sapAgencyCode: '', // Initialize the new field
             isActive: true,
         },
     })
@@ -182,6 +183,33 @@ function DistributorEdit() {
                         />
                     </FormItem>
                     <FormItem
+                        invalid={Boolean(errors.sapAgencyCode)}
+                        errorMessage={errors.sapAgencyCode?.message}
+                    >
+                        <Controller
+                            name="sapAgencyCode"
+                            control={control}
+                            render={({ field }) =>
+                                <Input
+                                    type="text"
+                                    autoComplete="off"
+                                    placeholder="SAP Agency Code"
+                                    {...field}
+                                />
+                            }
+                            rules={{
+                                validate: {
+                                    required: (value) => {
+                                        if (!value) {
+                                            return 'Required';
+                                        }
+                                        return;
+                                    }
+                                }
+                            }}
+                        />
+                    </FormItem>
+                    <FormItem
                         invalid={Boolean(errors.mobile)}
                         errorMessage={errors.mobile?.message}
                     >
@@ -266,4 +294,4 @@ function DistributorEdit() {
     )
 }
 
-export default DistributorEdit
+export default DistributorEdit;
