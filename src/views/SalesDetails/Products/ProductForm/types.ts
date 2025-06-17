@@ -45,6 +45,8 @@ export type GeneralFields = {
     SAPcode: string
     channel: string
     description: string
+    subchannel?: string
+    LNcode?: string
 }
 
 export type PricingFields = {
@@ -70,6 +72,8 @@ export type AttributeFields = {
     UnitValue: string
     tags?: { label: string; value: string }[]
     brand?: string
+    
+
 }
 
 export type ProductFormSchema = GeneralFields &

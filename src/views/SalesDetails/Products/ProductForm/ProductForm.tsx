@@ -27,6 +27,8 @@ const validationSchema: ZodType<ProductFormSchema> = z.object({
     SAPcode: z.string().min(1, { message: 'SAP code required!' }),
     description: z.string().min(1, { message: 'Product description required!' }),
     channel: z.string().min(1, { message: 'Channel required!' }),
+    subchannel: z.string().min(1, { message: 'Sub Channel required!' }),
+    LNcode: z.string().min(1, { message: 'LN Code required!' }),
     
 
     price: z.string().min(1, { message: 'Price required!' }),
