@@ -11,6 +11,7 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import Tag from '@/components/ui/Tag';
 import { Button } from '@/components/ui'; 
+import { useNavigate } from 'react-router-dom';
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -78,10 +79,14 @@ const statusOptions = [
   { value: 'Cancel', label: 'Cancel' },
 ];
 
+
+  
+
 function PrintBill() {
   const agencyName = "Example Agency";
   const distributorName = "Example Distributor";
   const territory = "Central";
+  const navigate = useNavigate();
   
   // Sample data for invoices
   const [data, setData] = useState<Invoice[]>([
@@ -108,6 +113,7 @@ function PrintBill() {
 
   const handleEdit = (invoice: Invoice) => {
     console.log('Editing invoice:', invoice);
+    navigate(`/EditBill/${invoice.id}`);
   };
 
   // Handle form submission
@@ -262,8 +268,8 @@ function PrintBill() {
           </div>
         </div>
         
-        <div className="overflow-x-auto">
-          <Table>
+        
+          <Table className="overflow-x-auto">
             <THead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <Tr key={headerGroup.id}>
@@ -299,7 +305,7 @@ function PrintBill() {
               ))}
             </TBody>
           </Table>
-        </div>
+        
 
         <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
           <Pagination

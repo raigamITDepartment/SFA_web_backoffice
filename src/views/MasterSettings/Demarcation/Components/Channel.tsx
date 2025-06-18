@@ -28,14 +28,12 @@ import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
 import Dialog from '@/components/ui/Dialog'
-import { fetchChannels } from '@/services/DemarcationService'
+import { fetchChannels, fetchCountry, addNewChannel } from '@/services/DemarcationService'
+import { z } from 'zod'
+import type { ZodType } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { HiCheckCircle } from 'react-icons/hi'
 
-type FormSchema = {
-    country: string
-    channelName: string
-    channelCode?: string
-    isActive: boolean
-}
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -52,6 +50,24 @@ interface Channel {
     channelName: string
     isActive?: boolean
 }
+
+export type AddChannelFormSchema = {
+    userId: number;
+    countryId: number | null;
+    channelName: string;
+    channelCode: string;
+    isActive: boolean;
+};
+
+
+const validationSchema: ZodType<AddChannelFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'), 
+    countryId: z.number({ required_error: 'Please select country' }),
+    channelName: z.string({ required_error: 'Channel name is required' }),
+    channelCode: z.string({ required_error: 'Channel code is required' }),
+    isActive: z.boolean(),
+});
+
 
 interface DebouncedInputProps
     extends Omit<
@@ -103,23 +119,39 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-const Channel = () => {
+const Channel = (props: AddChannelFormSchema) => {
+    const { disableSubmit = false, className, setMessage } = props
+    const token = sessionStorage.getItem('accessToken')
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
     const [SelelectChannel, setSelelectChannel] = useState<Channel | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
-
     const [channelData, setChannelData] = useState<Channel[]>([])
+    const [country, setCountry] = useState<any>([])
     const navigate = useNavigate()
 
     useEffect(() => {
         const loadUsers = async () => {
             try {
-                const res = await fetchChannels()
-                setChannelData(res)
+                const channelOptions = await fetchChannels()
+                setChannelData(channelOptions)
             } catch (err) {
                 console.error('Failed to load users:', err)
+            }
+        }
+        loadUsers()
+    }, [])
+
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const countryOptions = await fetchCountry()
+                console.log(countryOptions);
+                setCountry(countryOptions)
+            } catch (err) {
+                console.error('Failed to load countries:', err)
             }
         }
         loadUsers()
@@ -241,42 +273,84 @@ const Channel = () => {
         setDialogIsOpen(false)
         setSelelectChannel(null)
     }
-    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-    //     console.log(value, e);
-    // };
-
-    // const handleEdit = (channel: Channel) => {
-    //     // Implement edit functionality here
-    //     console.log('Edit:', channel);
-    // };
-
-    // const handleDelete = (channel: Channel) => {
-    //     // Implement delete functionality here
-    //     console.log('Delete:', channel);
-    // };
-
-    // const handleCreate = () => {
-    //     setError(null);
-    //     console.log('Create channel:', { country, channelName });
-    // };
 
     const {
         handleSubmit,
         formState: { errors },
         control,
-    } = useForm<FormSchema>({
+    } = useForm<AddChannelFormSchema>({
+        resolver: zodResolver(validationSchema),
         defaultValues: {
-            country: '',
-            channelCode: '',
+            userId: 123, 
+            countryId: null,
             channelName: '',
-            isActive: true, // Set default value to true
+            channelCode: '',
+            isActive: true,
         },
-    })
+    });
 
-    const onSubmit = async (values: FormSchema) => {
-        await new Promise((r) => setTimeout(r, 500))
-        alert(JSON.stringify(values, null, 2))
-    }
+    const onSubmit = async (values: AddChannelFormSchema) => {
+        if (isSubmitting) return // Prevent double submit
+        setIsSubmitting(true)
+        try {
+            const result = await addNewChannel(values, token);
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+            } else {
+                toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <HiCheckCircle
+                            className="text-green-500 mb-2"
+                            size={48}
+                        />
+                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                            New Channel created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 100,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    },
+                )
+            }
+        }catch (err: any) {
+            console.error('Signup failed:', err.message)
+            const backendMessage =
+                err?.response?.data?.payload &&
+                    typeof err.response.data.payload === 'object'
+                    ? Object.values(err.response.data.payload).join(', ')
+                    : err?.response?.data?.message ||
+                    'An error occurred during creating new channel. Please try again.'
+
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    {backendMessage}
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                },
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    };
+
 
     return (
         <div>
@@ -285,40 +359,32 @@ const Channel = () => {
                     <h5 className="mb-2">Channel Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.country)}
-                            errorMessage={errors.country?.message}
+                            invalid={Boolean(errors.countryId)}
+                            errorMessage={errors.countryId?.message}
                         >
                             <Controller
-                                name="country"
+                                name="countryId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Country"
-                                        options={[
-                                            {
-                                                label: 'All Island',
-                                                value: 'All Island',
-                                            } as any,
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
+                                        options={country}
+                                        value={country.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
                             />
                         </FormItem>
+
 
                         <FormItem
                             invalid={Boolean(errors.channelCode)}
