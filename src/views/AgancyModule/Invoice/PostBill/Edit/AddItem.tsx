@@ -1,11 +1,11 @@
 import React from 'react'
 
-function Editbill() {
+function AddItem() {
   return (
     <div>
-      Editbill
+      
     </div>
   )
 }
 
-export default Editbill
+export default AddItem
