@@ -153,3 +153,59 @@ export const fetchAgencies = async () => {
         throw new Error(error.response?.data?.message || 'Failed to load agencies.');
     }
 };
+
+export const fetchCountry = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/country`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload.map((country: any) => ({
+            label: country.countryName,
+            value: country.id
+        }));
+    } catch (error: any) {
+        console.error('Error fetching country:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load country.');
+    }
+};
+
+// add channel 
+export interface AddChannelPayload {
+    userId: number;
+    countryId: number | null;
+    channelName: string;
+    channelCode: string;
+    isActive: boolean;    
+}
+
+export const addNewChannel = async (payload: AddChannelPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/channel`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during adding new channel:', error, payload);
+        throw new Error(error.response?.data?.message || 'Add new channel failed.');
+    }
+};
