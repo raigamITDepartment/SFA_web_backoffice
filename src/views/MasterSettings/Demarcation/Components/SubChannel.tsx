@@ -27,16 +27,13 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-
-import { fetchSubChannels } from '@/services/DemarcationService'
+import { fetchSubChannels, addNewSubChannel } from '@/services/DemarcationService'
+import {fetchChannels} from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
-
-type FormSchema = {
-    channel: string
-    subChannelName: string
-    subChannelCode: string
-    isActive: boolean
-}
+import { z } from 'zod'
+import type { ZodType } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { HiCheckCircle } from 'react-icons/hi'
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -55,6 +52,23 @@ interface SubChannel {
     subChannelName: string
     isActive?: boolean
 }
+
+export type AddSubChannelFormSchema = {
+    userId: number;
+    channelId: number | null;
+    subChannelName: string;
+    subChannelCode: string;
+    isActive: boolean;
+};
+
+
+const validationSchema: ZodType<AddSubChannelFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'), 
+    channelId: z.number({ required_error: 'Please select country' }),
+    subChannelName: z.string({ required_error: 'Channel name is required' }),
+    subChannelCode: z.string({ required_error: 'Channel code is required' }),
+    isActive: z.boolean(),
+});
 
 interface DebouncedInputProps
     extends Omit<
@@ -106,16 +120,18 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-const SubChannel = () => {
+const SubChannel = (props: AddSubChannelFormSchema) => {
+    const token = sessionStorage.getItem('accessToken')
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const { disableSubmit = false, className, setMessage } = props
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
-    // const [error, setError] = useState<string | null>(null);
     const [channelData, setChannelData] = useState<SubChannel[]>([])
-    const [SubSelelectChannel, setSubSelelectChannel] =
-        useState<SubChannel | null>(null)
+    const [SubSelelectChannel, setSubSelelectChannel] = useState<SubChannel | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const navigate = useNavigate()
+    const [channel, setChannel] = useState<any>([])
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -128,6 +144,19 @@ const SubChannel = () => {
         }
         loadUsers()
     }, [])
+
+    
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
 
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
@@ -249,37 +278,86 @@ const SubChannel = () => {
         setDialogIsOpen(false)
         setSubSelelectChannel(null)
     }
-
-    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-    //     console.log(value, e);
-    // };
-
-    // const handleEdit = (channel: SubChannel) => {
-    //     // Implement edit functionality here
-    //     console.log('Edit:', channel);
-    // };
-
-    // const handleDelete = (channel: SubChannel) => {
-    //     // Implement delete functionality here
-    //     console.log('Delete:', channel);
-    // };
-
     const {
         handleSubmit,
         formState: { errors },
         control,
-    } = useForm<FormSchema>({
+    } = useForm<AddSubChannelFormSchema>({
+        resolver: zodResolver(validationSchema),
         defaultValues: {
-            channel: '',
+            userId: 123,
+            channelId: null,
             subChannelName: '',
-            isActive: true, // Set default value to true
+            subChannelCode: '',
+            isActive: true,
         },
-    })
+    });
 
-    const onSubmit = async (values: FormSchema) => {
-        await new Promise((r) => setTimeout(r, 500))
-        alert(JSON.stringify(values, null, 2))
-    }
+    useEffect(() => {
+        console.log('Validation errors:', errors);
+    }, [errors]);
+
+
+    const onSubmit = async (values: AddSubChannelFormSchema) => {
+        if (isSubmitting) return 
+        setIsSubmitting(true)
+        try {
+            const result = await addNewSubChannel(values, token);
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+            } else {
+                toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <HiCheckCircle
+                            className="text-green-500 mb-2"
+                            size={48}
+                        />
+                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                            New Sub Channel created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 100,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    },
+                )
+            }
+        }catch (err: any) {
+            const backendMessage =
+                err?.response?.data?.payload &&
+                    typeof err.response.data.payload === 'object'
+                    ? Object.values(err.response.data.payload).join(', ')
+                    : err?.response?.data?.message ||
+                    'An error occurred during creating new sub channel. Please try again.'
+
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    {backendMessage}
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                },
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    };
 
     return (
         <div>
@@ -288,24 +366,27 @@ const SubChannel = () => {
                     <h5 className="mb-2">Sub-Channel Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
                         >
                             <Controller
-                                name="channel"
+                                name="channelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        // options={[
-                                        //     { label: 'National Channel', value: 'National Channel' }as any,
-                                        //     { label: 'Bakery Channel', value: 'Bakery Channel' },
-                                        // ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
+                                        options={channel}
+                                        value={channel.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                                 rules={{

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { AuthService_URL } from '../configs/Config';
+import { channel } from 'diagnostics_channel';
 
 
 export const fetchChannels = async () => {
@@ -207,5 +208,36 @@ export const addNewChannel = async (payload: AddChannelPayload) => {
     } catch (error: any) {
         console.error('Error during adding new channel:', error, payload);
         throw new Error(error.response?.data?.message || 'Add new channel failed.');
+    }
+};
+
+// add sub channel
+export interface AddChannelPayload {
+    userId: number;
+    channelId: number | null;
+    subChannelName: string;
+    subChannelCode: string;
+    isActive: boolean;    
+}
+
+export const addNewSubChannel = async (payload: AddChannelPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/subChannel`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during adding new sub channel:', error, payload);
+        throw new Error(error.response?.data?.message || 'Add new sub channel failed.');
     }
 };
