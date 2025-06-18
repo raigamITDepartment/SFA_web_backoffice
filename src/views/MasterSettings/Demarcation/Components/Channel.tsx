@@ -322,7 +322,6 @@ const Channel = (props: AddChannelFormSchema) => {
                 )
             }
         }catch (err: any) {
-            console.error('Signup failed:', err.message)
             const backendMessage =
                 err?.response?.data?.payload &&
                     typeof err.response.data.payload === 'object'
