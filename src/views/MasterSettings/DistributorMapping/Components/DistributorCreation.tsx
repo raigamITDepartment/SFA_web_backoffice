@@ -30,11 +30,12 @@ import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom'
 
 type FormSchema = {
-    id:number;
+    id: number;
     distributorName: string;
     address1: string;
     address2: string;
     address3: string;
+    sapAgencyCode: string; // New field added
     mobile: string;
     email: string;
     isActive: boolean;
@@ -51,11 +52,12 @@ const pageSizeOptions = [
 ];
 
 interface Distributor {
-    id:number;
+    id: number;
     distributorName: string;
     address1: string;
     address2: string;
     address3: string;
+    sapAgencyCode: string;
     mobile: string;
     email: string;
     isActive: boolean;
@@ -106,11 +108,11 @@ const DistributorCreation = () => {
     const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
     const [successDialog, setSuccessDialog] = useState(false);
     const [data, setData] = useState<Distributor[]>([
-        { id: 1, distributorName: 'Distributor 1', address1: 'Address 1-1', address2: 'Address 1-2', address3: 'Address 1-3', mobile: '1234567890', email: 'distributor1@example.com', isActive: true },
-        { id: 2, distributorName: 'Distributor 2', address1: 'Address 2-1', address2: 'Address 2-2', address3: 'Address 2-3', mobile: '1234567891', email: 'distributor2@example.com', isActive: false },
-        { id: 3, distributorName: 'Distributor 3', address1: 'Address 3-1', address2: 'Address 3-2', address3: 'Address 3-3', mobile: '1234567892', email: 'distributor3@example.com', isActive: true },
-        { id: 4, distributorName: 'Distributor 4', address1: 'Address 4-1', address2: 'Address 4-2', address3: 'Address 4-3', mobile: '1234567893', email: 'distributor4@example.com', isActive: false },
-        { id: 5, distributorName: 'Distributor 5', address1: 'Address 5-1', address2: 'Address 5-2', address3: 'Address 5-3', mobile: '1234567894', email: 'distributor5@example.com', isActive: true },
+        { id: 1, distributorName: 'Distributor 1', address1: 'Address 1-1', address2: 'Address 1-2', address3: 'Address 1-3', sapAgencyCode: 'SAP001', mobile: '1234567890', email: 'distributor1@example.com', isActive: true },
+        { id: 2, distributorName: 'Distributor 2', address1: 'Address 2-1', address2: 'Address 2-2', address3: 'Address 2-3', sapAgencyCode: 'SAP002', mobile: '1234567891', email: 'distributor2@example.com', isActive: false },
+        { id: 3, distributorName: 'Distributor 3', address1: 'Address 3-1', address2: 'Address 3-2', address3: 'Address 3-3', sapAgencyCode: 'SAP003', mobile: '1234567892', email: 'distributor3@example.com', isActive: true },
+        { id: 4, distributorName: 'Distributor 4', address1: 'Address 4-1', address2: 'Address 4-2', address3: 'Address 4-3', sapAgencyCode: 'SAP004', mobile: '1234567893', email: 'distributor4@example.com', isActive: false },
+        { id: 5, distributorName: 'Distributor 5', address1: 'Address 5-1', address2: 'Address 5-2', address3: 'Address 5-3', sapAgencyCode: 'SAP005', mobile: '1234567894', email: 'distributor5@example.com', isActive: true },
     ]);
     const navigate = useNavigate();
 
@@ -119,6 +121,7 @@ const DistributorCreation = () => {
         { header: 'Address 1', accessorKey: 'address1' },
         { header: 'Address 2', accessorKey: 'address2' },
         { header: 'Address 3', accessorKey: 'address3' },
+        { header: 'SAP Agency Code', accessorKey: 'sapAgencyCode' },
         { header: 'Mobile', accessorKey: 'mobile' },
         { header: 'Email', accessorKey: 'email' },
         {
@@ -224,6 +227,7 @@ const DistributorCreation = () => {
             address1: '',
             address2: '',
             address3: '',
+            sapAgencyCode: '',
             mobile: '',
             email: '',
             isActive: true,
@@ -358,6 +362,33 @@ const DistributorCreation = () => {
                                         type="text"
                                         autoComplete="off"
                                         placeholder="Address 3"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
+                        <FormItem
+                            invalid={Boolean(errors.sapAgencyCode)}
+                            errorMessage={errors.sapAgencyCode?.message}
+                        >
+                            <Controller
+                                name="sapAgencyCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="SAP Agency Code"
                                         {...field}
                                     />
                                 }
@@ -554,3 +585,4 @@ const DistributorCreation = () => {
 };
 
 export default DistributorCreation;
+

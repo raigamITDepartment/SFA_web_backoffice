@@ -9,7 +9,7 @@ import Select from '@/components/ui/Select'
 type GeneralSectionProps = FormSectionBaseProps
 
 const channelOptions = [
-    { value: 'C', label: 'C' },
+    { value: 'C', label: 'C' } as any,
     { value: 'D', label: 'D' },
     { value: 'S', label: 'S' },
     { value: 'K', label: 'K' },
@@ -18,7 +18,7 @@ const channelOptions = [
 ]
 
 const subChannelOptions = [
-    { value: 'SC1', label: 'Sub-channel 1' },
+    { value: 'SC1', label: 'Sub-channel 1' } as any,
     { value: 'SC2', label: 'Sub-channel 2' },
     { value: 'SC3', label: 'Sub-channel 3' },
     // Add more sub-channel options as needed
@@ -84,6 +84,27 @@ const GeneralSection = ({ control, errors }: GeneralSectionProps) => {
                         )}
                     />
                 </FormItem>
+
+                
+                <FormItem
+                    label="LN Code"
+                    invalid={Boolean(errors.LNcode)}
+                    errorMessage={errors.LNcode?.message}
+                >
+                    <Controller
+                        name="LNcode"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                type="text"
+                                autoComplete="off"
+                                placeholder="LN Code"
+                                {...field}
+                            />
+                        )}
+                    />
+                </FormItem>
+
                 <FormItem
                     label="Channel"
                     invalid={Boolean(errors.channel)}

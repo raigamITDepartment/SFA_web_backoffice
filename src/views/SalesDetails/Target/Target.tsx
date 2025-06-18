@@ -16,7 +16,7 @@ const Default = () => {
             <Tabs defaultValue="tab1">
                 <TabList>
                     <TabNav value="tab1">Territory Wise</TabNav>
-                    <TabNav value="tab2">Territory Wise Category Value</TabNav>
+                    <TabNav value="tab2">Territory Wise Category </TabNav>
                     <TabNav value="tab3">Item Wise</TabNav>
                    
                   
