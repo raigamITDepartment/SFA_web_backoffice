@@ -304,17 +304,13 @@ const Channel = (props: AddChannelFormSchema) => {
                         type="success"
                         className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
                     >
-                        <HiCheckCircle
-                            className="text-green-500 mb-2"
-                            size={48}
-                        />
                         <div className="mt-2 text-green-700 font-semibold text-lg text-center">
                             New Channel created successfully!
                         </div>
                     </Alert>,
                     {
                         offsetX: 5,
-                        offsetY: 100,
+                        offsetY: 30,
                         transitionType: 'fade',
                         block: false,
                         placement: 'top-end',
@@ -558,7 +554,7 @@ const Channel = (props: AddChannelFormSchema) => {
             >
                 <h5 className="mb-4">Incative Channel</h5>
                 <p>
-                    Are you sure to Incative Channel{' '}
+                    Are you sure to Inactive Channel{' '}
                     <b>{SelelectChannel?.channelName}</b>?
                 </p>
                 <div className="text-right mt-6">
