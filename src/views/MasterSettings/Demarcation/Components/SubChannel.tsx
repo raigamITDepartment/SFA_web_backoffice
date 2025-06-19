@@ -187,8 +187,8 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-SubChannel`)
+    const handleEditClick = (SubCHCode : SubChannel) => {
+        navigate(`/Master-menu-Demarcation-/${SubCHCode.subChannelCode}/SubChannel`)
     }
   
 
