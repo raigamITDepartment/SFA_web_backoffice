@@ -175,8 +175,8 @@ const Territory = () => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-Territory`)
+    const handleEditClick = (TRCode:Territory) => {
+        navigate(`/Master-menu-Demarcation-/${TRCode.territoryCode}/Territory`)
     }
 
     const columns = useMemo<ColumnDef<Territory>[]>(

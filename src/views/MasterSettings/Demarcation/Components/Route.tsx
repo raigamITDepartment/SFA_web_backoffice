@@ -165,8 +165,8 @@ const Route = () => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-Route`)
+    const handleEditClick = (ROCode:Route) => {
+        navigate(`/Master-menu-Demarcation-/${ROCode.routeCode}/Route`)
     }
     const columns = useMemo<ColumnDef<Route>[]>(
         () => [

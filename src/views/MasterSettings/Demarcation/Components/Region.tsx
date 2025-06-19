@@ -160,8 +160,8 @@ const Region = () => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-Region`)
+    const handleEditClick = (RGCode : Region) => {
+        navigate(`/Master-menu-Demarcation-${RGCode?.regionCode}/Region`)
     }
     const columns = useMemo<ColumnDef<Region>[]>(
         () => [
