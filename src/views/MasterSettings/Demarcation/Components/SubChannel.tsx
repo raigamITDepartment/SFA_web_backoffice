@@ -311,19 +311,15 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                     <Alert
                         showIcon
                         type="success"
-                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                        className="dark:bg-gray-700 w-72 sm:w-80 md:w-96 flex flex-col items-center"
                     >
-                        <HiCheckCircle
-                            className="text-green-500 mb-2"
-                            size={48}
-                        />
-                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                        <div className="mt-2 text-green-700 font-semibold text-lg  text-center">
                             New Sub Channel created successfully!
                         </div>
                     </Alert>,
                     {
                         offsetX: 5,
-                        offsetY: 100,
+                        offsetY: 30,
                         transitionType: 'fade',
                         block: false,
                         placement: 'top-end',
