@@ -180,6 +180,32 @@ export const fetchCountry = async () => {
     }
 };
 
+export const fetchRoutesOptions = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/route`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload.map((route: any) => ({
+            label: route.routeName,
+            value: route.id
+        }));
+    } catch (error: any) {
+        console.error('Error fetching route:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load route.');
+    }
+};
+
+
 // add channel 
 export interface AddChannelPayload {
     userId: number;
@@ -227,6 +253,68 @@ export const addNewSubChannel = async (payload: AddChannelPayload) => {
         if (!token) throw new Error('No access token found.');
         const response = await axios.post(
             `${AuthService_URL}/api/v1/userDemarcation/subChannel`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during adding new sub channel:', error, payload);
+        throw new Error(error.response?.data?.message || 'Add new sub channel failed.');
+    }
+};
+
+
+export interface AddRegionPayload {
+    userId: number;
+    channelId: number | null;
+    regionName: string;
+    regionCode: string;
+    isActive: boolean;    
+}
+
+export const addNewRegion = async (payload: AddChannelPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/subChannel`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during adding new sub channel:', error, payload);
+        throw new Error(error.response?.data?.message || 'Add new sub channel failed.');
+    }
+};
+
+
+export interface AddAreaPayload {
+    userId: number;
+    regionId: number | null;
+    areaName: string;
+    areaCode: string;
+    isActive: boolean;
+}
+
+export const addNewArea = async (payload: AddAreaPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/area`,
             payload,
             {
                 headers: {

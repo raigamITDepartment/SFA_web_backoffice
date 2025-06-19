@@ -27,8 +27,8 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-
-import { fetchAgencies } from '@/services/DemarcationService'
+import {fetchChannels, fetchSubChannels, fetchRegions, fetchAreas, fetchTerritories} from '@/services/singupDropdownService'
+import { fetchAgencies, fetchRoutesOptions } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 
 type FormSchema = {
@@ -117,15 +117,23 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-const Agency = () => {
+const Agency = (props: AddAgencyFormSchema) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const token = sessionStorage.getItem('accessToken')
+    const { disableSubmit = false, className, setMessage } = props
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
-    //const [error, setError] = useState<string | null>(null);
     const [agencyData, setAgencyData] = useState<Agency[]>([])
     const [SelelectAgency, setSelelectAgency] = useState<Agency | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
-     const navigate = useNavigate()
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
+    const [region, setRegion] = useState<any>([])
+    const [area, setArea] = useState<any>([])
+    const [range, setRange] = useState<any>([])
+    const [territory, setTerritory] = useState<any>([])
+    const [route, setRoute] = useState<any>([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -138,6 +146,82 @@ const Agency = () => {
         }
         loadUsers()
     }, [])
+
+    useEffect(() => {
+                const loadChannel = async () => {
+                    try {
+                        const channelOptions = await fetchChannels(token)
+                        setChannel(channelOptions)
+                    } catch (error) {
+                        setMessage?.('Failed to load channels.')
+                    }
+                }
+                loadChannel()
+    }, [setMessage])
+        
+    useEffect(() => {
+        const loadSubChannel = async () => {
+            try {
+                const subChannelOptions = await fetchSubChannels(token)
+                setSubChannel(subChannelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+            }
+        }
+        loadSubChannel()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRegion = async () => {
+            try {
+                const regionOptions = await fetchRegions(token)
+                setRegion(regionOptions)
+            } catch (error) {
+                setMessage?.('Failed to load regions.')
+            }
+        }
+        loadRegion()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadArea = async () => {
+            try {
+                const areaOptions = await fetchAreas(token)
+                setArea(areaOptions)
+            } catch (error) {
+                setMessage?.('Failed to load areas.')
+            }
+        }
+        loadArea()
+    }, [setMessage])
+
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.')
+            return
+        }
+        const loadTerritories = async () => {
+            try {
+                const territoryOptions = await fetchTerritories(token)
+                setTerritory(territoryOptions)
+            } catch (error) {
+                setMessage?.('Failed to load territories.')
+            }
+        }
+        loadTerritories()
+    }, [token, setMessage])
+
+    useEffect(() => {
+        const loadRoutes = async () => {
+            try {
+                const routeOptions = await fetchRoutesOptions(token)
+                setRoute(routeOptions)
+            } catch (error) {
+                setMessage?.('Failed to load routes.')
+            }
+        }
+        loadRoutes()
+    }, [setMessage])
 
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
@@ -261,19 +345,6 @@ const Agency = () => {
         setDialogIsOpen(false)
         setSelelectAgency(null)
     }
-    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-    //     console.log(value, e);
-    // };
-
-    // const handleEdit = (agency: Agency) => {
-    //     // Implement edit functionality here
-    //     console.log('Edit:', agency);
-    // };
-
-    // const handleDelete = (agency: Agency) => {
-    //     // Implement delete functionality here
-    //     console.log('Delete:', agency);
-    // };
 
     const {
         handleSubmit,
@@ -304,30 +375,27 @@ const Agency = () => {
                     <h5 className="mb-2">Agency Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
                         >
                             <Controller
-                                name="channel"
+                                name="channelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        options={[
-                                            {
-                                                label: 'National Channel',
-                                                value: 'National Channel',
-                                            } as any,
-                                            {
-                                                label: 'Bakery Channel',
-                                                value: 'Bakery Channel',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
+                                        options={channel}
+                                        value={channel.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                                 rules={{
@@ -343,31 +411,29 @@ const Agency = () => {
                             />
                         </FormItem>
                         <FormItem
-                            invalid={Boolean(errors.subChannel)}
+                              invalid={Boolean(errors.subChannel)}
                             errorMessage={errors.subChannel?.message}
                         >
                             <Controller
                                 name="subChannel"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub-Channel"
-                                        options={[
-                                            {
-                                                label: 'Sub-Channel 1',
-                                                value: 'Sub-Channel 1',
-                                            } as any,
-                                            {
-                                                label: 'Sub-Channel 2',
-                                                value: 'Sub-Channel 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Sub Channel"
+                                            options={subChannel}
+                                            value={subChannel.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -389,24 +455,22 @@ const Agency = () => {
                                 name="region"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Region"
-                                        options={[
-                                            {
-                                                label: 'Region 1',
-                                                value: 'Region 1',
-                                            } as any,
-                                            {
-                                                label: 'Region 2',
-                                                value: 'Region 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Region"
+                                            options={region}
+                                            value={region.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -428,24 +492,22 @@ const Agency = () => {
                                 name="area"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Area"
-                                        options={[
-                                            {
-                                                label: 'Area 1',
-                                                value: 'Area 1',
-                                            } as any,
-                                            {
-                                                label: 'Area 2',
-                                                value: 'Area 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Area"
+                                            options={area}
+                                            value={area.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -467,24 +529,22 @@ const Agency = () => {
                                 name="territory"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Territory"
-                                        options={[
-                                            {
-                                                label: 'Territory 1',
-                                                value: 'Territory 1',
-                                            } as any,
-                                            {
-                                                label: 'Territory 2',
-                                                value: 'Territory 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Territory"
+                                            options={territory}
+                                            value={territory.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -498,7 +558,7 @@ const Agency = () => {
                                 }}
                             />
                         </FormItem>
-                        <FormItem
+                         <FormItem
                             invalid={Boolean(errors.route)}
                             errorMessage={errors.route?.message}
                         >
@@ -506,24 +566,22 @@ const Agency = () => {
                                 name="route"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Route"
-                                        options={[
-                                            {
-                                                label: 'Route 1',
-                                                value: 'Route 1',
-                                            } as any,
-                                            {
-                                                label: 'Route 2',
-                                                value: 'Route 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Route"
+                                            options={route}
+                                            value={route.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {

@@ -27,9 +27,14 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-
-import { fetchRegions } from '@/services/DemarcationService'
+import {fetchChannels, fetchSubChannels} from '@/services/singupDropdownService'
+import { fetchRegions, addNewRegion } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
+import { z } from 'zod'
+import type { ZodType } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { HiCheckCircle } from 'react-icons/hi'
+
 
 type FormSchema = {
     channel: string;
@@ -58,6 +63,24 @@ interface Region {
     isActive: boolean;
     channelName: string;
 }
+
+export type AddRegionFormSchema = {
+    userId: number;
+    channelId: number | null;
+    regionName: string;
+    regionCode: string;
+    isActive: boolean;
+};
+
+
+const validationSchema: ZodType<AddRegionFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'), 
+    channelId: z.number({ required_error: 'Please select channel' }),
+    regionName: z.string({ required_error: 'Region name is required' }),
+    regionCode: z.string({ required_error: 'Region code is required' }),
+    isActive: z.boolean(),
+});
+
 
 interface DebouncedInputProps
     extends Omit<
@@ -109,14 +132,18 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-const Region = () => {
+const Region = (props: AddRegionFormSchema) => {
+    const token = sessionStorage.getItem('accessToken')
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const { disableSubmit = false, className, setMessage } = props
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
-    //const [error, setError] = useState<string | null>(null);
     const [regionData, setRegionData] = useState<Region[]>([])
     const [SelelectRegion, setSelelectRegion] = useState<Region | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
     const navigate = useNavigate()
 
 
@@ -131,6 +158,32 @@ const Region = () => {
         }
         loadUsers()
     }, [])
+
+
+    useEffect(() => {
+            const loadChannel = async () => {
+                try {
+                    const channelOptions = await fetchChannels(token)
+                    setChannel(channelOptions)
+                } catch (error) {
+                    setMessage?.('Failed to load channels.')
+                }
+            }
+            loadChannel()
+        }, [setMessage])
+    
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const subChannelOptions = await fetchSubChannels(token)
+                setSubChannel(subChannelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectRegion) {
@@ -249,33 +302,20 @@ const Region = () => {
         setDialogIsOpen(false)
         setSelelectRegion(null)
     }
-
-    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-    //     console.log(value, e);
-    // };
-
-    // const handleEdit = (region: Region) => {
-    //     // Implement edit functionality here
-    //     console.log('Edit:', region);
-    // };
-
-    // const handleDelete = (region: Region) => {
-    //     // Implement delete functionality here
-    //     console.log('Delete:', region);
-    // };
-
     const {
         handleSubmit,
         formState: { errors },
         control,
-    } = useForm<FormSchema>({
+    } = useForm<AddRegionFormSchema>({
+        resolver: zodResolver(validationSchema),
         defaultValues: {
-            channel: '',
-            subChannel: '',
+            userId: 123,
+            channelId: null,
             regionName: '',
-            isActive: true, // Set default value to true
+            regionCode: '',
+            isActive: true,
         },
-    })
+    });
 
     const onSubmit = async (values: FormSchema) => {
         await new Promise((r) => setTimeout(r, 500))
@@ -289,26 +329,27 @@ const Region = () => {
                     <h5 className="mb-2">Region Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
                         >
                             <Controller
-                                name="channel"
+                                name="channelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        options={[
-                                            {
-                                                label: 'National Channel',
-                                                value: 'National Channel',
-                                            } as any,
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
+                                        options={channel}
+                                        value={channel.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                                 rules={{
@@ -324,31 +365,29 @@ const Region = () => {
                             />
                         </FormItem>
                         <FormItem
-                            invalid={Boolean(errors.subChannel)}
+                              invalid={Boolean(errors.subChannel)}
                             errorMessage={errors.subChannel?.message}
                         >
                             <Controller
                                 name="subChannel"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub-Channel"
-                                        options={[
-                                            {
-                                                label: 'Sub-Channel 1',
-                                                value: 'Sub-Channel 1',
-                                            } as any,
-                                            {
-                                                label: 'Sub-Channel 2',
-                                                value: 'Sub-Channel 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Sub Channel"
+                                            options={subChannel}
+                                            value={subChannel.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -362,7 +401,6 @@ const Region = () => {
                                 }}
                             />
                         </FormItem>
-
                         <FormItem
                             invalid={Boolean(errors.regionCode)}
                             errorMessage={errors.regionCode?.message}

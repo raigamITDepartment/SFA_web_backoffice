@@ -27,9 +27,12 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-
-import { fetchAreas } from '@/services/DemarcationService'
+import { fetchAreas, addNewArea } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
+import {fetchChannels, fetchSubChannels, fetchRegions} from '@/services/singupDropdownService'
+import { z } from 'zod'
+import type { ZodType } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 type FormSchema = {
     channel: string
@@ -59,6 +62,23 @@ interface Area {
     isActive: boolean
     regionName: string
 }
+
+export type AddAreaFormSchema = {
+    userId: number;
+    regionId: number | null;
+    areaName: string;
+    areaCode: string;
+    isActive: boolean;
+};
+
+
+const validationSchema: ZodType<AddAreaFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'), 
+    regionId: z.number({ required_error: 'Please select region' }),
+    areaName: z.string({ required_error: 'Region name is required' }),
+    areaCode: z.string({ required_error: 'Region code is required' }),
+    isActive: z.boolean(),
+});
 
 interface DebouncedInputProps
     extends Omit<
@@ -110,14 +130,19 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-const Area = () => {
+const Area = (props: AddAreaFormSchema) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const token = sessionStorage.getItem('accessToken')
+    const { disableSubmit = false, className, setMessage } = props
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
     //const [error, setError] = useState<string | null>(null);
     const [areaData, setAreaData] = useState<Area[]>([])
     const [SelelectArea, setSelelectArea] = useState<Area | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
+    const [region, setRegion] = useState<any>([])
     const navigate = useNavigate()
  
     useEffect(() => {
@@ -131,6 +156,42 @@ const Area = () => {
         }
         loadUsers()
     }, [])
+
+    useEffect(() => {
+            const loadChannel = async () => {
+                try {
+                    const channelOptions = await fetchChannels(token)
+                    setChannel(channelOptions)
+                } catch (error) {
+                    setMessage?.('Failed to load channels.')
+                }
+            }
+            loadChannel()
+        }, [setMessage])
+    
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const subChannelOptions = await fetchSubChannels(token)
+                setSubChannel(subChannelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadRegion = async () => {
+            try {
+                const regionOptions = await fetchRegions(token)
+                setRegion(regionOptions)
+            } catch (error) {
+                setMessage?.('Failed to load regions.')
+            }
+        }
+        loadRegion()
+    }, [setMessage])
 
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
@@ -251,19 +312,6 @@ const Area = () => {
         setDialogIsOpen(false)
         setSelelectArea(null)
     }
-    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-    //     console.log(value, e);
-    // };
-
-    // const handleEdit = (area: Area) => {
-    //     // Implement edit functionality here
-    //     console.log('Edit:', area);
-    // };
-
-    // const handleDelete = (area: Area) => {
-    //     // Implement delete functionality here
-    //     console.log('Delete:', area);
-    // };
 
     const {
         handleSubmit,
@@ -290,31 +338,28 @@ const Area = () => {
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
                     <h5 className="mb-2">Area Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                        <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
+                         <FormItem
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
                         >
                             <Controller
-                                name="channel"
+                                name="channelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        options={[
-                                            {
-                                                label: 'National Channel',
-                                                value: 'National Channel',
-                                            } as any,
-                                            {
-                                                label: 'Bakery Channel',
-                                                value: 'Bakery Channel',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
+                                        options={channel}
+                                        value={channel.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                                 rules={{
@@ -330,31 +375,29 @@ const Area = () => {
                             />
                         </FormItem>
                         <FormItem
-                            invalid={Boolean(errors.subChannel)}
+                              invalid={Boolean(errors.subChannel)}
                             errorMessage={errors.subChannel?.message}
                         >
                             <Controller
                                 name="subChannel"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub-Channel"
-                                        options={[
-                                            {
-                                                label: 'Sub-Channel 1',
-                                                value: 'Sub-Channel 1',
-                                            } as any,
-                                            {
-                                                label: 'Sub-Channel 2',
-                                                value: 'Sub-Channel 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Sub Channel"
+                                            options={subChannel}
+                                            value={subChannel.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -369,31 +412,29 @@ const Area = () => {
                             />
                         </FormItem>
                         <FormItem
-                            invalid={Boolean(errors.region)}
+                              invalid={Boolean(errors.region)}
                             errorMessage={errors.region?.message}
                         >
                             <Controller
                                 name="region"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Region"
-                                        options={[
-                                            {
-                                                label: 'Region 1',
-                                                value: 'Region 1',
-                                            } as any,
-                                            {
-                                                label: 'Region 2',
-                                                value: 'Region 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Region"
+                                            options={region}
+                                            value={region.find(
+                                                (option: { value: number }) =>
+                                                    option.value ===
+                                                    Number(field.value),
+                                            )}
+                                            onChange={(
+                                                option: {
+                                                    label: string
+                                                    value: number
+                                                } | null,
+                                            ) => field.onChange(option?.value)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
