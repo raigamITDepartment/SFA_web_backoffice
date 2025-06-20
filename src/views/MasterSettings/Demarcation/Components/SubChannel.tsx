@@ -64,9 +64,9 @@ export type AddSubChannelFormSchema = {
 
 const validationSchema: ZodType<AddSubChannelFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
-    channelId: z.number({ required_error: 'Please select country' }),
-    subChannelName: z.string({ required_error: 'Channel name is required' }),
-    subChannelCode: z.string({ required_error: 'Channel code is required' }),
+    channelId: z.number({ required_error: 'Please select channel' }),
+    subChannelName: z.string({ required_error: 'Sub Channel name is required' }),
+    subChannelCode: z.string({ required_error: 'Sub Channel code is required' }),
     isActive: z.boolean(),
 });
 
@@ -187,8 +187,8 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
             }
         }
     }
-    const handleEditClick = () => {
-        navigate(`/Master-menu-Demarcation-SubChannel`)
+    const handleEditClick = (SubCHCode : SubChannel) => {
+        navigate(`/Master-menu-Demarcation-/${SubCHCode.subChannelCode}/SubChannel`)
     }
   
 
