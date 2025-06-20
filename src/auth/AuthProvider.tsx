@@ -84,6 +84,7 @@ function AuthProvider({ children }: AuthProviderProps) {
                 sessionStorage.setItem('sessionTimeout', sessionTimeout.toString());
 
                 sessionStorage.setItem('role', user.role);
+                sessionStorage.setItem('userId', user.userId.toString());
                 sessionStorage.setItem('subRole', user.subRole);
                 sessionStorage.setItem('user', JSON.stringify(user));
 
