@@ -35,7 +35,7 @@ const MasterRoute: Routes = [
     },
     {
         key: 'MasterMenu.collapse.Demarcation',
-        path: '/Master-menu-Demarcation-/: SubchannelCode/SubChannel',
+        path: '/Master-menu-Demarcation-/:SubchannelCode/SubChannel',
         component: lazy(() => import('@/views/MasterSettings/Demarcation/Edit/SubChannelEdit'),
         ),
         authority: [],

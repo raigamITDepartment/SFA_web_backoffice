@@ -188,7 +188,7 @@ const Channel = (props: AddChannelFormSchema) => {
     }
 
     const handleEditClick = (CHCode: Channel) => {
-        navigate(`/Master-menu-Demarcation-/${CHCode.channelCode}//SubChannel`)
+        navigate(`/Master-menu-Demarcation-/${CHCode.channelCode}/SubChannel`)
     }
 
     const columns = useMemo<ColumnDef<Channel>[]>(
