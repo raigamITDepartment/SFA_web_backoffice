@@ -4,7 +4,8 @@ import Table from '@/components/ui/Table';
 import { MdDeleteOutline } from "react-icons/md";
 import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Button } from '@/components/ui';
+import { Button, toast, Alert } from '@/components/ui';
+import Dialog from '@/components/ui/Dialog';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const { Tr, Th, Td, THead, TBody } = Table;
@@ -25,8 +26,11 @@ interface InvoiceItem {
 function Editbill() {
   const navigate = useNavigate();
   const { invoiceId } = useParams<{ invoiceId: string }>();
-  
-  // Sample invoice data
+
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<InvoiceItem | null>(null);
+
   const invoiceData = {
     invoiceNo: 'INV-2023-001',
     distributorName: 'ABC Distributors',
@@ -36,7 +40,6 @@ function Editbill() {
     route: 'Route C',
   };
 
-  // State for invoice items
   const [itemsData, setItemsData] = useState<InvoiceItem[]>([
     {
       id: 1,
@@ -76,91 +79,123 @@ function Editbill() {
     }
   ]);
 
-  // Handle item deletion
-  const handleDeleteItem = (itemId: number) => {
-    setItemsData(prevItems => prevItems.filter(item => item.id !== itemId));
+  const handleDeleteConfirm = () => {
+    if (itemToDelete) {
+      setItemsData(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
+      toast.push(
+        <Alert
+          showIcon
+          type="danger"
+          className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+        >
+          Item deleted successfully
+        </Alert>,
+        {
+          offsetX: 5,
+          offsetY: 100,
+          transitionType: 'fade',
+          block: false,
+          placement: 'top-end',
+        }
+      );
+    }
+    setDeleteDialogOpen(false);
+    setItemToDelete(null);
   };
 
-  // Handle item field changes
-  const handleItemChange = (
-    itemId: number, 
-    field: keyof InvoiceItem, 
-    value: string | number
-  ) => {
-    setItemsData(prevItems => 
+  const handleDeleteItem = (item: InvoiceItem) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleItemChange = (itemId: number, field: keyof InvoiceItem, value: string | number) => {
+    setItemsData(prevItems =>
       prevItems.map(item => {
         if (item.id === itemId) {
-          // Calculate grandTotal if any of the quantity/price fields change
-          const updatedItem = { 
-            ...item, 
-            [field]: typeof value === 'string' ? parseFloat(value) || 0 : value 
+          const updatedItem = {
+            ...item,
+            [field]: typeof value === 'string' ? parseFloat(value) || 0 : value
           };
-          
-          // Recalculate grandTotal if relevant fields change
-          if (field === 'qty' || field === 'itemPrice' || 
-              field === 'goodReturnQty' || field === 'goodReturnPrice' ||
-              field === 'marketReturnQty' || field === 'marketReturnPrice') {
-            const netQty = updatedItem.qty - updatedItem.goodReturnQty - updatedItem.marketReturnQty;
-            const netValue = 
-              (updatedItem.qty * updatedItem.itemPrice) - 
-              (updatedItem.goodReturnQty * updatedItem.goodReturnPrice) - 
-              (updatedItem.marketReturnQty * updatedItem.marketReturnPrice);
-            
-            return { 
-              ...updatedItem, 
-              grandTotal: netValue
-            };
-          }
-          
-          return updatedItem;
+
+          const netQty = updatedItem.qty - updatedItem.goodReturnQty - updatedItem.marketReturnQty;
+          const netValue =
+            (netQty * updatedItem.itemPrice) -
+            (updatedItem.goodReturnQty * updatedItem.goodReturnPrice) -
+            (updatedItem.marketReturnQty * updatedItem.marketReturnPrice);
+
+          return {
+            ...updatedItem,
+            grandTotal: netValue
+          };
         }
         return item;
       })
     );
   };
 
-  // Button handlers
-  const handleUpdate = () => {
-    console.log('Updating invoice with data:', {
-      invoiceId,
-      itemsData
-    });
-    navigate('/bills');
-  };
-
   const handleCancel = () => {
-    console.log('Canceling changes for invoice:', invoiceId);
     navigate('/bills');
   };
 
-  // Handle adding a new item
   const handleAddItem = () => {
     navigate(`/AddItem/${invoiceId}`);
   };
 
-  // Define columns for the invoice items table
+  const handleUpdate = () => {
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmUpdate = () => {
+    toast.push(
+      <Alert
+        showIcon
+        type="warning"
+        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+      >
+        Invoice Updated Successfully
+      </Alert>,
+      {
+        offsetX: 5,
+        offsetY: 100,
+        transitionType: 'fade',
+        block: false,
+        placement: 'top-end',
+      }
+    );
+
+    setConfirmDialogOpen(false);
+
+    setTimeout(() => {
+      navigate(-1); 
+    }, 1000);
+  };
+
   const columns = useMemo<ColumnDef<InvoiceItem>[]>(() => [
-    { 
-      header: 'Item No', 
+    {
+      header: 'Item No',
       accessorKey: 'itemNo',
       cell: ({ getValue }) => (
         <div className="text-center">{getValue<string>()}</div>
       )
     },
-    { 
-      header: 'Description', 
+    {
+    header: 'Item Name',
+    accessorKey: 'itemName',
+    cell: ({ row }) => (
+      <div className="text-center font-medium text-gray-700 dark:text-gray-200">
+        {`Item ${row.index + 1}`}
+      </div>
+    )
+  },
+    {
+      header: 'Description',
       accessorKey: 'description',
       cell: ({ row }) => (
-        <input
-          type="text"
-          className="w-full p-1 border rounded"
-          value={row.original.description}
-          onChange={(e) => handleItemChange(row.original.id, 'description', e.target.value)}
-        />
+        <div className="text-center">{row.original.description}</div>
       )
     },
-    { 
-      header: 'Qty', 
+    {
+      header: 'Qty',
       accessorKey: 'qty',
       cell: ({ row }) => (
         <div className="text-center">
@@ -174,8 +209,8 @@ function Editbill() {
         </div>
       )
     },
-    { 
-      header: 'Item Price', 
+    {
+      header: 'Item Price',
       accessorKey: 'itemPrice',
       cell: ({ row }) => (
         <div className="text-right">
@@ -190,8 +225,8 @@ function Editbill() {
         </div>
       )
     },
-    { 
-      header: 'Good Return Qty', 
+    {
+      header: 'Good Return Qty',
       accessorKey: 'goodReturnQty',
       cell: ({ row }) => (
         <div className="text-center">
@@ -205,8 +240,8 @@ function Editbill() {
         </div>
       )
     },
-    { 
-      header: 'Good Return Price', 
+    {
+      header: 'Good Return Price',
       accessorKey: 'goodReturnPrice',
       cell: ({ row }) => (
         <div className="text-right">
@@ -221,8 +256,8 @@ function Editbill() {
         </div>
       )
     },
-    { 
-      header: 'Market Return Qty', 
+    {
+      header: 'Market Return Qty',
       accessorKey: 'marketReturnQty',
       cell: ({ row }) => (
         <div className="text-center">
@@ -236,8 +271,8 @@ function Editbill() {
         </div>
       )
     },
-    { 
-      header: 'Market Return Price', 
+    {
+      header: 'Market Return Price',
       accessorKey: 'marketReturnPrice',
       cell: ({ row }) => (
         <div className="text-right">
@@ -252,7 +287,7 @@ function Editbill() {
         </div>
       )
     },
-    { 
+    {
       header: 'Total',
       accessorKey: 'grandTotal',
       cell: ({ row }) => (
@@ -269,14 +304,13 @@ function Editbill() {
           <MdDeleteOutline
             className="text-red-500 text-lg cursor-pointer hover:text-red-700 transition-colors"
             title="Delete"
-            onClick={() => handleDeleteItem(row.original.id)}
+            onClick={() => handleDeleteItem(row.original)}
           />
         </div>
-      ),
-    },
+      )
+    }
   ], []);
 
-  // Create table instance
   const table = useReactTable({
     data: itemsData,
     columns,
@@ -289,71 +323,32 @@ function Editbill() {
       <Card className="rounded-xl shadow-lg">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Invoice Details
-            </h1>
-            
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoice Details</h1>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Invoice No */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
-                Invoice No
-              </label>
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                {invoiceData.invoiceNo}
-              </div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Invoice No</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.invoiceNo}</div>
             </div>
-            
-            {/* Distributor Name */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
-                Distributor Name
-              </label>
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                {invoiceData.distributorName}
-              </div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Distributor Name</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.distributorName}</div>
             </div>
-            
-            {/* Bill Type */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
-                Bill Type
-              </label>
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                {invoiceData.billType}
-              </div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Bill Type</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.billType}</div>
             </div>
-            
-            {/* Shop Name */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
-                Shop Name
-              </label>
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                {invoiceData.shopName}
-              </div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Shop Name</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.shopName}</div>
             </div>
-            
-            {/* Shop Code */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
-                Shop Code
-              </label>
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                {invoiceData.shopCode}
-              </div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Shop Code</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.shopCode}</div>
             </div>
-            
-            {/* Route */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
-                Route
-              </label>
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                {invoiceData.route}
-              </div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Route</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.route}</div>
             </div>
           </div>
         </div>
@@ -371,21 +366,14 @@ function Editbill() {
             + Add Item
           </Button>
         </div>
-        
+
         <Table className="overflow-x-auto">
           <THead>
             {table.getHeaderGroups().map(headerGroup => (
               <Tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
                   <Th key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder ? null : (
-                      <div>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                      </div>
-                    )}
+                    {!header.isPlaceholder && flexRender(header.column.columnDef.header, header.getContext())}
                   </Th>
                 ))}
               </Tr>
@@ -395,9 +383,7 @@ function Editbill() {
             {table.getRowModel().rows.map(row => (
               <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 {row.getVisibleCells().map(cell => (
-                  <Td key={cell.id} className="py-3 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
+                  <Td key={cell.id} className="py-3 px-4">{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
                 ))}
               </Tr>
             ))}
@@ -405,9 +391,7 @@ function Editbill() {
         </Table>
       </Card>
 
-      
-
-      {/* Action buttons */}
+      {/* Buttons */}
       <div className="flex justify-end space-x-3">
         <Button 
           variant="default" 
@@ -424,6 +408,34 @@ function Editbill() {
           Update
         </Button>
       </div>
+
+      {/* Confirm Update Dialog */}
+      <Dialog
+        isOpen={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        onRequestClose={() => setConfirmDialogOpen(false)}
+      >
+        <h5 className="mb-4">Confirm Update</h5>
+        <p>Are you sure you want to update the invoice?</p>
+        <div className="text-right mt-6">
+          <Button className="mr-2" onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
+          <Button variant="solid" onClick={handleConfirmUpdate}>Confirm</Button>
+        </div>
+      </Dialog>
+
+      {/* Confirm Delete Dialog */}
+      <Dialog
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onRequestClose={() => setDeleteDialogOpen(false)}
+      >
+        <h5 className="mb-4">Confirm Deletion</h5>
+        <p>Are you sure you want to delete this item?</p>
+        <div className="text-right mt-6">
+          <Button className="mr-2" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button variant="solid" onClick={handleDeleteConfirm}>Delete</Button>
+        </div>
+      </Dialog>
     </div>
   );
 }
