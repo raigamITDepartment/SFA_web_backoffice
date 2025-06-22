@@ -165,6 +165,7 @@ const RouteEdit = (props: UpdateRouteFormSchema) => {
                     placement: 'top-end',
                 },
             );
+            reset();
             navigate(-1);
         } catch (error: any) {
             console.error('Failed to update Route:', error);

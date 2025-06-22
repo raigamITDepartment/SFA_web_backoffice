@@ -146,17 +146,18 @@ const Region = (props: AddRegionFormSchema) => {
     const userIdNumber = Number(userId);
  
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const res = await fetchRegions()
-                setRegionData(res)
-            } catch (err) {
-                console.error('Failed to load regions:', err)
-            }
+    const loadRegions = async () => {
+        try {
+            const res = await fetchRegions()
+            setRegionData(res)
+        } catch (err) {
+            console.error('Failed to load regions:', err)
         }
-        loadUsers()
-    }, [])
+    }
+
+    useEffect(() => {
+        loadRegions();
+    }, []);
 
     useEffect(() => {
             const loadChannel = async () => {
@@ -174,6 +175,7 @@ const Region = (props: AddRegionFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
+        reset
     } = useForm<AddRegionFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
@@ -362,6 +364,8 @@ const Region = (props: AddRegionFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadRegions();
             }
         }catch (err: any) {
             const backendMessage =
@@ -410,16 +414,8 @@ const Region = (props: AddRegionFormSchema) => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={channel}
-                                        value={channel.find(
-                                            (option: { value: number }) =>
-                                                option.value === field.value,
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                                 rules={{
@@ -447,17 +443,8 @@ const Region = (props: AddRegionFormSchema) => {
                                             size="sm"
                                             placeholder="Select Sub Channel"
                                             options={subChannel}
-                                            value={subChannel.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={subChannel.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{

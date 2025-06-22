@@ -146,17 +146,18 @@ const Area = (props: AddAreaFormSchema) => {
 
     const userIdNumber = Number(userId);
  
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const res = await fetchAreas()
-                setAreaData(res)
-            } catch (err) {
-                console.error('Failed to load areas:', err)
-            }
+    const loadAreas = async () => {
+        try {
+            const res = await fetchAreas()
+            setAreaData(res)
+        } catch (err) {
+            console.error('Failed to load areas:', err)
         }
-        loadUsers()
-    }, [])
+    }
+
+    useEffect(() => {
+        loadAreas();
+    }, []);
 
     useEffect(() => {
             const loadChannel = async () => {
@@ -175,6 +176,7 @@ const Area = (props: AddAreaFormSchema) => {
             handleSubmit,
             formState: { errors },
             control,
+            reset
         } = useForm<AddAreaFormSchema>({
             resolver: zodResolver(validationSchema),
             defaultValues: {
@@ -369,7 +371,6 @@ const Area = (props: AddAreaFormSchema) => {
     }
 
     const onSubmit = async (values: AddAreaFormSchema) => {
-        console.log('clicked');
         if (isSubmitting) return // Prevent double submit
         setIsSubmitting(true)
         try {
@@ -400,6 +401,8 @@ const Area = (props: AddAreaFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadAreas();
             }
         }catch (err: any) {
             const backendMessage =
@@ -448,16 +451,8 @@ const Area = (props: AddAreaFormSchema) => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={channel}
-                                        value={channel.find(
-                                            (option: { value: number }) =>
-                                                option.value === field.value,
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                                 rules={{
@@ -485,17 +480,8 @@ const Area = (props: AddAreaFormSchema) => {
                                             size="sm"
                                             placeholder="Select Sub Channel"
                                             options={subChannel}
-                                            value={subChannel.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={subChannel.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{
@@ -523,17 +509,8 @@ const Area = (props: AddAreaFormSchema) => {
                                             size="sm"
                                             placeholder="Select Region"
                                             options={region}
-                                            value={region.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={region.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{
