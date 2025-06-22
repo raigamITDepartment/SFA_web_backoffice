@@ -14,7 +14,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
-import { Button } from '@/components/ui'; 
+import { Button,toast,Alert } from '@/components/ui'; 
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -103,11 +103,21 @@ function LateDelivary() {
 
   const handleSubmit = () => {
     console.log('Submitting late delivery data:', data);
+    toast.push(
+      <Alert showIcon type="success" className="dark:bg-gray-700 w-64 sm:w-80 md:w-96">
+        Submitted Successfully
+      </Alert>,
+      {
+        offsetX: 5,
+        offsetY: 100,
+        transitionType: 'fade',
+        block: false,
+        placement: 'top-end',
+      }
+    );
   };
 
-  const handleCancel = () => {
-    console.log('Operation canceled');
-  };
+  
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
     { header: 'Invoice No:', accessorKey: 'invoiceNo' },
@@ -232,13 +242,7 @@ function LateDelivary() {
         </div>
 
         <div className="flex justify-end mt-8 space-x-4">
-          <Button 
-            variant="default" 
-            className="border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-2"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
+          
           <Button 
             variant="solid" 
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 shadow-md"
