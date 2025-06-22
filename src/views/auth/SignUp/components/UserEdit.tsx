@@ -11,7 +11,7 @@ import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getUserById, fetchAreas, fetchChannels, fetchDepartments, fetchRanges, fetchRegions, fetchTerritories, fetchUserTypes, fetchUserRoles, signupUser, SignupPayload, fetchGrades, updateUser } from '@/services/singupDropdownService';
+import { getUserById, updateUser } from '@/services/singupDropdownService';
 import type { CommonProps } from '@/@types/common';
 import type { ZodType } from 'zod'
 
@@ -51,31 +51,18 @@ function UserEdit(props: SignUpFormProps) {
     const navigate = useNavigate()
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
-    const [subRoles, setSubRoles] = useState<any>([])
-    const [territory, setTerritory] = useState<any>([])
-    const [region, setRegion] = useState<any>([])
-    const [channel, setChannel] = useState<any>([])
-    const [area, setArea] = useState<any>([])
-    const [range, setRange] = useState<any>([])
-    const [userType, setUserType] = useState<any>([])
-    const [userRole, setUserRole] = useState<any>([])
-    const [departments, setDepartments] = useState<any>([])
     const token = sessionStorage.getItem('accessToken')
     const { disableSubmit = false, className, setMessage } = props
 
 
     const {
-        watch,
         control,
         handleSubmit,
-        setValue,
         formState: { errors, isSubmitting },
         reset, 
     } = useForm<SignUpFormSchema>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
-        subRole: userData?.subRole || undefined,
-        // other fields here
     },
     });
 
@@ -109,179 +96,49 @@ function UserEdit(props: SignUpFormProps) {
         loadUserDetails()
     }, [token, id, setMessage]);
 
-     useEffect(() => {
-            if (!token) {
-                setMessage?.('No auth token found.');
-                return;
-            }
-    
-            const loadDepartments = async () => {
-                try {
-                    const departmentOptions = await fetchDepartments(token)
-                    setDepartments(departmentOptions)
-                } catch (error) {
-                    setMessage?.('Failed to load departments.')
+
+    const onSubmit = async (values: SignUpFormSchema) => {
+        if (!userData || !id) {
+            setMessage?.('User data or ID not loaded.');
+            return;
+        }
+
+        try {
+            const payload = {
+                id: parseInt(id),
+                userName: values.userName,
+                firstName: values.firstName,
+                lastName: values.lastName,
+                email: values.email,
+                password: values.password,
+                mobileNo: values.mobileNumber,
+                isActive:  true,   
+                gpsStatus:  true,
+                superUserId:  1,
+            };
+
+            await updateUser(payload, token);
+
+            toast.push(
+                <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
+                    <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
+                        User updated successfully!
+                    </div>
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
                 }
-            }
-    
-            loadDepartments()
-        }, [token, setMessage])
-    
-    useEffect(() => {
-        if (!token) {
-            setMessage?.('No auth token found.');
-            return;
+            );
+            navigate(-1);
+        } catch (error: any) {
+            console.error('Failed to update user:', error);
+            setMessage?.(error?.message || 'Failed to update user');
         }
-
-        const loadSubRoles = async () => {
-            try {
-                const subRoleOptions = await fetchGrades(token)
-                setSubRoles(subRoleOptions)
-            } catch (error) {
-                setMessage?.('Failed to load sub roles.')
-            }
-        }
-
-        loadSubRoles()
-    }, [token, setMessage])
-
-    useEffect(() => {
-        if (!token) {
-            setMessage?.('No auth token found.');
-            return;
-        }
-
-        const loadTerritories = async () => {
-            try {
-                const territoryOptions = await fetchTerritories(token)
-                setTerritory(territoryOptions)
-            } catch (error) {
-                setMessage?.('Failed to load territories.')
-            }
-        }
-        loadTerritories()
-    }, [token, setMessage])
-
-    useEffect(() => {
-        
-        const loadRegion = async () => {
-            try {
-                const regionOptions = await fetchRegions(token)
-                setRegion(regionOptions)
-            } catch (error) {
-                setMessage?.('Failed to load regions.')
-            }
-        }
-        loadRegion()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadChannel = async () => {
-            try {
-                const channelOptions = await fetchChannels(token)
-                setChannel(channelOptions)
-            } catch (error) {
-                setMessage?.('Failed to load channels.')
-            }
-        }
-        loadChannel()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadArea = async () => {
-            try {
-                const areaOptions = await fetchAreas(token)
-                setArea(areaOptions)
-            } catch (error) {
-                setMessage?.('Failed to load areas.')
-            }
-        }
-        loadArea()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadRange = async () => {
-            try {
-                const rangeOptions = await fetchRanges(token)
-                setRange(rangeOptions)
-            } catch (error) {
-                setMessage?.('Failed to load ranges.')
-            }
-        }
-        loadRange()
-    }, [setMessage])
-
-    
-    useEffect(() => {
-        const loadRange = async () => {
-            try {
-                const userTypes = await fetchUserTypes(token)
-                setUserType(userTypes)
-            } catch (error) {
-                setMessage?.('Failed to load user types.')
-            }
-        }
-        loadRange()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadRange = async () => {
-            try {
-                const userRole = await fetchUserRoles(token)
-                setUserRole(userRole)
-            } catch (error) {
-                setMessage?.('Failed to load user types.')
-            }
-        }
-        loadRange()
-    }, [setMessage])
-
-
-    console.log("user data " ,userData)
-
-
-const onSubmit = async (values: SignUpFormSchema) => {
-    if (!userData || !id) {
-        setMessage?.('User data or ID not loaded.');
-        return;
     }
-
-    try {
-        const payload = {
-            id: parseInt(id),
-            userName: values.userName,
-            firstName: values.firstName,
-            lastName: values.lastName,
-            email: values.email,
-            password: values.password,
-            mobileNo: values.mobileNumber,
-            isActive:  true,   
-            gpsStatus:  true,
-            superUserId:  1,
-        };
-
-        await updateUser(payload, token);
-
-        toast.push(
-            <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
-                <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
-                    User updated successfully!
-                </div>
-            </Alert>,
-            {
-                offsetX: 5,
-                offsetY: 100,
-                transitionType: 'fade',
-                block: false,
-                placement: 'top-end',
-            }
-        );
-        navigate(-1);
-    } catch (error: any) {
-        console.error('Failed to update user:', error);
-        setMessage?.(error?.message || 'Failed to update user');
-    }
-}
 
 
     const handleDiscard = () => {

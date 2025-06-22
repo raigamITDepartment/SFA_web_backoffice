@@ -123,6 +123,8 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 const Channel = (props: AddChannelFormSchema) => {
     const { disableSubmit = false, className, setMessage } = props
     const token = sessionStorage.getItem('accessToken')
+    const userId = sessionStorage.getItem('userId');
+    const userIdNumber = Number(userId);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
@@ -296,7 +298,7 @@ const Channel = (props: AddChannelFormSchema) => {
     } = useForm<AddChannelFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
-            userId: 123, 
+            userId: userIdNumber, 
             countryId: null,
             channelName: '',
             channelCode: '',

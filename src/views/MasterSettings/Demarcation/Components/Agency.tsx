@@ -288,17 +288,12 @@ const Agency = (props: AddAgencyFormSchema) => {
         }
     }
     const handleEditClick = (RGCode :Agency) => {
-        navigate(`/Master-menu-Demarcation-/${RGCode.agencyCode}/Agency`)
+        navigate(`/Master-menu-Demarcation-/${RGCode.id}/Agency`)
     }
 
     const columns = useMemo<ColumnDef<Agency>[]>(
         () => [
             { header: 'Channel', accessorKey: 'channelName' },
-            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
-            { header: 'Region', accessorKey: 'regionCode' },
-            { header: 'Area', accessorKey: 'areaCode' },
-            { header: 'Territory', accessorKey: 'territoryCode' },
-            { header: 'Route', accessorKey: 'routeCode' },
             { header: 'Agency Code', accessorKey: 'agencyCode' },
             { header: 'Agency Name', accessorKey: 'agencyName' },
             {

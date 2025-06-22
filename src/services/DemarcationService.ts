@@ -103,7 +103,6 @@ export const fetchSubChannels = async () => {
         throw new Error(error.response?.data?.message || 'Failed to load sub channels.');
     }
 };
-
 export const deleteSubChannel = async (id: number | string) => {
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -129,16 +128,14 @@ export const deleteSubChannel = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete subChannel.');
     }
 };
-
-export interface AddChannelPayload {
+export interface AddSubChannelPayload {
     userId: number;
     channelId: number | null;
     subChannelName: string;
     subChannelCode: string;
     isActive: boolean;    
 }
-
-export const addNewSubChannel = async (payload: AddChannelPayload) => {
+export const addNewSubChannel = async (payload: AddSubChannelPayload) => {
     try {
         const token = sessionStorage.getItem('accessToken');
 
@@ -159,7 +156,6 @@ export const addNewSubChannel = async (payload: AddChannelPayload) => {
         throw new Error(error.response?.data?.message || 'Add new sub channel failed.');
     }
 };
-
 export const getAllSubChannelsByChannelId = async (id: number | string) => {
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -184,6 +180,55 @@ export const getAllSubChannelsByChannelId = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to fetch  subchannel by channel Id.');
     }
 };
+export interface UpdateSubChannelPayload {
+    id: number;
+    channelId: number | null;
+    userId: number;
+    subChannelName: string;
+    subChannelCode: string;
+    isActive: boolean;
+}
+export const updateSubChannel = async (payload: UpdateSubChannelPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/subChannel`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during channel update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Channel update failed.');
+    }
+};
+export const getSubChannelById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/subChannel/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching subchannel by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch subchannel by Id.');
+    }
+};
+
 
 
 
@@ -373,6 +418,56 @@ export const deleteArea = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete area.');
     }
 };
+export interface UpdateAreaPayload {
+    id: number;
+    regionId: number | null;
+    userId: number;
+    areaName: string;
+    areaCode: string;
+    isActive: boolean;
+    displayOrder: number;
+}
+export const updateArea = async (payload: UpdateAreaPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/area`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during area update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Area update failed.');
+    }
+};
+export const getAreaById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/area/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching area by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch area by Id.');
+    }
+};
+
 
 
 
@@ -456,6 +551,56 @@ export const deleteTerritory = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete territory.');
     }
 };
+export interface UpdateTerritoryPayload {
+    id: number;
+    regionId: number | null;
+    userId: number;
+    areaName: string;
+    areaCode: string;
+    isActive: boolean;
+    displayOrder: number;
+}
+export const updateTerritory = async (payload: UpdateTerritoryPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/territory`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during territory update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Territory update failed.');
+    }
+};
+export const getTerritoryById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/territory/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching territory by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch territory by Id.');
+    }
+};
+
 
 
 //routes APIs
@@ -561,6 +706,57 @@ export const deleteRoute = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete route.');
     }
 };
+export const getRouteById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/route/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching route by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch route by Id.');
+    }
+};
+
+export interface UpdateRoutePayload {
+    id: number;
+    territoryId: number | null;
+    userId: number;
+    routeName: string;
+    routeCode: string;
+    isActive: boolean;
+    displayOrder: number;
+}
+export const updateRoute = async (payload: UpdateRoutePayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/route`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during route update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Route update failed.');
+    }
+};
+
 
 
 
@@ -646,6 +842,58 @@ export const deleteAgency = async (id: number | string) => {
     }
 };
 
+export const getAgencyById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/agency/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching agency by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch agency by Id.');
+    }
+};
+
+export interface UpdateAgencyPayload {
+    userId: number;
+    channelId: number | null;
+    agencyName: string;
+    agencyCode: string,
+    bankGuarantee: string,
+    creditLimit: string,
+    latitude: string,
+    longitude: string,
+    isActive: boolean;
+}
+export const updateAgency = async (payload: UpdateAgencyPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/agency`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during agency update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Agency update failed.');
+    }
+};
 
 
 //country APIs
