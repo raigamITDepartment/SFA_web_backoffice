@@ -25,17 +25,6 @@ interface ChannelEdit {
 const ChannelEdit = () => {
     const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     const loadUsers = async () => {
-    //         try {
-    //             const res = await fetchChannels()
-    //             setChannelData(res)
-    //         } catch (err) {
-    //             console.error('Failed to load users:', err)
-    //         }
-    //     }
-    //     loadUsers()
-    // }, [])
     const {
         handleSubmit,
         formState: { errors, isSubmitting },

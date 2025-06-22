@@ -136,17 +136,19 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
     const navigate = useNavigate()
     const [channel, setChannel] = useState<any>([])
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const res = await fetchSubChannels()
-                setChannelData(res)
-            } catch (err) {
-                console.error('Failed to load sub channels:', err)
-            }
+
+    const loadSubChannels = async () => {
+        try {
+            const res = await fetchSubChannels()
+            setChannelData(res)
+        } catch (err) {
+            console.error('Failed to load sub channels:', err)
         }
-        loadUsers()
-    }, [])
+    }
+
+    useEffect(() => {
+        loadSubChannels();
+    }, []);
 
     useEffect(() => {
         const loadChannel = async () => {
@@ -295,6 +297,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
+        reset
     } = useForm<AddSubChannelFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
@@ -338,6 +341,8 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadSubChannels();
             }
         }catch (err: any) {
             const backendMessage =
@@ -386,16 +391,8 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={channel}
-                                        value={channel.find(
-                                            (option: { value: number }) =>
-                                                option.value === field.value,
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                                 rules={{

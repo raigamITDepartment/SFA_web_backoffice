@@ -174,6 +174,7 @@ const AreaEdit = (props: UpdateAreaFormSchema) => {
                     placement: 'top-end',
                 },
             );
+            reset();
             navigate(-1);
         } catch (error: any) {
             console.error('Failed to update Area:', error);

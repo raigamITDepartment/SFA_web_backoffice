@@ -169,17 +169,20 @@ const Agency = (props: AddAgencyFormSchema) => {
 
     const userIdNumber = Number(userId);
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const res = await fetchAgencies()
-                setAgencyData(res)
-            } catch (err) {
-                console.error('Failed to load agencies:', err)
-            }
+
+    const loadAgency = async () => {
+        try {
+            const res = await fetchAgencies()
+            setAgencyData(res)
+        } catch (err) {
+            console.error('Failed to load agencies:', err)
         }
-        loadUsers()
-    }, [])
+    }
+    useEffect(() => {
+        loadAgency();
+    }, []);
+        
+
 
     useEffect(() => {
                 const loadChannel = async () => {
@@ -390,6 +393,7 @@ const Agency = (props: AddAgencyFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
+        reset
     } = useForm<AddAgencyFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
@@ -436,6 +440,8 @@ const Agency = (props: AddAgencyFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadAgency();
             }
         }catch (err: any) {
             const backendMessage =
@@ -483,16 +489,8 @@ const Agency = (props: AddAgencyFormSchema) => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={channel}
-                                        value={channel.find(
-                                            (option: { value: number }) =>
-                                                option.value === field.value,
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                                 rules={{

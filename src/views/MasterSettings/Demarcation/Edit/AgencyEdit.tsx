@@ -170,6 +170,7 @@ const AgencyEdit = (props: UpdateAgencyFormSchema) => {
                     placement: 'top-end',
                 },
             );
+            reset();
             navigate(-1);
         } catch (error: any) {
             console.error('Failed to update Agency:', error);

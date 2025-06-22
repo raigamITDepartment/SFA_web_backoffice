@@ -151,17 +151,18 @@ const Territory = (props: AddTerritoryFormSchema) => {
 
     const userIdNumber = Number(userId);
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const res = await fetchTerritories()
-                setTerritoryData(res)
-            } catch (err) {
-                console.error('Failed to load territories:', err)
-            }
+    const loadTerritories = async () => {
+        try {
+            const res = await fetchTerritories()
+            setTerritoryData(res)
+        } catch (err) {
+            console.error('Failed to load territories:', err)
         }
-        loadUsers()
-    }, [])
+    }
+    useEffect(() => {
+        loadTerritories();
+    }, []);
+
 
     useEffect(() => {
         const loadArea = async () => {
@@ -322,6 +323,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
+        reset
     } = useForm<AddTerritoryFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
@@ -367,6 +369,9 @@ const Territory = (props: AddTerritoryFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                
+                reset();
+                await loadTerritories();
             }
         }catch (err: any) {
             const backendMessage =
@@ -416,17 +421,8 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                             size="sm"
                                             placeholder="Select Area"
                                             options={area}
-                                            value={area.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={area.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{
@@ -453,17 +449,8 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                             size="sm"
                                             placeholder="Select Range"
                                             options={range}
-                                            value={range.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={range.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{

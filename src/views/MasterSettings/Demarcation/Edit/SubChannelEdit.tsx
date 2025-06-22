@@ -145,6 +145,7 @@ const SubChannelEdit = (props: UpdateSubChannelFormSchema) => {
                     placement: 'top-end',
                 },
             );
+            reset();
             navigate(-1);
         } catch (error: any) {
             console.error('Failed to update sub-channel:', error);

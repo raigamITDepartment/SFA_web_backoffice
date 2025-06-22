@@ -181,6 +181,7 @@ const TerritoryEdit = (props: UpdateTerritoryFormSchema) => {
                     placement: 'top-end',
                 },
             );
+            reset();
             navigate(-1);
         } catch (error: any) {
             console.error('Failed to update Territory:', error);

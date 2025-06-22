@@ -135,17 +135,18 @@ const Channel = (props: AddChannelFormSchema) => {
     const [country, setCountry] = useState<any>([])
     const navigate = useNavigate()
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const channelOptions = await fetchChannels()
-                setChannelData(channelOptions)
-            } catch (err) {
-                console.error('Failed to load users:', err)
-            }
+    const loadUsers = async () => {
+        try {
+            const channelOptions = await fetchChannels()
+            setChannelData(channelOptions)
+        } catch (err) {
+            console.error('Failed to load users:', err)
         }
-        loadUsers()
-    }, [])
+    };
+
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -295,6 +296,7 @@ const Channel = (props: AddChannelFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
+        reset,
     } = useForm<AddChannelFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
@@ -333,6 +335,8 @@ const Channel = (props: AddChannelFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadUsers();
             }
         }catch (err: any) {
             const backendMessage =
@@ -382,16 +386,8 @@ const Channel = (props: AddChannelFormSchema) => {
                                         size="sm"
                                         placeholder="Select Country"
                                         options={country}
-                                        value={country.find(
-                                            (option: { value: number }) =>
-                                                option.value === field.value,
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
+                                        value={country.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                             />

@@ -151,17 +151,18 @@ const Route = (props: AddRouteFormSchema) => {
 
     const userIdNumber = Number(userId);
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const res = await fetchRoutes()
-                setRouteData(res)
-            } catch (err) {
-                console.error('Failed to load routes:', err)
-            }
+
+    const loadRoutes = async () => {
+        try {
+            const res = await fetchRoutes()
+            setRouteData(res)
+        } catch (err) {
+            console.error('Failed to load routes:', err)
         }
-        loadUsers()
-    }, [])
+    }
+    useEffect(() => {
+        loadRoutes();
+    }, []);
 
     useEffect(() => {
         const loadArea = async () => {
@@ -179,6 +180,7 @@ const Route = (props: AddRouteFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
+        reset
     } = useForm<AddRouteFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
@@ -375,6 +377,8 @@ const Route = (props: AddRouteFormSchema) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadRoutes();
             }
         }catch (err: any) {
             const backendMessage =
@@ -422,17 +426,8 @@ const Route = (props: AddRouteFormSchema) => {
                                             size="sm"
                                             placeholder="Select Area"
                                             options={area}
-                                            value={area.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={area.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{
@@ -459,17 +454,8 @@ const Route = (props: AddRouteFormSchema) => {
                                             size="sm"
                                             placeholder="Select Territory"
                                             options={territory}
-                                            value={territory.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
+                                            value={territory.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
                                 rules={{
