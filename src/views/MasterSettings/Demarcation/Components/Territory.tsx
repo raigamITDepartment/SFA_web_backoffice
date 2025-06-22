@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -27,9 +27,9 @@ import type {
 import type { InputHTMLAttributes, ChangeEvent } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchTerritories, addNewTerritory } from '@/services/DemarcationService'
+import { fetchTerritories, addNewTerritory, deleteTerritory } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
-import {fetchChannels, fetchSubChannels, fetchRegions, fetchAreas, fetchRanges} from '@/services/singupDropdownService'
+import {fetchAreas, fetchRanges} from '@/services/singupDropdownService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -189,13 +189,14 @@ const Territory = (props: AddTerritoryFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectTerritory) {
+            const isDeactivating = SelelectTerritory?.isActive;
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Inactive Territory
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Territory
                 </Alert>,
                 {
                     offsetX: 5,
@@ -206,10 +207,10 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 },
             )
             try {
-                // await ()
+                 await deleteTerritory(SelelectTerritory.id);
                 // setData(prev => prev.filter(u => u.id !== selectedUser.id))
             } catch (error) {
-                console.error('Failed to Territory:', error)
+                console.error('Failed to delete Territory:', error)
             } finally {
                 setSelelectTerritory(null)
             }
@@ -251,17 +252,27 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 cell: ({ row }) => {
                     const TRCode = row.original
                     return (
-                        <div className="flex space-x-2 ">
-                            <FaRegEdit
-                                className="text-blue-500 text-base  cursor-pointer"
-                                title="Edit"
-                                onClick={() => handleEditClick(TRCode)}
-                            />
-                            <MdDeleteOutline
-                                className="text-red-500 text-lg cursor-pointer"
-                                title="Delete"
-                                onClick={() => handleDeleteClick(TRCode)}
-                            />
+                        <div className="flex space-x-2">
+                            {TRCode.isActive && (
+                                <FaRegEdit
+                                    className="text-blue-500 text-base cursor-pointer"
+                                    title="Edit"
+                                    onClick={() => handleEditClick(TRCode)}
+                                />
+                            )}
+                            {TRCode.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate User"
+                                    onClick={() => handleDeleteClick(TRCode)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate User"
+                                    onClick={() => handleDeleteClick(TRCode)}
+                                />
+                            )}
                         </div>
                     )
                 },
@@ -639,10 +650,9 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Incative Territory</h5>
+                <h5 className="mb-4">{SelelectTerritory?.isActive ? 'Deactivate' : 'Activate'} Territory</h5>
                 <p>
-                    Are you sure to Incative Territory{' '}
-                    <b>{SelelectTerritory?.territoryName}</b>?
+                    Are you sure you want to {SelelectTerritory?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectTerritory?.territoryName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button

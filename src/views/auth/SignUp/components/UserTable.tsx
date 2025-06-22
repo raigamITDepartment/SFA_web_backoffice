@@ -320,7 +320,7 @@ const Filtering = () => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Remove User</h5>
+                <h5 className="mb-4">{selectedUser?.isActive ? 'Deactivate' : 'Activate'} User</h5>
                 <p>
                     <p>
                         Are you sure you want to {selectedUser?.isActive ? 'Deactivate' : 'Activate'} <b>{selectedUser?.userName}</b>?

@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdDeleteOutline,  MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -27,7 +27,7 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchRoutes, addNewRoute } from '@/services/DemarcationService'
+import { fetchRoutes, addNewRoute, deleteRoute } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 import { fetchAreas, fetchTerritories, getTerritoriesByAreaId} from '@/services/singupDropdownService'
 import { useWatch } from 'react-hook-form';
@@ -59,6 +59,7 @@ const pageSizeOptions = [
 ]
 
 interface Route {
+    id: number,
     channelCode: string;
     subChannelCode: string;
     regionCode: string;
@@ -245,13 +246,14 @@ const Route = (props: AddRouteFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectRoute) {
+            const isDeactivating = SelelectRoute?.isActive;
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Inactive Route
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Route
                 </Alert>,
                 {
                     offsetX: 5,
@@ -262,10 +264,10 @@ const Route = (props: AddRouteFormSchema) => {
                 },
             )
             try {
-                // await ()
+                 await deleteRoute(SelelectRoute.id);
                 // setData(prev => prev.filter(u => u.id !== selectedUser.id))
             } catch (error) {
-                console.error('Failed to Territory:', error)
+                console.error('Failed to deactivate route:', error)
             } finally {
                 setSelelectRoute(null)
             }
@@ -306,17 +308,27 @@ const Route = (props: AddRouteFormSchema) => {
                 cell: ({ row }) => {
                     const ROCode = row.original
                     return (
-                        <div className="flex space-x-2 ">
-                            <FaRegEdit
-                                className="text-blue-500 text-base  cursor-pointer"
-                                title="Edit"
-                                onClick={() => handleEditClick(ROCode)}
-                            />
-                            <MdDeleteOutline
-                                className="text-red-500 text-lg cursor-pointer"
-                                title="Delete"
-                                onClick={() => handleDeleteClick(ROCode)}
-                            />
+                        <div className="flex space-x-2">
+                            {ROCode.isActive && (
+                                <FaRegEdit
+                                    className="text-blue-500 text-base cursor-pointer"
+                                    title="Edit"
+                                    onClick={() => handleEditClick(ROCode)}
+                                />
+                            )}
+                            {ROCode.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate User"
+                                    onClick={() => handleDeleteClick(ROCode)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate User"
+                                    onClick={() => handleDeleteClick(ROCode)}
+                                />
+                            )}
                         </div>
                     )
                 },
@@ -674,10 +686,9 @@ const Route = (props: AddRouteFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Incative Route</h5>
+                <h5 className="mb-4">{SelelectRoute?.isActive ? 'Deactivate' : 'Activate'} Route</h5>
                 <p>
-                    Are you sure to Incative Route{' '}
-                    <b>{SelelectRoute?.routeName}</b>?
+                   Are you sure you want to {SelelectRoute?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectRoute?.routeName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button
