@@ -212,13 +212,14 @@ const Region = (props: AddRegionFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectRegion) {
+            const isDeactivating = SelelectRegion?.isActive;
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Inactive sub Region
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Region
                 </Alert>,
                 {
                     offsetX: 5,
@@ -232,7 +233,7 @@ const Region = (props: AddRegionFormSchema) => {
                 // await ()
                 // setData(prev => prev.filter(u => u.id !== selectedUser.id))
             } catch (error) {
-                console.error('Failed to Region:', error)
+                console.error('Failed to delete Region:', error)
             } finally {
                 setSelelectRegion(null)
             }
@@ -642,10 +643,9 @@ const Region = (props: AddRegionFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Incative Region</h5>
+                <h5 className="mb-4">{SelelectRegion?.isActive ? 'Deactivate' : 'Activate'} Region</h5>
                 <p>
-                    Are you sure to Incative Region{' '}
-                    <b>{SelelectRegion?.regionName}</b>?
+                    Are you sure you want to {SelelectRegion?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectRegion?.regionName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button

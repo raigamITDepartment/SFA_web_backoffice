@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -27,9 +27,9 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchAreas, addNewArea, getAllSubChannelsByChannelId, getAllRegionsBySubChannelId } from '@/services/DemarcationService'
+import { fetchAreas, addNewArea, getAllSubChannelsByChannelId, getAllRegionsBySubChannelId, deleteArea } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
-import {fetchChannels, fetchSubChannels, fetchRegions} from '@/services/singupDropdownService'
+import {fetchChannels} from '@/services/singupDropdownService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -56,6 +56,7 @@ const pageSizeOptions = [
 ]
 
 interface Area {
+    id: number,
     channelCode: string
     subChannelCode: string
     regionCode: string
@@ -248,13 +249,14 @@ const Area = (props: AddAreaFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectArea) {
+            const isDeactivating = SelelectArea?.isActive;
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Inactive Area
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Area
                 </Alert>,
                 {
                     offsetX: 5,
@@ -265,10 +267,10 @@ const Area = (props: AddAreaFormSchema) => {
                 },
             )
             try {
-                // await ()
+                await deleteArea(SelelectArea.id);
                 // setData(prev => prev.filter(u => u.id !== selectedUser.id))
             } catch (error) {
-                console.error('Failed to delete user:', error)
+                console.error('Failed to delete area:', error)
             } finally {
                 setSelelectArea(null)
             }
@@ -308,17 +310,27 @@ const Area = (props: AddAreaFormSchema) => {
                 cell: ({ row }) => {
                     const ARCode = row.original
                     return (
-                        <div className="flex space-x-2 ">
-                            <FaRegEdit
-                                className="text-blue-500 text-base  cursor-pointer"
-                                title="Edit"
-                                onClick={() => handleEditClick(ARCode)}
-                            />
-                            <MdDeleteOutline
-                                className="text-red-500 text-lg cursor-pointer"
-                                title="Delete"
-                                onClick={() => handleDeleteClick(ARCode)}
-                            />
+                        <div className="flex space-x-2">
+                            {ARCode.isActive && (
+                                <FaRegEdit
+                                    className="text-blue-500 text-base cursor-pointer"
+                                    title="Edit"
+                                    onClick={() => handleEditClick(ARCode)}
+                                />
+                            )}
+                            {ARCode.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate User"
+                                    onClick={() => handleDeleteClick(ARCode)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate User"
+                                    onClick={() => handleDeleteClick(ARCode)}
+                                />
+                            )}
                         </div>
                     )
                 },
@@ -717,10 +729,9 @@ const Area = (props: AddAreaFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Incative Channel</h5>
+                <h5 className="mb-4">{SelelectArea?.isActive ? 'Deactivate' : 'Activate'} Channel</h5>
                 <p>
-                    Are you sure to Incative Channel{' '}
-                    <b>{SelelectArea?.areaName}</b>?
+                    Are you sure you want to {SelelectArea?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectArea?.areaName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button

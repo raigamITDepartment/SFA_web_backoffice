@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdDeleteOutline, MdBlock, MdCheckCircleOutline  } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -28,7 +28,7 @@ import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
 import {fetchChannels, fetchSubChannels, fetchRegions, fetchAreas, fetchTerritories} from '@/services/singupDropdownService'
-import { fetchAgencies, fetchRoutesOptions, addNewAgency } from '@/services/DemarcationService'
+import { fetchAgencies, fetchRoutesOptions, addNewAgency, deleteAgency } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
@@ -59,6 +59,7 @@ const pageSizeOptions = [
 ]
 
 interface Agency {
+    id: number,
     channelCode: string;
     subChannelCode: string;
     regionCode: string;
@@ -259,13 +260,14 @@ const Agency = (props: AddAgencyFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectAgency) {
+            const isDeactivating = SelelectAgency?.isActive;
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Inactive Route
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Route
                 </Alert>,
                 {
                     offsetX: 5,
@@ -276,7 +278,7 @@ const Agency = (props: AddAgencyFormSchema) => {
                 },
             )
             try {
-                // await ()
+                await deleteAgency(SelelectAgency.id);
                 // setData(prev => prev.filter(u => u.id !== selectedUser.id))
             } catch (error) {
                 console.error('Failed to Territory:', error)
@@ -322,17 +324,27 @@ const Agency = (props: AddAgencyFormSchema) => {
                 cell: ({ row }) => {
                     const RGCode = row.original
                     return (
-                        <div className="flex space-x-2 ">
-                            <FaRegEdit
-                                className="text-blue-500 text-base  cursor-pointer"
-                                title="Edit"
-                                onClick={() => handleEditClick(RGCode)}
-                            />
-                            <MdDeleteOutline
-                                className="text-red-500 text-lg cursor-pointer"
-                                title="Delete"
-                                onClick={() => handleDeleteClick(RGCode)}
-                            />
+                        <div className="flex space-x-2">
+                            {RGCode.isActive && (
+                                <FaRegEdit
+                                    className="text-blue-500 text-base cursor-pointer"
+                                    title="Edit"
+                                    onClick={() => handleEditClick(RGCode)}
+                                />
+                            )}
+                            {RGCode.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate User"
+                                    onClick={() => handleDeleteClick(RGCode)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate User"
+                                    onClick={() => handleDeleteClick(RGCode)}
+                                />
+                            )}
                         </div>
                     )
                 },
@@ -784,10 +796,9 @@ const Agency = (props: AddAgencyFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Incative Agancy</h5>
+                <h5 className="mb-4">{SelelectAgency?.isActive ? 'Deactivate' : 'Activate'} Agancy</h5>
                 <p>
-                    Are you sure to Incative Agancy{' '}
-                    <b>{SelelectAgency?.agencyName}</b>?
+                    Are you sure you want to {SelelectAgency?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectAgency?.agencyName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button

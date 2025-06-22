@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdDeleteOutline, MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -27,7 +27,7 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchSubChannels, addNewSubChannel } from '@/services/DemarcationService'
+import { fetchSubChannels, addNewSubChannel, deleteSubChannel } from '@/services/DemarcationService'
 import {fetchChannels} from '@/services/singupDropdownService'
 import Dialog from '@/components/ui/Dialog'
 import { z } from 'zod'
@@ -46,6 +46,7 @@ const pageSizeOptions = [
 ]
 
 interface SubChannel {
+    id: number;
     channelCode: string
     channelName: string
     subChannelCode: string
@@ -161,13 +162,15 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SubSelelectChannel) {
+            const isDeactivating = SubSelelectChannel?.isActive;
+
             toast.push(
                 <Alert
                     showIcon
-                    type="danger"
+                    type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Inactive sub Channel
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Sub Channel
                 </Alert>,
                 {
                     offsetX: 5,
@@ -175,13 +178,12 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                     transitionType: 'fade',
                     block: false,
                     placement: 'top-end',
-                },
-            )
+                }
+            );
             try {
-                // await ()
-                // setData(prev => prev.filter(u => u.id !== selectedUser.id))
+              await deleteSubChannel(SubSelelectChannel.id);
             } catch (error) {
-                console.error('Failed to delete user:', error)
+                console.error('Failed to delete sub channel:', error)
             } finally {
                 setSubSelelectChannel(null)
             }
@@ -221,17 +223,27 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                 cell: ({ row }) => {
                     const SubCHCode = row.original
                     return (
-                        <div className="flex space-x-2 ">
-                            <FaRegEdit
-                                className="text-blue-500 text-base  cursor-pointer"
-                                title="Edit"
-                                onClick={() => handleEditClick(SubCHCode)}
-                            />
-                            <MdDeleteOutline
-                                className="text-red-500 text-lg cursor-pointer"
-                                title="Delete"
-                                onClick={() => handleDeleteClick(SubCHCode)}
-                            />
+                        <div className="flex space-x-2">
+                            {SubCHCode.isActive && (
+                                <FaRegEdit
+                                    className="text-blue-500 text-base cursor-pointer"
+                                    title="Edit"
+                                    onClick={() => handleEditClick(SubCHCode)}
+                                />
+                            )}
+                            {SubCHCode.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate User"
+                                    onClick={() => handleDeleteClick(SubCHCode)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate User"
+                                    onClick={() => handleDeleteClick(SubCHCode)}
+                                />
+                            )}
                         </div>
                     )
                 },
@@ -573,10 +585,9 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Incative Channel</h5>
+                <h5 className="mb-4">{SubSelelectChannel?.isActive ? 'Deactivate' : 'Activate'} Channel</h5>
                 <p>
-                    Are you sure to Incative Channel{' '}
-                    <b>{SubSelelectChannel?.subChannelName}</b>?
+                    Are you sure you want to {SubSelelectChannel?.isActive ? 'Deactivate' : 'Activate'} <b>{SubSelelectChannel?.subChannelName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button
