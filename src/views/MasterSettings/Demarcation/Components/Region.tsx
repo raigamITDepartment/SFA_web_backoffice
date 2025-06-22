@@ -240,7 +240,7 @@ const Region = (props: AddRegionFormSchema) => {
         }
     }
     const handleEditClick = (RGCode : Region) => {
-        navigate(`/Master-menu-Demarcation-${RGCode?.regionCode}/Region`)
+        navigate(`/Master-menu-Demarcation-/${RGCode.regionCode}/Region`)
     }
     const columns = useMemo<ColumnDef<Region>[]>(
         () => [
