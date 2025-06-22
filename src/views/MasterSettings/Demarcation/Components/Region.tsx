@@ -49,6 +49,7 @@ const pageSizeOptions = [
 ]
 
 interface Region {
+    id:number,
     channelCode: string;
     subChannelCode: string;
     regionCode: string;
@@ -240,7 +241,7 @@ const Region = (props: AddRegionFormSchema) => {
         }
     }
     const handleEditClick = (RGCode : Region) => {
-        navigate(`/Master-menu-Demarcation-${RGCode?.regionCode}/Region`)
+        navigate(`/Master-menu-Demarcation-/${RGCode.id}/Region`)
     }
     const columns = useMemo<ColumnDef<Region>[]>(
         () => [

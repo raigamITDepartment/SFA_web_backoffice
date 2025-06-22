@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline, MdBlock, MdCheckCircleOutline } from 'react-icons/md'
+import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -33,7 +33,7 @@ import Dialog from '@/components/ui/Dialog'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { HiCheckCircle } from 'react-icons/hi'
+
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -123,6 +123,8 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 
 const SubChannel = (props: AddSubChannelFormSchema) => {
     const token = sessionStorage.getItem('accessToken')
+    const userId = sessionStorage.getItem('userId');
+    const userIdNumber = Number(userId);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const { disableSubmit = false, className, setMessage } = props
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -146,7 +148,6 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
         loadUsers()
     }, [])
 
-    
     useEffect(() => {
         const loadChannel = async () => {
             try {
@@ -190,7 +191,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
         }
     }
     const handleEditClick = (SubCHCode : SubChannel) => {
-        navigate(`/Master-menu-Demarcation-/${SubCHCode.subChannelCode}/SubChannel`)
+        navigate(`/Master-menu-Demarcation/${SubCHCode.id}/SubChannel`)
     }
   
 
@@ -297,7 +298,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
     } = useForm<AddSubChannelFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
-            userId: 123,
+            userId: userIdNumber,
             channelId: null,
             subChannelName: '',
             subChannelCode: '',

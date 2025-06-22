@@ -1,4 +1,4 @@
-//import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Card from '@/components/ui/Card'
@@ -7,7 +7,12 @@ import { FormItem, Form } from '@/components/ui/Form'
 import { Button, Alert, toast } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
 import { useNavigate } from 'react-router-dom'
-//import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import type { ZodType } from 'zod'
+import {fetchChannels} from '@/services/singupDropdownService'
+import { getAgencyById, updateAgency } from '@/services/DemarcationService'
+import { useParams } from 'react-router-dom';
 
 type FormSchema = {
     country: string
@@ -21,49 +26,156 @@ interface AgencyEdit {
     channelName: string
     isActive?: boolean
 }
+interface Agency {
+    id: number,
+    channelCode: string;
+    subChannelCode: string;
+    regionCode: string;
+    areaCode: string;
+    territoryCode: string;
+    routeCode: string;
+    agencyCode: string;
+    agencyName: string;
+    isActive: boolean;
+    channelName:string;
+}
 
-const AgencyEdit = () => {
+export type UpdateAgencyFormSchema = {
+    userId: number;
+    channelId: number | null;
+    agencyName: string;
+    agencyCode: string,
+    bankGuarantee: string,
+    creditLimit: string,
+    latitude: string,
+    longitude: string,
+    isActive: boolean;
+};
+
+
+const validationSchema: ZodType<UpdateAgencyFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'), 
+    channelId: z.number({ required_error: 'Please select channel' }),
+    agencyName: z.string({ required_error: 'Agency name is required' }),
+    agencyCode: z.string({ required_error: 'Agency code is required' }),
+    bankGuarantee: z.string({ required_error: 'Bank guarantee is required' }),
+    creditLimit: z.string({ required_error: 'Credit limit is required' }),
+    latitude: z.string({ required_error: 'Latitude is required' }),
+    longitude: z.string({ required_error: 'Longitude is required' }),
+    isActive: z.boolean(),
+});
+
+const AgencyEdit = (props: UpdateAgencyFormSchema) => {
     const navigate = useNavigate()
+    const { id } = useParams();
+    const token = sessionStorage.getItem('accessToken')
+    const userId = sessionStorage.getItem('userId');
+    const userIdNumber = Number(userId);
+    const { disableSubmit = false, className, setMessage } = props
+    const [agencyData, setAgencyData] = useState<Agency[]>([])
+    const [channel, setChannel] = useState<any>([])
 
-    // useEffect(() => {
-    //     const loadUsers = async () => {
-    //         try {
-    //             const res = await fetchChannels()
-    //             setChannelData(res)
-    //         } catch (err) {
-    //             console.error('Failed to load users:', err)
-    //         }
-    //     }
-    //     loadUsers()
-    // }, [])
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
     const {
         handleSubmit,
         formState: { errors, isSubmitting },
         control,
-    } = useForm<FormSchema>({
-        //  resolver: zodResolver(),
+        reset
+    } = useForm<UpdateAgencyFormSchema>({
         defaultValues: {},
     })
 
-    const onSubmit = async (values: FormSchema) => {
-        toast.push(
-            <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
-                {/* <HiCheckCircle className="text-green-500 mb-2" size={48} /> */}
-                <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
-                    User updated successfully!
-                </div>
-            </Alert>,
-            {
-                offsetX: 5,
-                offsetY: 100,
-                transitionType: 'fade',
-                block: false,
-                placement: 'top-end',
-            },
-        )
-        navigate(-1)
-    }
+        useEffect(() => {
+            if (!token) {
+                setMessage?.('No auth token found.');
+                return;
+            }
+            if (!id) {
+                setMessage?.('No user ID found.');
+                return;
+            }
+    
+            const loadAreaDetails = async () => {
+                try {
+                    const agencyDetails = await getAgencyById(id)
+                    setAgencyData(agencyDetails);
+    
+                    reset({
+                        id: agencyDetails.id,
+                        userId: userIdNumber,
+                        channelId: agencyDetails.channelId ?? null,
+                        agencyName: agencyDetails.agencyName ?? '',
+                        agencyCode: agencyDetails.agencyCode ?? '',
+                        bankGuarantee: agencyDetails.bankGuarantee ?? '',
+                        creditLimit: agencyDetails.creditLimit ?? '',
+                        latitude: agencyDetails.latitude ?? '',
+                        longitude: agencyDetails.longitude ?? '',
+                        displayOrder: agencyDetails.displayOrder ?? '',
+                        isActive: agencyDetails.isActive ?? false,
+                    });
+                } catch (error) {
+                    setMessage?.('Failed to load area data.');
+                }
+            };
+    
+    
+            loadAreaDetails()
+        }, [token, id, setMessage]);
 
+    const onSubmit = async (values: UpdateAgencyFormSchema) => {
+        if (!token) {
+            setMessage?.('Auth token not found.');
+            return;
+        }
+
+        try {
+            const payload = {
+                id: parseInt(id),
+                channelId: values.channelId,
+                userId: userIdNumber,
+                agencyName: values.agencyName,
+                agencyCode: values.agencyCode,
+                bankGuarantee: values.bankGuarantee,
+                creditLimit: values.creditLimit,
+                latitude: values.latitude,
+                longitude: values.longitude,
+                displayOrder:1,
+                isActive: values.isActive,
+            };
+
+            await updateAgency(payload, token);
+
+            toast.push(
+                <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
+                    <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
+                        Agency updated successfully!
+                    </div>
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                },
+            );
+            navigate(-1);
+        } catch (error: any) {
+            console.error('Failed to update Agency:', error);
+            setMessage?.(error.message || 'Failed to update Agency');
+        }
+    };
     const handleDiscard = () => {
         navigate(-1)
     }
@@ -75,30 +187,27 @@ const AgencyEdit = () => {
                    <h5 className="mb-2">Agency Update</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.channel)}
-                            errorMessage={errors.channel?.message}
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
                         >
                             <Controller
-                                name="channel"
+                                name="channelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        options={[
-                                            {
-                                                label: 'National Channel',
-                                                value: 'National Channel',
-                                            } as any,
-                                            {
-                                                label: 'Bakery Channel',
-                                                value: 'Bakery Channel',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
+                                        options={channel}
+                                        value={channel.find(
+                                            (option: { value: number }) =>
+                                                option.value === field.value,
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
                                     />
                                 )}
                                 rules={{
@@ -113,201 +222,7 @@ const AgencyEdit = () => {
                                 }}
                             />
                         </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.subChannel)}
-                            errorMessage={errors.subChannel?.message}
-                        >
-                            <Controller
-                                name="subChannel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub-Channel"
-                                        options={[
-                                            {
-                                                label: 'Sub-Channel 1',
-                                                value: 'Sub-Channel 1',
-                                            } as any,
-                                            {
-                                                label: 'Sub-Channel 2',
-                                                value: 'Sub-Channel 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.region)}
-                            errorMessage={errors.region?.message}
-                        >
-                            <Controller
-                                name="region"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Region"
-                                        options={[
-                                            {
-                                                label: 'Region 1',
-                                                value: 'Region 1',
-                                            } as any,
-                                            {
-                                                label: 'Region 2',
-                                                value: 'Region 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.area)}
-                            errorMessage={errors.area?.message}
-                        >
-                            <Controller
-                                name="area"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Area"
-                                        options={[
-                                            {
-                                                label: 'Area 1',
-                                                value: 'Area 1',
-                                            } as any,
-                                            {
-                                                label: 'Area 2',
-                                                value: 'Area 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.territory)}
-                            errorMessage={errors.territory?.message}
-                        >
-                            <Controller
-                                name="territory"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Territory"
-                                        options={[
-                                            {
-                                                label: 'Territory 1',
-                                                value: 'Territory 1',
-                                            } as any,
-                                            {
-                                                label: 'Territory 2',
-                                                value: 'Territory 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.route)}
-                            errorMessage={errors.route?.message}
-                        >
-                            <Controller
-                                name="route"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Route"
-                                        options={[
-                                            {
-                                                label: 'Route 1',
-                                                value: 'Route 1',
-                                            } as any,
-                                            {
-                                                label: 'Route 2',
-                                                value: 'Route 2',
-                                            },
-                                        ]}
-                                        value={field.value}
-                                        onChange={(selectedOption) =>
-                                            field.onChange(selectedOption)
-                                        }
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
+                       
                         <FormItem
                             invalid={Boolean(errors.agencyCode)}
                             errorMessage={errors.agencyCode?.message}
@@ -363,7 +278,117 @@ const AgencyEdit = () => {
                             />
                         </FormItem>
 
+                        <FormItem
+                            invalid={Boolean(errors.bankGuarantee)}
+                            errorMessage={errors.bankGuarantee?.message}
+                        >
+                            <Controller
+                                name="bankGuarantee"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Bank Guarantee"
+                                        {...field}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
 
+                        <FormItem
+                            invalid={Boolean(errors.creditLimit)}
+                            errorMessage={errors.creditLimit?.message}
+                        >
+                            <Controller
+                                name="creditLimit"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Credit Limit"
+                                        {...field}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+
+                        <FormItem
+                            invalid={Boolean(errors.latitude)}
+                            errorMessage={errors.latitude?.message}
+                        >
+                            <Controller
+                                name="latitude"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Latitude"
+                                        {...field}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+
+                        <FormItem
+                            invalid={Boolean(errors.longitude)}
+                            errorMessage={errors.longitude?.message}
+                        >
+                            <Controller
+                                name="longitude"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        type="number"
+                                        autoComplete="off"
+                                        placeholder="Longitude"
+                                        {...field}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
                         <FormItem>
                             <Controller
                                 name="isActive"

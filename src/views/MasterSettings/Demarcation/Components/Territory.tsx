@@ -46,6 +46,7 @@ const pageSizeOptions = [
 ]
 
 interface Territory {
+    id: number,
     channelCode: string;
     subChannelCode: string;
     regionCode: string;
@@ -217,14 +218,11 @@ const Territory = (props: AddTerritoryFormSchema) => {
         }
     }
     const handleEditClick = (TRCode:Territory) => {
-        navigate(`/Master-menu-Demarcation-/${TRCode.territoryCode}/Territory`)
+        navigate(`/Master-menu-Demarcation-/${TRCode.id}/Territory`)
     }
 
     const columns = useMemo<ColumnDef<Territory>[]>(
         () => [
-            { header: 'Channel', accessorKey: 'channelName' },
-            { header: 'Sub-Channel', accessorKey: 'subChannelName' },
-            { header: 'Region', accessorKey: 'regionName' },
             { header: 'Area', accessorKey: 'areaName' },
             { header: 'Range', accessorKey: 'rangeName' },
             { header: 'Territory Code', accessorKey: 'territoryCode' },

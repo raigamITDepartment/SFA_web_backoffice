@@ -36,17 +36,6 @@ import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { HiCheckCircle } from 'react-icons/hi'
 
-type FormSchema = {
-    channel: string;
-    subChannel: string;
-    region: string;
-    area: string;
-    territory: string;
-    routeCode: string;
-    routeName: string;
-    isActive: boolean;
-    territoryName:string;
-};
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -227,22 +216,6 @@ const Route = (props: AddRouteFormSchema) => {
 }, [selectedAreaId, setMessage]);
 
 
-    useEffect(() => {
-        if (!token) {
-            setMessage?.('No auth token found.')
-            return
-        }
-        const loadTerritories = async () => {
-            try {
-                const territoryOptions = await fetchTerritories(token)
-                setTerritory(territoryOptions)
-            } catch (error) {
-                setMessage?.('Failed to load territories.')
-            }
-        }
-        loadTerritories()
-    }, [token, setMessage])
-
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectRoute) {
@@ -274,14 +247,10 @@ const Route = (props: AddRouteFormSchema) => {
         }
     }
     const handleEditClick = (ROCode:Route) => {
-        navigate(`/Master-menu-Demarcation-/${ROCode.routeCode}/Route`)
+        navigate(`/Master-menu-Demarcation-/${ROCode.id}/Route`)
     }
     const columns = useMemo<ColumnDef<Route>[]>(
         () => [
-            { header: 'Channel', accessorKey: 'channelCode' },
-            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
-            { header: 'Region', accessorKey: 'regionCode' },
-            { header: 'Area', accessorKey: 'areaCode' },
             { header: 'Territory', accessorKey: 'territoryName' },
             { header: 'Route Code', accessorKey: 'routeCode' },
             { header: 'Route Name', accessorKey: 'routeName' },

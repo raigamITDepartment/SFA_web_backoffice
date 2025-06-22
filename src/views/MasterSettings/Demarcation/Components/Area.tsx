@@ -36,14 +36,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useWatch } from 'react-hook-form';
 import { HiCheckCircle } from 'react-icons/hi'
 
-type FormSchema = {
-    channel: string
-    subChannel: string
-    region: string
-    areaCode: string
-    areaName: string
-    isActive: boolean
-}
+
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -143,7 +136,6 @@ const Area = (props: AddAreaFormSchema) => {
     const { disableSubmit = false, className, setMessage } = props
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
-    //const [error, setError] = useState<string | null>(null);
     const [areaData, setAreaData] = useState<Area[]>([])
     const [SelelectArea, setSelelectArea] = useState<Area | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
@@ -278,12 +270,10 @@ const Area = (props: AddAreaFormSchema) => {
     }
 
     const handleEditClick =  (ARCode: Area) => {
-        navigate(`/Master-menu-Demarcation-/${ARCode.areaCode}/Area`)
+        navigate(`/Master-menu-Demarcation-/${ARCode.id}/Area`)
     }
     const columns = useMemo<ColumnDef<Area>[]>(
         () => [
-            { header: 'Channel', accessorKey: 'channelCode' },
-            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
             { header: 'Region', accessorKey: 'regionName' },
             { header: 'Area Code', accessorKey: 'areaCode' },
             { header: 'Area Name', accessorKey: 'areaName' },
