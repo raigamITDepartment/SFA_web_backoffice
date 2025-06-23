@@ -75,6 +75,53 @@ export const addNewChannel = async (payload: AddChannelPayload) => {
         throw new Error(error.response?.data?.message || 'Add new channel failed.');
     }
 };
+export const getChannelById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/channel/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching channel by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch channel by Id.');
+    }
+};
+export interface UpdateChannelPayload {
+    userId: number;
+    countryId: number | null;
+    channelName: string;
+    channelCode: string;
+    isActive: boolean;    
+}
+export const updateChannel = async (payload: UpdateSubChannelPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/channel`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during channel update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Channel update failed.');
+    }
+};
 
 
 //sub channel APIs
