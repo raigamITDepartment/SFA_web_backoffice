@@ -209,8 +209,8 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 },
             )
             try {
-                 await deleteTerritory(SelelectTerritory.id);
-                // setData(prev => prev.filter(u => u.id !== selectedUser.id))
+                await deleteTerritory(SelelectTerritory.id);
+                setTerritoryData(prev => prev.filter(u => u.id !== SelelectTerritory.id))
             } catch (error) {
                 console.error('Failed to delete Territory:', error)
             } finally {

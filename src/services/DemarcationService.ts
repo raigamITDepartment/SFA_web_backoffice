@@ -32,13 +32,10 @@ export const deleteChannel = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/channel`,
+            `${AuthService_URL}/api/v1/userDemarcation/channel/deactivateChannel/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }
@@ -50,7 +47,6 @@ export const deleteChannel = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete channel.');
     }
 };
-
 export interface AddChannelPayload {
     userId: number;
     countryId: number | null;
@@ -58,7 +54,6 @@ export interface AddChannelPayload {
     channelCode: string;
     isActive: boolean;    
 }
-
 export const addNewChannel = async (payload: AddChannelPayload) => {
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -110,13 +105,10 @@ export const deleteSubChannel = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/subChannel`,
+            `${AuthService_URL}/api/v1/userDemarcation/subChannel/deactivateSubChannel/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }
@@ -316,13 +308,10 @@ export const deleteRegion = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/region`,
+            `${AuthService_URL}/api/v1/userDemarcation/region/deactivateRegion/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }
@@ -332,6 +321,56 @@ export const deleteRegion = async (id: number | string) => {
     } catch (error: any) {
         console.error('Error deleting region:', error);
         throw new Error(error.response?.data?.message || 'Failed to delete region.');
+    }
+};
+
+export const getRegionById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/region/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching region by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch region by Id.');
+    }
+};
+export interface UpdateRegionPayload {
+    id: number;
+    channelId: number | null;
+    subChannelId: number | null;
+    userId: number;
+    regionName: string;
+    regionCode: string;
+    isActive: boolean;
+}
+export const updateRegion = async (payload: UpdateRegionPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/region`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during region update:', error, payload);
+        throw new Error(error.response?.data?.message || 'Region update failed.');
     }
 };
 
@@ -400,13 +439,10 @@ export const deleteArea = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/area`,
+            `${AuthService_URL}/api/v1/userDemarcation/area/deactivateArea/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }
@@ -533,13 +569,10 @@ export const deleteTerritory = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/territory`,
+            `${AuthService_URL}/api/v1/userDemarcation/territory/deactivateTerritory/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }
@@ -688,13 +721,10 @@ export const deleteRoute = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/route`,
+            `${AuthService_URL}/api/v1/userDemarcation/route/deactivateRoute/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }
@@ -823,13 +853,10 @@ export const deleteAgency = async (id: number | string) => {
         if (!token) throw new Error('No access token found.');
 
         const response = await axios.delete(
-            `${AuthService_URL}/api/v1/userDemarcation/agency`,
+            `${AuthService_URL}/api/v1/userDemarcation/agency/deactivateAgency/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
-                params: {
-                    id,
                 },
                 timeout: 10000,
             }

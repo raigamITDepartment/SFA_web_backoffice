@@ -239,8 +239,8 @@ const Route = (props: AddRouteFormSchema) => {
                 },
             )
             try {
-                 await deleteRoute(SelelectRoute.id);
-                // setData(prev => prev.filter(u => u.id !== selectedUser.id))
+                await deleteRoute(SelelectRoute.id);
+                setRouteData(prev => prev.filter(u => u.id !== SelelectRoute.id))
             } catch (error) {
                 console.error('Failed to deactivate route:', error)
             } finally {

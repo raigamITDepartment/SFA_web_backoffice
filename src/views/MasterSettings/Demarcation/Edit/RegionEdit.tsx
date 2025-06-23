@@ -7,11 +7,12 @@ import { FormItem, Form } from '@/components/ui/Form'
 import { Button, Alert, toast } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
 import { useNavigate } from 'react-router-dom'
-import { updateSubChannel, getSubChannelById} from '@/services/DemarcationService'
-import {fetchChannels} from '@/services/singupDropdownService'
+import { getRegionById, updateRegion} from '@/services/DemarcationService'
+import {fetchChannels, fetchSubChannels} from '@/services/singupDropdownService'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
+import { useParams } from 'react-router-dom';
 
 type FormSchema = {
     country: string
@@ -26,13 +27,36 @@ interface RegionEdit {
     isActive?: boolean
 }
 
-const RegionEdit = () => {
+export type UpdateRegionFormSchema = {
+    id: number;
+    subChannelId: number | null;
+    channelId: number | null;
+    userId: number;
+    regionName: string;
+    regionCode: string;
+    isActive: boolean;
+};
+
+const validationSchema: ZodType<UpdateRegionFormSchema> = z.object({
+    id: z.number(),
+    userId: z.number(),
+    subChannelId: z.number().nullable(),
+    channelId: z.number().nullable(),
+    regionName: z.string().min(1, 'Area name is required'),
+    regionCode: z.string().min(1, 'Area code is required'),
+    isActive: z.boolean(),
+});
+
+const RegionEdit = (props: UpdateRegionFormSchema) => {
     const navigate = useNavigate()
-    const token = sessionStorage.getItem('accessToken');
+    const { id } = useParams();
+    const token = sessionStorage.getItem('accessToken')
     const userId = sessionStorage.getItem('userId');
     const userIdNumber = Number(userId);
+    const [subChannel, setSubChannel] = useState<any>([])
     const { disableSubmit = false, className, setMessage } = props
     const [channel, setChannel] = useState<any>([])
+    const [regionData, setRegionData] = useState<any[]>([])
 
     useEffect(() => {
             const loadChannel = async () => {
@@ -46,33 +70,108 @@ const RegionEdit = () => {
             loadChannel()
     }, [setMessage])
 
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const subChannelOptions = await fetchSubChannels(token)
+                setSubChannel(subChannelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
     const {
         handleSubmit,
         formState: { errors, isSubmitting },
         control,
-    } = useForm<FormSchema>({
-        //  resolver: zodResolver(),
-        defaultValues: {},
+        reset
+    } = useForm<UpdateRegionFormSchema>({
+          resolver: zodResolver(validationSchema),
+          defaultValues: {
+              userId: userIdNumber,
+              channelId: null,
+              subChannelId: null,
+              regionName: '',
+              regionCode: '',
+              isActive: true,
+          },
     })
 
-    const onSubmit = async (values: FormSchema) => {
-        toast.push(
-            <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
-                {/* <HiCheckCircle className="text-green-500 mb-2" size={48} /> */}
-                <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
-                    User updated successfully!
-                </div>
-            </Alert>,
-            {
-                offsetX: 5,
-                offsetY: 100,
-                transitionType: 'fade',
-                block: false,
-                placement: 'top-end',
-            },
-        )
-        navigate(-1)
-    }
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+        if (!id) {
+            setMessage?.('No user ID found.');
+            return;
+        }
+
+        const loadAreaDetails = async () => {
+            try {
+                const regionDetails = await getRegionById(id)
+                setRegionData(regionDetails);
+
+                reset({
+                    id: regionDetails.id,
+                    userId: userIdNumber,
+                    channelId: regionDetails.channelId ?? null,
+                    subChannelId: regionDetails.subChannelId ?? null,
+                    regionCode: regionDetails.regionCode ?? '',
+                    regionName: regionDetails.regionName ?? '',
+                    isActive: regionDetails.isActive ?? false,
+                });
+            } catch (error) {
+                setMessage?.('Failed to load area data.');
+            }
+        };
+
+
+        loadAreaDetails()
+    }, [token, id, setMessage]);
+
+    const onSubmit = async (values: UpdateRegionFormSchema) => {
+        if (!token) {
+            setMessage?.('Auth token not found.');
+            return;
+        }
+
+        try {
+            const payload = {
+                id: parseInt(id),
+                subChannelId: values.subChannelId,
+                channelId: values.channelId ,
+                userId: userIdNumber,
+                regionName: values.regionName,
+                regionCode: values.regionCode,
+                isActive: values.isActive,
+            };
+
+            await updateRegion(payload, token);
+
+            toast.push(
+                <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
+                    <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
+                        Region updated successfully!
+                    </div>
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                },
+            );
+            reset();
+            navigate(-1);
+        } catch (error: any) {
+            console.error('Failed to update Region:', error);
+            setMessage?.(error.message || 'Failed to update Region');
+        }
+    };
 
     const handleDiscard = () => {
         navigate(-1)
@@ -96,16 +195,8 @@ const RegionEdit = () => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={channel}
-                                        value={channel.find(
-                                            (option: { value: number }) =>
-                                                option.value === field.value,
-                                        )}
-                                        onChange={(
-                                            option: {
-                                                label: string
-                                                value: number
-                                            } | null,
-                                        ) => field.onChange(option?.value)}
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                                 rules={{
@@ -120,7 +211,6 @@ const RegionEdit = () => {
                                 }}
                             />
                         </FormItem>
-
                         <FormItem
                             invalid={Boolean(errors.subChannelId)}
                             errorMessage={errors.subChannelId?.message}
@@ -159,7 +249,7 @@ const RegionEdit = () => {
                             />
                         </FormItem>
 
-                        <FormItem
+                       <FormItem
                             invalid={Boolean(errors.regionCode)}
                             errorMessage={errors.regionCode?.message}
                         >
@@ -185,7 +275,7 @@ const RegionEdit = () => {
                                     },
                                 }}
                             />
-                        </FormItem>
+                        </FormItem> 
 
                         <FormItem
                             invalid={Boolean(errors.regionName)}
@@ -213,7 +303,7 @@ const RegionEdit = () => {
                                     },
                                 }}
                             />
-                        </FormItem>
+                        </FormItem> 
 
                         <FormItem>
                             <Controller

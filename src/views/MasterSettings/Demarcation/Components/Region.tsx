@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
@@ -28,7 +28,7 @@ import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
 import {fetchChannels} from '@/services/singupDropdownService'
-import { fetchRegions, addNewRegion, getAllSubChannelsByChannelId } from '@/services/DemarcationService'
+import { fetchRegions, addNewRegion, getAllSubChannelsByChannelId, deleteRegion } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
@@ -212,6 +212,7 @@ const Region = (props: AddRegionFormSchema) => {
         loadSubChannels();
     }, [selectedChannelId, setMessage]);
 
+
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectRegion) {
@@ -233,8 +234,8 @@ const Region = (props: AddRegionFormSchema) => {
                 },
             )
             try {
-                // await ()
-                // setData(prev => prev.filter(u => u.id !== selectedUser.id))
+                await deleteRegion(SelelectRegion.id);
+                setRegionData(prev => prev.filter(u => u.id !== SelelectRegion.id))
             } catch (error) {
                 console.error('Failed to delete Region:', error)
             } finally {
@@ -275,16 +276,26 @@ const Region = (props: AddRegionFormSchema) => {
                     const RGCode = row.original
                     return (
                         <div className="flex space-x-2 ">
-                            <FaRegEdit
-                                className="text-blue-500 text-base  cursor-pointer"
-                                title="Edit"
-                                onClick={() => handleEditClick(RGCode)}
-                            />
-                            <MdDeleteOutline
-                                className="text-red-500 text-lg cursor-pointer"
-                                title="Delete"
-                                onClick={() => handleDeleteClick(RGCode)}
-                            />
+                                   {RGCode.isActive && (
+                                       <FaRegEdit
+                                           className="text-blue-500 text-base cursor-pointer"
+                                           title="Edit"
+                                           onClick={() => handleEditClick(RGCode)}
+                                       />
+                                   )}
+                                   {RGCode.isActive ? (
+                                       <MdBlock
+                                           className="text-red-500 text-lg cursor-pointer"
+                                           title="Deactivate User"
+                                           onClick={() => handleDeleteClick(RGCode)}
+                                       />
+                                   ) : (
+                                       <MdCheckCircleOutline
+                                           className="text-green-500 text-lg cursor-pointer"
+                                           title="Activate User"
+                                           onClick={() => handleDeleteClick(RGCode)}
+                                       />
+                                   )}
                         </div>
                     )
                 },

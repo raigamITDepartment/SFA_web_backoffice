@@ -130,7 +130,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
-    const [channelData, setChannelData] = useState<SubChannel[]>([])
+    const [subChannelData, setSubChannelData] = useState<SubChannel[]>([])
     const [SubSelelectChannel, setSubSelelectChannel] = useState<SubChannel | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const navigate = useNavigate()
@@ -140,7 +140,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
     const loadSubChannels = async () => {
         try {
             const res = await fetchSubChannels()
-            setChannelData(res)
+            setSubChannelData(res)
         } catch (err) {
             console.error('Failed to load sub channels:', err)
         }
@@ -185,6 +185,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
             );
             try {
               await deleteSubChannel(SubSelelectChannel.id);
+              setSubChannelData(prev => prev.filter(u => u.id !== SubSelelectChannel.id))
             } catch (error) {
                 console.error('Failed to delete sub channel:', error)
             } finally {
@@ -255,7 +256,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
         [],
     )
 
-    const data = channelData
+    const data = subChannelData
 
     const totalData = data.length
 
