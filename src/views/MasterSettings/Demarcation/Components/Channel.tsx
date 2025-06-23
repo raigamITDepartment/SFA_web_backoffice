@@ -186,6 +186,7 @@ const Channel = (props: AddChannelFormSchema) => {
 
             try {
                 await deleteChannel(SelelectChannel.id);
+                setChannelData(prev => prev.filter(u => u.id !== SelelectChannel.id))
             } catch (error) {
                 console.error('Failed to delete Channel:', error);
             } finally {
@@ -224,17 +225,17 @@ const Channel = (props: AddChannelFormSchema) => {
                 header: 'Actions',
                 id: 'actions',
                 cell: ({ row }) => {
-                    const SelelectChannel = row.original
+                    const CHCode = row.original
                     return (
                         <div className="flex space-x-2">
-                            {SelelectChannel.isActive && (
+                            {CHCode.isActive && (
                                 <FaRegEdit
                                     className="text-blue-500 text-base cursor-pointer"
                                     title="Edit"
                                     onClick={() => handleEditClick(CHCode)}
                                 />
                             )}
-                            {SelelectChannel.isActive ? (
+                            {CHCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
                                     title="Deactivate User"

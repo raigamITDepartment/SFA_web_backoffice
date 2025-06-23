@@ -189,8 +189,6 @@ const Filtering = () => {
         { header: 'Username', accessorKey: 'userName' },
         { header: 'First Name', accessorKey: 'firstName' },
         { header: 'Last Name', accessorKey: 'lastName' },
-        // { header: 'Role', accessorKey: 'role' },
-        // { header: 'User Type', accessorKey: 'userType' },
         { header: 'Email', accessorKey: 'email' },
         {
             header: 'Status',

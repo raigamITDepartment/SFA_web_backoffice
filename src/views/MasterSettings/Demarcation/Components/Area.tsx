@@ -262,7 +262,7 @@ const Area = (props: AddAreaFormSchema) => {
             )
             try {
                 await deleteArea(SelelectArea.id);
-                // setData(prev => prev.filter(u => u.id !== selectedUser.id))
+                setAreaData(prev => prev.filter(u => u.id !== SelelectArea.id))
             } catch (error) {
                 console.error('Failed to delete area:', error)
             } finally {

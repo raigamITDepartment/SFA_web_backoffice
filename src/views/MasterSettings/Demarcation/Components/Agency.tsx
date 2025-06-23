@@ -282,7 +282,7 @@ const Agency = (props: AddAgencyFormSchema) => {
             )
             try {
                 await deleteAgency(SelelectAgency.id);
-                // setData(prev => prev.filter(u => u.id !== selectedUser.id))
+                setAgencyData(prev => prev.filter(u => u.id !== SelelectAgency.id))
             } catch (error) {
                 console.error('Failed to Territory:', error)
             } finally {
