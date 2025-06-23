@@ -33,6 +33,7 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { HiCheckCircle } from 'react-icons/hi'
+import { co } from '@fullcalendar/core/internal-common'
 
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
@@ -197,7 +198,8 @@ const Channel = (props: AddChannelFormSchema) => {
 
 
     const handleEditClick = (CHCode: Channel) => {
-        navigate(`/Master-menu-Demarcation-/${CHCode.id}/SubChannel`)
+     
+        navigate(`/Master-menu-Demarcation/${CHCode.id}/Channel`)
     }
 
     const columns = useMemo<ColumnDef<Channel>[]>(
