@@ -61,7 +61,6 @@ interface Area {
 
 export type AddAreaFormSchema = {
     userId: number;
-    regionId: number | null;
     areaName: string;
     areaCode: string;
     displayOrder: number,
@@ -71,7 +70,6 @@ export type AddAreaFormSchema = {
 
 const validationSchema: ZodType<AddAreaFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
-    regionId: z.number({ required_error: 'Please select region' }),
     areaName: z.string({ required_error: 'Region name is required' }),
     areaCode: z.string({ required_error: 'Region code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -139,14 +137,37 @@ const Area = (props: AddAreaFormSchema) => {
     const [areaData, setAreaData] = useState<Area[]>([])
     const [SelelectArea, setSelelectArea] = useState<Area | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
-
-
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
     const [region, setRegion] = useState<any>([])
     const navigate = useNavigate()
 
     const userIdNumber = Number(userId);
  
-  
+    const loadAreas = async () => {
+        try {
+            const res = await fetchAreas()
+            setAreaData(res)
+        } catch (err) {
+            console.error('Failed to load areas:', err)
+        }
+    }
+
+    useEffect(() => {
+        loadAreas();
+    }, []);
+
+    useEffect(() => {
+            const loadChannel = async () => {
+                try {
+                    const channelOptions = await fetchChannels(token)
+                    setChannel(channelOptions)
+                } catch (error) {
+                    setMessage?.('Failed to load channels.')
+                }
+            }
+            loadChannel()
+    }, [setMessage])
     
 
     const {
@@ -158,7 +179,6 @@ const Area = (props: AddAreaFormSchema) => {
             resolver: zodResolver(validationSchema),
             defaultValues: {
                 userId: userIdNumber,
-                regionId: null,
                 areaName: '',
                 areaCode: '',
                 displayOrder:1,
@@ -166,50 +186,7 @@ const Area = (props: AddAreaFormSchema) => {
             },
         });
 
-    const selectedChannelId = useWatch({
-        control,
-        name: 'channelId',
-    });
             
-    useEffect(() => {
-        const loadSubChannels = async () => {
-            if (!selectedChannelId) {
-                setSubChannel([]);
-                return;
-            }
-            try {
-                const subChannelOptions = await getAllSubChannelsByChannelId(selectedChannelId);
-                setSubChannel(subChannelOptions);
-            } catch (error) {
-                setMessage?.('Failed to load sub channels.');
-                setSubChannel([]);
-            }
-        };
-
-        loadSubChannels();
-    }, [selectedChannelId, setMessage]);
-
-
-// -------------------------Remove the ---------------------------
-    // useEffect(() => {
-    // const loadRegions = async () => {
-    //     if (!selectedSubChannelId) {
-    //         setRegion([]);
-    //         return;
-    //     }
-    //     try {
-    //         console.log(selectedSubChannelId,'selected subchannels');
-    //         const regionOptions = await getAllRegionsBySubChannelId(selectedSubChannelId);
-    //          console.log(regionOptions,'regions');
-    //         setRegion(regionOptions);
-    //     } catch (error) {
-    //         setMessage?.('Failed to load regions.');
-    //         setRegion([]);
-    //     }
-    // };
-
-    //     loadRegions();
-    // }, [selectedSubChannelId, setMessage]);
 
 
     const handleDialogConfirm = async () => {
@@ -248,7 +225,6 @@ const Area = (props: AddAreaFormSchema) => {
     }
     const columns = useMemo<ColumnDef<Area>[]>(
         () => [
-   
             { header: 'Area Code', accessorKey: 'areaCode' },
             { header: 'Area Name', accessorKey: 'areaName' },
             {
@@ -411,7 +387,6 @@ const Area = (props: AddAreaFormSchema) => {
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
                     <h5 className="mb-2">Area Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                         
 
                         <FormItem
                             invalid={Boolean(errors.areaCode)}

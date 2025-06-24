@@ -34,7 +34,6 @@ interface AreaEdit {
 
 export type UpdateAreaFormSchema = {
     id: number;
-    regionId: number | null;
     userId: number;
     areaName: string;
     areaCode: string;
@@ -45,7 +44,6 @@ export type UpdateAreaFormSchema = {
 const validationSchema: ZodType<UpdateAreaFormSchema> = z.object({
     id: z.number(),
     userId: z.number(),
-    regionId: z.number().nullable(),
     areaName: z.string().min(1, 'Area name is required'),
     areaCode: z.string().min(1, 'Area code is required'),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -86,7 +84,6 @@ const AreaEdit = (props: UpdateAreaFormSchema) => {
         resolver: zodResolver(validationSchema),
         defaultValues: {
             userId: userIdNumber,
-            regionId: null,
             areaName: '',
             areaCode: '',
             displayOrder:1,
@@ -150,7 +147,6 @@ const AreaEdit = (props: UpdateAreaFormSchema) => {
         try {
             const payload = {
                 id: parseInt(id),
-                regionId: values.regionId,
                 userId: userIdNumber,
                 areaName: values.areaName,
                 areaCode: values.areaCode,
@@ -192,44 +188,6 @@ const AreaEdit = (props: UpdateAreaFormSchema) => {
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
                     <h5 className="mb-2">Area update</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-
-                        <FormItem
-                              invalid={Boolean(errors.regionId)}
-                            errorMessage={errors.regionId?.message}
-                        >
-                            <Controller
-                                name="regionId"
-                                control={control}
-                                render={({ field }) => (
-                                     <Select
-                                            size="sm"
-                                            placeholder="Select Region"
-                                            options={region}
-                                            value={region.find(
-                                                (option: { value: number }) =>
-                                                    option.value ===
-                                                    Number(field.value),
-                                            )}
-                                            onChange={(
-                                                option: {
-                                                    label: string
-                                                    value: number
-                                                } | null,
-                                            ) => field.onChange(option?.value)}
-                                        />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
 
                         <FormItem
                             invalid={Boolean(errors.areaCode)}

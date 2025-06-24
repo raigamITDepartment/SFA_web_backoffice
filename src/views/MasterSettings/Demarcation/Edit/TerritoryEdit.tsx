@@ -7,19 +7,13 @@ import { FormItem, Form } from '@/components/ui/Form'
 import { Button, Alert, toast } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
 import { useNavigate } from 'react-router-dom'
-import {fetchAreas, fetchRanges} from '@/services/singupDropdownService'
+import {fetchAreas, fetchRanges, fetchSubChannels} from '@/services/singupDropdownService'
 import { getTerritoryById, updateTerritory } from '@/services/DemarcationService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'react-router-dom';
 
-type FormSchema = {
-    country: string
-    channelName: string
-    channelCode?: string
-    isActive: boolean
-}
 
 interface Territory {
     id: number,
@@ -41,6 +35,7 @@ interface Territory {
 export type UpdateTerritoryFormSchema = {
     userId: number;
     rangeId: number | null;
+    subChannelId: number | null;
     areaId: number | null;
     territoryName: string;
     territoryCode: string,
@@ -53,6 +48,7 @@ const validationSchema: ZodType<UpdateTerritoryFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
     rangeId: z.number({ required_error: 'Please select range' }),
     areaId: z.number({ required_error: 'Please select area' }),
+    subChannelId: z.number({ required_error: 'Please select subchannel' }),
     territoryName: z.string({ required_error: 'Territory name is required' }),
     territoryCode: z.string({ required_error: 'Territory code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -70,6 +66,7 @@ const TerritoryEdit = (props: UpdateTerritoryFormSchema) => {
     const [range, setRange] = useState<any>([])
     const [territoryData, setTerritoryData] = useState<Territory[]>([])
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const [subChannel, setSubChannel] = useState<any>([])
 
     useEffect(() => {
         const loadArea = async () => {
@@ -93,6 +90,18 @@ const TerritoryEdit = (props: UpdateTerritoryFormSchema) => {
             }
         }
         loadRange()
+    }, [setMessage])
+
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const subChannelOptions = await fetchSubChannels(token)
+                setSubChannel(subChannelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+            }
+        }
+        loadChannel()
     }, [setMessage])
 
     const {
@@ -132,6 +141,7 @@ const TerritoryEdit = (props: UpdateTerritoryFormSchema) => {
                     id: territoryDetails.id,
                     userId: userIdNumber,
                     rangeId: territoryDetails.rangeId ?? null,
+                    subChannelId: territoryDetails.subChannelId ?? null,
                     areaId: territoryDetails.areaId ?? '',
                     territoryName: territoryDetails.territoryName ?? '',
                     territoryCode: territoryDetails.territoryCode ?? '',
@@ -158,6 +168,7 @@ const TerritoryEdit = (props: UpdateTerritoryFormSchema) => {
                 id: parseInt(id),
                 rangeId: values.rangeId,
                 areaId: values.areaId,
+                subChannelId: values.subChannelId,
                 userId: userIdNumber,
                 territoryName: values.territoryName,
                 territoryCode: values.territoryCode,
@@ -199,6 +210,34 @@ const TerritoryEdit = (props: UpdateTerritoryFormSchema) => {
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
                     <h5 className="mb-2">Territory Update</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                        <FormItem
+                            invalid={Boolean(errors.subChannelId)}
+                            errorMessage={errors.subChannelId?.message}
+                            style={{ flex: 1, marginLeft: '10px' }}
+                        >
+                            <Controller
+                                name="subChannelId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        placeholder="Please Select Channel"
+                                        options={subChannel}
+                                        value={subChannel.find(
+                                            (option: { value: number }) =>
+                                                option.value ===
+                                                Number(field.value),
+                                        )}
+                                        onChange={(
+                                            option: {
+                                                label: string
+                                                value: number
+                                            } | null,
+                                        ) => field.onChange(option?.value)}
+                                    />
+                                )}
+                            />
+                        </FormItem>
                         <FormItem
                             invalid={Boolean(errors.areaId)}
                             errorMessage={errors.areaId?.message}

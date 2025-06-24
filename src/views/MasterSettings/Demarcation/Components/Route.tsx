@@ -198,24 +198,24 @@ const Route = (props: AddRouteFormSchema) => {
         name: 'area',
     });
 
-    useEffect(() => {
-    const loadTerritoriesByArea = async () => {
-        if (!selectedAreaId) {
-            setTerritory([]);
-            return;
-        }
+        useEffect(() => {
+        const loadTerritoriesByArea = async () => {
+            if (!selectedAreaId) {
+                setTerritory([]);
+                return;
+            }
 
-        try {
-            const territoryOptions = await getTerritoriesByAreaId(selectedAreaId);
-            setTerritory(territoryOptions);
-        } catch (error) {
-            setMessage?.('Failed to load territories.');
-            setTerritory([]);
-        }
-    };
+            try {
+                const territoryOptions = await getTerritoriesByAreaId(selectedAreaId);
+                setTerritory(territoryOptions);
+            } catch (error) {
+                setMessage?.('Failed to load territories.');
+                setTerritory([]);
+            }
+        };
 
-    loadTerritoriesByArea();
-}, [selectedAreaId, setMessage]);
+        loadTerritoriesByArea();
+    }, [selectedAreaId, setMessage]);
 
 
     const handleDialogConfirm = async () => {

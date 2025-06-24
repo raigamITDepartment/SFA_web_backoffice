@@ -31,13 +31,16 @@ import {
     fetchTerritories,
     addNewTerritory,
     deleteTerritory,
+    getAllSubChannelsByChannelId
 } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
-import { fetchAreas, fetchRanges } from '@/services/singupDropdownService'
+import { fetchAreas, fetchRanges, fetchChannels } from '@/services/singupDropdownService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { HiCheckCircle } from 'react-icons/hi'
+import { useWatch } from 'react-hook-form'
+
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -78,8 +81,7 @@ interface DebouncedInputProps
 
 export type AddTerritoryFormSchema = {
     userId: number
-     channelId: number | null
-      subChannelId: number | null
+    subChannelId: number | null;
     rangeId: number | null
     areaId: number | null
     territoryName: string
@@ -92,6 +94,7 @@ const validationSchema: ZodType<AddTerritoryFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'),
     rangeId: z.number({ required_error: 'Please select range' }),
     areaId: z.number({ required_error: 'Please select area' }),
+    subChannelId: z.number({ required_error: 'Please select subchannel' }),
     territoryName: z.string({ required_error: 'Territory name is required' }),
     territoryCode: z.string({ required_error: 'Territory code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -148,12 +151,12 @@ const Territory = (props: AddTerritoryFormSchema) => {
     const [pageSize, setPageSize] = useState(10)
     const [territoryData, setTerritoryData] = useState<Territory[]>([])
     const [SelelectTerritory, setSelelectTerritory] =
-        useState<Territory | null>(null)
+    useState<Territory | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
-        const [channel, setChannel] = useState<any>([])
-        const [subChannel, setSubChannel] = useState<any>([])
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
     const navigate = useNavigate()
 
     const userIdNumber = Number(userId)
@@ -193,6 +196,59 @@ const Territory = (props: AddTerritoryFormSchema) => {
         }
         loadRange()
     }, [setMessage])
+
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
+        const {
+        handleSubmit,
+        formState: { errors },
+        control,
+        reset,
+    } = useForm<AddTerritoryFormSchema>({
+        resolver: zodResolver(validationSchema),
+        defaultValues: {
+            userId: userIdNumber,
+            rangeId: null,
+            areaId: null,
+            territoryName: '',
+            territoryCode: '',
+            isActive: true,
+            displayOrder: 1,
+        },
+    })
+
+    const selectedChannelId = useWatch({
+        control,
+        name: 'channelId',
+    })
+
+    useEffect(() => {
+        const loadSubChannels = async () => {
+            if (!selectedChannelId) {
+                setSubChannel([])
+                return
+            }
+            try {
+                const subChannelOptions = await getAllSubChannelsByChannelId(selectedChannelId)
+                setSubChannel(subChannelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+                setSubChannel([])
+            }
+        }
+
+        loadSubChannels()
+    }, [selectedChannelId, setMessage])
 
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
@@ -327,23 +383,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
         setSelelectTerritory(null)
     }
 
-    const {
-        handleSubmit,
-        formState: { errors },
-        control,
-        reset,
-    } = useForm<AddTerritoryFormSchema>({
-        resolver: zodResolver(validationSchema),
-        defaultValues: {
-            userId: userIdNumber,
-            rangeId: null,
-            areaId: null,
-            territoryName: '',
-            territoryCode: '',
-            isActive: true,
-            displayOrder: 1,
-        },
-    })
+
 
     const onSubmit = async (values: AddTerritoryFormSchema) => {
         console.log('clicked')
@@ -428,18 +468,8 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                         size="sm"
                                         placeholder="Select Channel"
                                         options={channel}
-                                        value={
-                                            channel.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    field.value,
-                                            ) || null
-                                        }
-                                        onChange={(option) =>
-                                            field.onChange(
-                                                option?.value ?? null,
-                                            )
-                                        }
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                                 rules={{
@@ -463,26 +493,27 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 name="subChannelId"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Sub Channel"
-                                        options={subChannel}
-                                        value={
-                                            subChannel.find(
-                                                (option: any) =>
-                                                    option.value === field.value,
-                                            ) || null
-                                        }
-                                        onChange={(option: any) =>
-                                            field.onChange(option?.value ?? null)
-                                        }
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Sub Channel"
+                                            options={subChannel}
+                                            value={subChannel.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
+                                        />
                                 )}
                                 rules={{
-                                    required: 'Please select sub channel',
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
                                 }}
                             />
                         </FormItem>
+
                         <FormItem
                             invalid={Boolean(errors.areaId)}
                             errorMessage={errors.areaId?.message}
@@ -521,6 +552,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 }}
                             />
                         </FormItem>
+
                         <FormItem
                             invalid={Boolean(errors.rangeId)}
                             errorMessage={errors.rangeId?.message}
@@ -559,6 +591,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 }}
                             />
                         </FormItem>
+
                         <FormItem
                             invalid={Boolean(errors.territoryCode)}
                             errorMessage={errors.territoryCode?.message}
@@ -586,6 +619,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 }}
                             />
                         </FormItem>
+
                         <FormItem
                             invalid={Boolean(errors.territoryName)}
                             errorMessage={errors.territoryName?.message}
