@@ -92,8 +92,11 @@ export const fetchChannels = async () => {
                 timeout: 10000, // Set timeout to 10 seconds
             }
         );
+        const activeChannels = response.data.payload.filter(
+            (channel: any) => channel.isActive === true
+        );
 
-        return response.data.payload.map((channel: any) => ({
+        return activeChannels.map((channel: any) => ({
             label: channel.channelName,
             value: channel.id,
         }));
@@ -143,8 +146,11 @@ export const fetchAreas = async () => {
                 timeout: 10000, // Set timeout to 10 seconds
             }
         );
+        const activeAreas = response.data.payload.filter(
+            (channel: any) => channel.isActive === true
+        );
 
-        return response.data.payload.map((area: any) => ({
+        return activeAreas.map((area: any) => ({
             label: area.areaName,
             value: area.id,
         }));
