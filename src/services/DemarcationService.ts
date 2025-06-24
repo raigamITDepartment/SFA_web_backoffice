@@ -338,9 +338,9 @@ export const getAllRegionsBySubChannelId = async (id: number | string) => {
                 timeout: 10000,
             }
         );
-         return response.data.payload.map((subChannel: any) => ({
-            label: subChannel.subChannelName,
-            value: subChannel.id
+         return response.data.payload.map((regions: any) => ({
+            label: regions.regionName,
+            value: regions.id
         }));
     } catch (error: any) {
         console.error('Error fetching region by subchannel Id:', error);

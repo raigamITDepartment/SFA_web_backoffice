@@ -201,10 +201,8 @@ const Area = (props: AddAreaFormSchema) => {
                 return;
             }
             try {
-                console.log(selectedChannelId,'selectedChannelId');
                 const subChannelOptions = await getAllSubChannelsByChannelId(selectedChannelId);
                 setSubChannel(subChannelOptions);
-                console.log(subChannel,'sc');
             } catch (error) {
                 setMessage?.('Failed to load sub channels.');
                 setSubChannel([]);
@@ -226,9 +224,10 @@ const Area = (props: AddAreaFormSchema) => {
             setRegion([]);
             return;
         }
-
         try {
+            console.log(selectedSubChannelId,'selected subchannels');
             const regionOptions = await getAllRegionsBySubChannelId(selectedSubChannelId);
+             console.log(regionOptions,'regions');
             setRegion(regionOptions);
         } catch (error) {
             setMessage?.('Failed to load regions.');
