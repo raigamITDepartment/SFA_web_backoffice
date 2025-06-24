@@ -80,7 +80,9 @@ const validationSchema: ZodType<AddAreaFormSchema> = z.object({
     ArealId: z.number().nullable(),
     channelId: z.number({ required_error: 'Please select channel' }).nullable(),
     regionId: z.number({ required_error: 'Please select region' }).nullable(),
-    subChannelId: z.number({ required_error: 'Please select sub channel' }).nullable(),
+    subChannelId: z
+        .number({ required_error: 'Please select sub channel' })
+        .nullable(),
     areaName: z.string({ required_error: 'Region name is required' }),
     areaCode: z.string({ required_error: 'Region code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -147,6 +149,7 @@ const Area = (props: AddAreaFormSchema) => {
     const [pageSize, setPageSize] = useState(10)
     const [areaData, setAreaData] = useState<Area[]>([])
     const [SelelectArea, setSelelectArea] = useState<Area | null>(null)
+    const [SelelectRegion, setSelelectRegion] = useState<any[] | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const [channel, setChannel] = useState<any>([])
     const [subChannel, setSubChannel] = useState<any>([])
@@ -531,9 +534,12 @@ const Area = (props: AddAreaFormSchema) => {
                             />
                         </FormItem>
 
+                     
+
                         <FormItem
-                            invalid={Boolean(errors.subChannelId)}
-                            errorMessage={errors.subChannelId?.message}
+                            label="Select Sub Channel"
+                            invalid={Boolean(errors.areaName)}
+                            errorMessage={errors.areaName?.message}
                         >
                             <Controller
                                 name="subChannelId"
@@ -542,8 +548,6 @@ const Area = (props: AddAreaFormSchema) => {
                                     <Select
                                         isMulti
                                         componentAs={CreatableSelect}
-                                        size="sm"
-                                        placeholder="Select Sub Channel"
                                         options={subChannel}
                                         value={subChannel.filter(
                                             (option: { value: number }) =>
@@ -564,57 +568,44 @@ const Area = (props: AddAreaFormSchema) => {
                                         }}
                                     />
                                 )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
                             />
                         </FormItem>
-
-                        <FormItem
+                           <FormItem
+                            label="Select region"
                             invalid={Boolean(errors.regionId)}
                             errorMessage={errors.regionId?.message}
                         >
                             <Controller
-                                name="regionId"
+                                name="subChannelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
-                                        size="sm"
-                                        placeholder="Select Region"
+                                        isMulti
+                                        componentAs={CreatableSelect}
                                         options={region}
-                                        value={
-                                            region.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    field.value,
-                                            ) || null
-                                        }
-                                        onChange={(option) =>
-                                            field.onChange(
-                                                option?.value ?? null,
-                                            )
-                                        }
+                                        value={region.filter(
+                                            (option: { value: number }) =>
+                                                Array.isArray(field.value)
+                                                    ? field.value.includes(
+                                                          option.value,
+                                                      )
+                                                    : false,
+                                        )}
+                                        onChange={(selected) => {
+                                            const ids = Array.isArray(selected)
+                                                ? selected.map(
+                                                      (opt) => opt.value,
+                                                  )
+                                                : []
+                                            field.onChange(ids)
+                                            setSelelectRegion(ids)
+                                        }}
                                     />
                                 )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
                             />
                         </FormItem>
+
+
 
                         <FormItem>
                             <Controller
