@@ -136,7 +136,7 @@ const Channel = (props: AddChannelFormSchema) => {
     const [country, setCountry] = useState<any>([])
     const navigate = useNavigate()
 
-    const loadUsers = async () => {
+    const loadChannels = async () => {
         try {
             const channelOptions = await fetchChannels()
             setChannelData(channelOptions)
@@ -146,7 +146,7 @@ const Channel = (props: AddChannelFormSchema) => {
     };
 
     useEffect(() => {
-        loadUsers();
+        loadChannels();
     }, []);
 
     useEffect(() => {
@@ -187,6 +187,7 @@ const Channel = (props: AddChannelFormSchema) => {
 
             try {
                 await deleteChannel(SelelectChannel.id);
+                await loadChannels();
                 setChannelData(prev => prev.filter(u => u.id !== SelelectChannel.id))
             } catch (error) {
                 console.error('Failed to delete Channel:', error);
@@ -339,7 +340,7 @@ const Channel = (props: AddChannelFormSchema) => {
                     },
                 )
                 reset();
-                await loadUsers();
+                await loadChannels();
             }
         }catch (err: any) {
             const backendMessage =

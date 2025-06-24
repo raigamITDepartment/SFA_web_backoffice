@@ -210,7 +210,11 @@ export const getAllSubChannelsByChannelId = async (id: number | string) => {
                 timeout: 10000,
             }
         );
-         return response.data.payload.map((subChannel: any) => ({
+        const activeSubChannels = response.data.payload.filter(
+            (channel: any) => channel.isActive === true
+        );
+
+        return activeSubChannels.map((subChannel: any) => ({
             label: subChannel.subChannelName,
             value: subChannel.id
         }));
@@ -338,9 +342,12 @@ export const getAllRegionsBySubChannelId = async (id: number | string) => {
                 timeout: 10000,
             }
         );
-         return response.data.payload.map((subChannel: any) => ({
-            label: subChannel.subChannelName,
-            value: subChannel.id
+        const activeRegions = response.data.payload.filter(
+            (channel: any) => channel.isActive === true
+        );
+         return activeRegions.map((regions: any) => ({
+            label: regions.regionName,
+            value: regions.id
         }));
     } catch (error: any) {
         console.error('Error fetching region by subchannel Id:', error);

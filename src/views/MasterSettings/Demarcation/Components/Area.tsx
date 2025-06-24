@@ -171,10 +171,45 @@ const Area = (props: AddAreaFormSchema) => {
         name: 'channelId',
     });
             
+    useEffect(() => {
+        const loadSubChannels = async () => {
+            if (!selectedChannelId) {
+                setSubChannel([]);
+                return;
+            }
+            try {
+                const subChannelOptions = await getAllSubChannelsByChannelId(selectedChannelId);
+                setSubChannel(subChannelOptions);
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.');
+                setSubChannel([]);
+            }
+        };
+
+        loadSubChannels();
+    }, [selectedChannelId, setMessage]);
 
 
+// -------------------------Remove the ---------------------------
+    // useEffect(() => {
+    // const loadRegions = async () => {
+    //     if (!selectedSubChannelId) {
+    //         setRegion([]);
+    //         return;
+    //     }
+    //     try {
+    //         console.log(selectedSubChannelId,'selected subchannels');
+    //         const regionOptions = await getAllRegionsBySubChannelId(selectedSubChannelId);
+    //          console.log(regionOptions,'regions');
+    //         setRegion(regionOptions);
+    //     } catch (error) {
+    //         setMessage?.('Failed to load regions.');
+    //         setRegion([]);
+    //     }
+    // };
 
- 
+    //     loadRegions();
+    // }, [selectedSubChannelId, setMessage]);
 
 
     const handleDialogConfirm = async () => {
