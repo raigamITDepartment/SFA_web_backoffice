@@ -41,6 +41,7 @@ import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useWatch } from 'react-hook-form'
 import { HiCheckCircle } from 'react-icons/hi'
+import CreatableSelect from 'react-select/creatable'
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -65,16 +66,21 @@ interface Area {
 
 export type AddAreaFormSchema = {
     userId: number
+    ArealId: number | null
+    channelId: number | null
     regionId: number | null
+    subChannelId: number | null
     areaName: string
     areaCode: string
     displayOrder: number
     isActive: boolean
 }
-
 const validationSchema: ZodType<AddAreaFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'),
-    regionId: z.number({ required_error: 'Please select region' }),
+    ArealId: z.number().nullable(),
+    channelId: z.number({ required_error: 'Please select channel' }).nullable(),
+    regionId: z.number({ required_error: 'Please select region' }).nullable(),
+    subChannelId: z.number({ required_error: 'Please select sub channel' }).nullable(),
     areaName: z.string({ required_error: 'Region name is required' }),
     areaCode: z.string({ required_error: 'Region code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -534,21 +540,28 @@ const Area = (props: AddAreaFormSchema) => {
                                 control={control}
                                 render={({ field }) => (
                                     <Select
+                                        isMulti
+                                        componentAs={CreatableSelect}
                                         size="sm"
                                         placeholder="Select Sub Channel"
                                         options={subChannel}
-                                        value={
-                                            subChannel.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    field.value,
-                                            ) || null
-                                        }
-                                        onChange={(option) =>
-                                            field.onChange(
-                                                option?.value ?? null,
-                                            )
-                                        }
+                                        value={subChannel.filter(
+                                            (option: { value: number }) =>
+                                                Array.isArray(field.value)
+                                                    ? field.value.includes(
+                                                          option.value,
+                                                      )
+                                                    : false,
+                                        )}
+                                        onChange={(selected) => {
+                                            const ids = Array.isArray(selected)
+                                                ? selected.map(
+                                                      (opt) => opt.value,
+                                                  )
+                                                : []
+                                            field.onChange(ids)
+                                            setSubChannel(ids)
+                                        }}
                                     />
                                 )}
                                 rules={{

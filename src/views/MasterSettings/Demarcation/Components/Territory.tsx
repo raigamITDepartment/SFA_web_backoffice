@@ -10,7 +10,7 @@ import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
 import { useNavigate } from 'react-router-dom'
- import {
+import {
     useReactTable,
     getCoreRowModel,
     getFilteredRowModel,
@@ -27,9 +27,13 @@ import type {
 import type { InputHTMLAttributes, ChangeEvent } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchTerritories, addNewTerritory, deleteTerritory } from '@/services/DemarcationService'
+import {
+    fetchTerritories,
+    addNewTerritory,
+    deleteTerritory,
+} from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
-import {fetchAreas, fetchRanges} from '@/services/singupDropdownService'
+import { fetchAreas, fetchRanges } from '@/services/singupDropdownService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -46,20 +50,20 @@ const pageSizeOptions = [
 ]
 
 interface Territory {
-    id: number,
-    channelCode: string;
-    subChannelCode: string;
-    regionCode: string;
-    areaCode: string;
-    range: string;
-    territoryCode: string;
-    territoryName: string;
-    isActive: boolean;
-    channelName:string;
-    subChannelName:string;
-    regionName:string;
-    rangeName:string;
-    areaName:string;
+    id: number
+    channelCode: string
+    subChannelCode: string
+    regionCode: string
+    areaCode: string
+    range: string
+    territoryCode: string
+    territoryName: string
+    isActive: boolean
+    channelName: string
+    subChannelName: string
+    regionName: string
+    rangeName: string
+    areaName: string
 }
 
 interface DebouncedInputProps
@@ -73,25 +77,26 @@ interface DebouncedInputProps
 }
 
 export type AddTerritoryFormSchema = {
-    userId: number;
-    rangeId: number | null;
-    areaId: number | null;
-    territoryName: string;
-    territoryCode: string,
-    displayOrder: number,
-    isActive: boolean;
-};
-
+    userId: number
+     channelId: number | null
+      subChannelId: number | null
+    rangeId: number | null
+    areaId: number | null
+    territoryName: string
+    territoryCode: string
+    displayOrder: number
+    isActive: boolean
+}
 
 const validationSchema: ZodType<AddTerritoryFormSchema> = z.object({
-    userId: z.number().min(1, 'User ID is required'), 
+    userId: z.number().min(1, 'User ID is required'),
     rangeId: z.number({ required_error: 'Please select range' }),
     areaId: z.number({ required_error: 'Please select area' }),
     territoryName: z.string({ required_error: 'Territory name is required' }),
     territoryCode: z.string({ required_error: 'Territory code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
     isActive: z.boolean(),
-});
+})
 
 function DebouncedInput({
     value: initialValue,
@@ -136,20 +141,22 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 const Territory = (props: AddTerritoryFormSchema) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const token = sessionStorage.getItem('accessToken')
-    const userId = sessionStorage.getItem('userId');
+    const userId = sessionStorage.getItem('userId')
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const { disableSubmit = false, className, setMessage } = props
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
     const [territoryData, setTerritoryData] = useState<Territory[]>([])
     const [SelelectTerritory, setSelelectTerritory] =
-    useState<Territory | null>(null)
+        useState<Territory | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const [area, setArea] = useState<any>([])
     const [range, setRange] = useState<any>([])
+        const [channel, setChannel] = useState<any>([])
+        const [subChannel, setSubChannel] = useState<any>([])
     const navigate = useNavigate()
 
-    const userIdNumber = Number(userId);
+    const userIdNumber = Number(userId)
 
     const loadTerritories = async () => {
         try {
@@ -160,9 +167,8 @@ const Territory = (props: AddTerritoryFormSchema) => {
         }
     }
     useEffect(() => {
-        loadTerritories();
-    }, []);
-
+        loadTerritories()
+    }, [])
 
     useEffect(() => {
         const loadArea = async () => {
@@ -191,7 +197,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectTerritory) {
-            const isDeactivating = SelelectTerritory?.isActive;
+            const isDeactivating = SelelectTerritory?.isActive
             toast.push(
                 <Alert
                     showIcon
@@ -209,8 +215,10 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 },
             )
             try {
-                await deleteTerritory(SelelectTerritory.id);
-                setTerritoryData(prev => prev.filter(u => u.id !== SelelectTerritory.id))
+                await deleteTerritory(SelelectTerritory.id)
+                setTerritoryData((prev) =>
+                    prev.filter((u) => u.id !== SelelectTerritory.id),
+                )
             } catch (error) {
                 console.error('Failed to delete Territory:', error)
             } finally {
@@ -218,7 +226,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
             }
         }
     }
-    const handleEditClick = (TRCode:Territory) => {
+    const handleEditClick = (TRCode: Territory) => {
         navigate(`/Master-menu-Demarcation-/${TRCode.id}/Territory`)
     }
 
@@ -279,7 +287,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
         ],
         [],
     )
-   
+
     const data = territoryData
 
     const totalData = data.length
@@ -323,26 +331,26 @@ const Territory = (props: AddTerritoryFormSchema) => {
         handleSubmit,
         formState: { errors },
         control,
-        reset
+        reset,
     } = useForm<AddTerritoryFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
-            userId: userIdNumber, 
+            userId: userIdNumber,
             rangeId: null,
             areaId: null,
             territoryName: '',
             territoryCode: '',
             isActive: true,
-            displayOrder: 1
+            displayOrder: 1,
         },
-    });
+    })
 
     const onSubmit = async (values: AddTerritoryFormSchema) => {
-        console.log('clicked');
+        console.log('clicked')
         if (isSubmitting) return // Prevent double submit
         setIsSubmitting(true)
         try {
-            const result = await addNewTerritory(values, token);
+            const result = await addNewTerritory(values, token)
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
@@ -369,17 +377,17 @@ const Territory = (props: AddTerritoryFormSchema) => {
                         placement: 'top-end',
                     },
                 )
-                
-                reset();
-                await loadTerritories();
+
+                reset()
+                await loadTerritories()
             }
-        }catch (err: any) {
+        } catch (err: any) {
             const backendMessage =
                 err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
+                typeof err.response.data.payload === 'object'
                     ? Object.values(err.response.data.payload).join(', ')
                     : err?.response?.data?.message ||
-                    'An error occurred during creating new Territory. Please try again.'
+                      'An error occurred during creating new Territory. Please try again.'
 
             toast.push(
                 <Alert
@@ -400,7 +408,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
         } finally {
             setIsSubmitting(false)
         }
-    };
+    }
 
     return (
         <div>
@@ -408,7 +416,73 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
                     <h5 className="mb-2">Territory Creation</h5>
                     <Form onSubmit={handleSubmit(onSubmit)}>
-          
+                        <FormItem
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
+                        >
+                            <Controller
+                                name="channelId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={channel}
+                                        value={
+                                            channel.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    field.value,
+                                            ) || null
+                                        }
+                                        onChange={(option) =>
+                                            field.onChange(
+                                                option?.value ?? null,
+                                            )
+                                        }
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+
+                        <FormItem
+                            invalid={Boolean(errors.subChannelId)}
+                            errorMessage={errors.subChannelId?.message}
+                        >
+                            <Controller
+                                name="subChannelId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Sub Channel"
+                                        options={subChannel}
+                                        value={
+                                            subChannel.find(
+                                                (option: any) =>
+                                                    option.value === field.value,
+                                            ) || null
+                                        }
+                                        onChange={(option: any) =>
+                                            field.onChange(option?.value ?? null)
+                                        }
+                                    />
+                                )}
+                                rules={{
+                                    required: 'Please select sub channel',
+                                }}
+                            />
+                        </FormItem>
                         <FormItem
                             invalid={Boolean(errors.areaId)}
                             errorMessage={errors.areaId?.message}
@@ -417,13 +491,23 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 name="areaId"
                                 control={control}
                                 render={({ field }) => (
-                                     <Select
-                                            size="sm"
-                                            placeholder="Select Area"
-                                            options={area}
-                                            value={area.find(option => option.value === field.value) || null}
-                                            onChange={(option) => field.onChange(option?.value ?? null)}
-                                        />
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Area"
+                                        options={area}
+                                        value={
+                                            area.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    field.value,
+                                            ) || null
+                                        }
+                                        onChange={(option) =>
+                                            field.onChange(
+                                                option?.value ?? null,
+                                            )
+                                        }
+                                    />
                                 )}
                                 rules={{
                                     validate: {
@@ -445,13 +529,23 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 name="rangeId"
                                 control={control}
                                 render={({ field }) => (
-                                     <Select
-                                            size="sm"
-                                            placeholder="Select Range"
-                                            options={range}
-                                            value={range.find(option => option.value === field.value) || null}
-                                            onChange={(option) => field.onChange(option?.value ?? null)}
-                                        />
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Range"
+                                        options={range}
+                                        value={
+                                            range.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    field.value,
+                                            ) || null
+                                        }
+                                        onChange={(option) =>
+                                            field.onChange(
+                                                option?.value ?? null,
+                                            )
+                                        }
+                                    />
                                 )}
                                 rules={{
                                     validate: {
@@ -635,9 +729,14 @@ const Territory = (props: AddTerritoryFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">{SelelectTerritory?.isActive ? 'Deactivate' : 'Activate'} Territory</h5>
+                <h5 className="mb-4">
+                    {SelelectTerritory?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    Territory
+                </h5>
                 <p>
-                    Are you sure you want to {SelelectTerritory?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectTerritory?.territoryName}</b>?
+                    Are you sure you want to{' '}
+                    {SelelectTerritory?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    <b>{SelelectTerritory?.territoryName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button
