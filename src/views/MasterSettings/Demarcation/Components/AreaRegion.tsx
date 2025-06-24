@@ -9,7 +9,7 @@ import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
- import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
     useReactTable,
     getCoreRowModel,
@@ -27,16 +27,21 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchAreas, addNewArea, getAllSubChannelsByChannelId, getAllRegionsBySubChannelId, deleteArea } from '@/services/DemarcationService'
+import {
+    fetchAreas,
+    addNewArea,
+    getAllSubChannelsByChannelId,
+    getAllRegionsBySubChannelId,
+    deleteArea,
+} from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
-import {fetchChannels} from '@/services/singupDropdownService'
+import { fetchChannels } from '@/services/singupDropdownService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useWatch } from 'react-hook-form';
+import { useWatch } from 'react-hook-form'
 import { HiCheckCircle } from 'react-icons/hi'
-
-
+import CreatableSelect from 'react-select/creatable'
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -49,7 +54,7 @@ const pageSizeOptions = [
 ]
 
 interface Area {
-    id: number,
+    id: number
     channelCode: string
     subChannelCode: string
     regionCode: string
@@ -60,23 +65,29 @@ interface Area {
 }
 
 export type AddAreaFormSchema = {
-    userId: number;
-    regionId: number | null;
-    areaName: string;
-    areaCode: string;
-    displayOrder: number,
-    isActive: boolean;
-};
-
-
+    userId: number
+    ArealId: number | null
+    channelId: number | null
+    regionId: number | null
+    subChannelId: number | null
+    areaName: string
+    areaCode: string
+    displayOrder: number
+    isActive: boolean
+}
 const validationSchema: ZodType<AddAreaFormSchema> = z.object({
-    userId: z.number().min(1, 'User ID is required'), 
-    regionId: z.number({ required_error: 'Please select region' }),
+    userId: z.number().min(1, 'User ID is required'),
+    ArealId: z.number().nullable(),
+    channelId: z.number({ required_error: 'Please select channel' }).nullable(),
+    regionId: z.number({ required_error: 'Please select region' }).nullable(),
+    subChannelId: z
+        .number({ required_error: 'Please select sub channel' })
+        .nullable(),
     areaName: z.string({ required_error: 'Region name is required' }),
     areaCode: z.string({ required_error: 'Region code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
     isActive: z.boolean(),
-});
+})
 
 interface DebouncedInputProps
     extends Omit<
@@ -131,91 +142,119 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 const Area = (props: AddAreaFormSchema) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const token = sessionStorage.getItem('accessToken')
-    const userId = sessionStorage.getItem('userId');
+    const userId = sessionStorage.getItem('userId')
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const { disableSubmit = false, className, setMessage } = props
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
     const [areaData, setAreaData] = useState<Area[]>([])
     const [SelelectArea, setSelelectArea] = useState<Area | null>(null)
+    const [SelelectRegion, setSelelectRegion] = useState<any[] | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
-
-
+    const [channel, setChannel] = useState<any>([])
+    const [subChannel, setSubChannel] = useState<any>([])
     const [region, setRegion] = useState<any>([])
     const navigate = useNavigate()
 
-    const userIdNumber = Number(userId);
- 
-  
-    
+    const userIdNumber = Number(userId)
+
+    const loadAreas = async () => {
+        try {
+            const res = await fetchAreas()
+            setAreaData(res)
+        } catch (err) {
+            console.error('Failed to load areas:', err)
+        }
+    }
+
+    useEffect(() => {
+        loadAreas()
+    }, [])
+
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
 
     const {
-            handleSubmit,
-            formState: { errors },
-            control,
-            reset
-        } = useForm<AddAreaFormSchema>({
-            resolver: zodResolver(validationSchema),
-            defaultValues: {
-                userId: userIdNumber,
-                regionId: null,
-                areaName: '',
-                areaCode: '',
-                displayOrder:1,
-                isActive: true,
-            },
-        });
+        handleSubmit,
+        formState: { errors },
+        control,
+        reset,
+    } = useForm<AddAreaFormSchema>({
+        resolver: zodResolver(validationSchema),
+        defaultValues: {
+            userId: userIdNumber,
+            regionId: null,
+            areaName: '',
+            areaCode: '',
+            displayOrder: 1,
+            isActive: true,
+        },
+    })
 
     const selectedChannelId = useWatch({
         control,
         name: 'channelId',
-    });
-            
+    })
+
     useEffect(() => {
         const loadSubChannels = async () => {
             if (!selectedChannelId) {
-                setSubChannel([]);
-                return;
+                setSubChannel([])
+                return
             }
             try {
-                const subChannelOptions = await getAllSubChannelsByChannelId(selectedChannelId);
-                setSubChannel(subChannelOptions);
+                console.log(selectedChannelId, 'selectedChannelId')
+                const subChannelOptions =
+                    await getAllSubChannelsByChannelId(selectedChannelId)
+                setSubChannel(subChannelOptions)
+                console.log(subChannel, 'sc')
             } catch (error) {
-                setMessage?.('Failed to load sub channels.');
-                setSubChannel([]);
+                setMessage?.('Failed to load sub channels.')
+                setSubChannel([])
             }
-        };
+        }
 
-        loadSubChannels();
-    }, [selectedChannelId, setMessage]);
+        loadSubChannels()
+    }, [selectedChannelId, setMessage])
 
+    const selectedSubChannelId = useWatch({
+        control,
+        name: 'subChannelId',
+    })
 
-// -------------------------Remove the ---------------------------
-    // useEffect(() => {
-    // const loadRegions = async () => {
-    //     if (!selectedSubChannelId) {
-    //         setRegion([]);
-    //         return;
-    //     }
-    //     try {
-    //         console.log(selectedSubChannelId,'selected subchannels');
-    //         const regionOptions = await getAllRegionsBySubChannelId(selectedSubChannelId);
-    //          console.log(regionOptions,'regions');
-    //         setRegion(regionOptions);
-    //     } catch (error) {
-    //         setMessage?.('Failed to load regions.');
-    //         setRegion([]);
-    //     }
-    // };
+    useEffect(() => {
+        const loadRegions = async () => {
+            if (!selectedSubChannelId) {
+                setRegion([])
+                return
+            }
 
-    //     loadRegions();
-    // }, [selectedSubChannelId, setMessage]);
+            try {
+                const regionOptions =
+                    await getAllRegionsBySubChannelId(selectedSubChannelId)
+                setRegion(regionOptions)
+            } catch (error) {
+                setMessage?.('Failed to load regions.')
+                setRegion([])
+            }
+        }
 
+        loadRegions()
+    }, [selectedSubChannelId, setMessage])
 
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
         if (SelelectArea) {
-            const isDeactivating = SelelectArea?.isActive;
+            const isDeactivating = SelelectArea?.isActive
             toast.push(
                 <Alert
                     showIcon
@@ -233,8 +272,10 @@ const Area = (props: AddAreaFormSchema) => {
                 },
             )
             try {
-                await deleteArea(SelelectArea.id);
-                setAreaData(prev => prev.filter(u => u.id !== SelelectArea.id))
+                await deleteArea(SelelectArea.id)
+                setAreaData((prev) =>
+                    prev.filter((u) => u.id !== SelelectArea.id),
+                )
             } catch (error) {
                 console.error('Failed to delete area:', error)
             } finally {
@@ -243,12 +284,12 @@ const Area = (props: AddAreaFormSchema) => {
         }
     }
 
-    const handleEditClick =  (ARCode: Area) => {
+    const handleEditClick = (ARCode: Area) => {
         navigate(`/Master-menu-Demarcation-/${ARCode.id}/Area`)
     }
     const columns = useMemo<ColumnDef<Area>[]>(
         () => [
-   
+            { header: 'Region', accessorKey: 'regionName' },
             { header: 'Area Code', accessorKey: 'areaCode' },
             { header: 'Area Name', accessorKey: 'areaName' },
             {
@@ -346,7 +387,7 @@ const Area = (props: AddAreaFormSchema) => {
         if (isSubmitting) return // Prevent double submit
         setIsSubmitting(true)
         try {
-            const result = await addNewArea(values, token);
+            const result = await addNewArea(values, token)
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
@@ -373,16 +414,16 @@ const Area = (props: AddAreaFormSchema) => {
                         placement: 'top-end',
                     },
                 )
-                reset();
-                await loadAreas();
+                reset()
+                await loadAreas()
             }
-        }catch (err: any) {
+        } catch (err: any) {
             const backendMessage =
                 err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
+                typeof err.response.data.payload === 'object'
                     ? Object.values(err.response.data.payload).join(', ')
                     : err?.response?.data?.message ||
-                    'An error occurred during creating new Area. Please try again.'
+                      'An error occurred during creating new Area. Please try again.'
 
             toast.push(
                 <Alert
@@ -403,29 +444,42 @@ const Area = (props: AddAreaFormSchema) => {
         } finally {
             setIsSubmitting(false)
         }
-    };
+    }
 
     return (
         <div>
             <div className="flex flex-col lg:flex-row xl:flex-row gap-4">
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
-                    <h5 className="mb-2">Area Creation</h5>
-                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                         
+                    <h5 className="mb-2">Area Region Mapping</h5>
+                    <br></br>
 
+                    <h6 className="mb-2"> Step 01</h6>
+
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
-                            invalid={Boolean(errors.areaCode)}
-                            errorMessage={errors.areaCode?.message}
+                            invalid={Boolean(errors.ArealId)}
+                            errorMessage={errors.ArealId?.message}
                         >
                             <Controller
-                                name="areaCode"
+                                name="ArealId"
                                 control={control}
                                 render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Area Code"
-                                        {...field}
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Area"
+                                        options={channel}
+                                        value={
+                                            channel.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    field.value,
+                                            ) || null
+                                        }
+                                        onChange={(option) =>
+                                            field.onChange(
+                                                option?.value ?? null,
+                                            )
+                                        }
                                     />
                                 )}
                                 rules={{
@@ -440,33 +494,118 @@ const Area = (props: AddAreaFormSchema) => {
                                 }}
                             />
                         </FormItem>
+                        <h6 className="mb-2"> Step 02</h6>
                         <FormItem
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
+                        >
+                            <Controller
+                                name="channelId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={channel}
+                                        value={
+                                            channel.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    field.value,
+                                            ) || null
+                                        }
+                                        onChange={(option) =>
+                                            field.onChange(
+                                                option?.value ?? null,
+                                            )
+                                        }
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+
+                     
+
+                        <FormItem
+                            label="Select Sub Channel"
                             invalid={Boolean(errors.areaName)}
                             errorMessage={errors.areaName?.message}
                         >
                             <Controller
-                                name="areaName"
+                                name="subChannelId"
                                 control={control}
                                 render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Area Name"
-                                        {...field}
+                                    <Select
+                                        isMulti
+                                        componentAs={CreatableSelect}
+                                        options={subChannel}
+                                        value={subChannel.filter(
+                                            (option: { value: number }) =>
+                                                Array.isArray(field.value)
+                                                    ? field.value.includes(
+                                                          option.value,
+                                                      )
+                                                    : false,
+                                        )}
+                                        onChange={(selected) => {
+                                            const ids = Array.isArray(selected)
+                                                ? selected.map(
+                                                      (opt) => opt.value,
+                                                  )
+                                                : []
+                                            field.onChange(ids)
+                                            setSubChannel(ids)
+                                        }}
                                     />
                                 )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
                             />
                         </FormItem>
+                           <FormItem
+                            label="Select region"
+                            invalid={Boolean(errors.regionId)}
+                            errorMessage={errors.regionId?.message}
+                        >
+                            <Controller
+                                name="subChannelId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        isMulti
+                                        componentAs={CreatableSelect}
+                                        options={region}
+                                        value={region.filter(
+                                            (option: { value: number }) =>
+                                                Array.isArray(field.value)
+                                                    ? field.value.includes(
+                                                          option.value,
+                                                      )
+                                                    : false,
+                                        )}
+                                        onChange={(selected) => {
+                                            const ids = Array.isArray(selected)
+                                                ? selected.map(
+                                                      (opt) => opt.value,
+                                                  )
+                                                : []
+                                            field.onChange(ids)
+                                            setSelelectRegion(ids)
+                                        }}
+                                    />
+                                )}
+                            />
+                        </FormItem>
+
+
 
                         <FormItem>
                             <Controller
@@ -583,9 +722,13 @@ const Area = (props: AddAreaFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">{SelelectArea?.isActive ? 'Deactivate' : 'Activate'} Channel</h5>
+                <h5 className="mb-4">
+                    {SelelectArea?.isActive ? 'Deactivate' : 'Activate'} Channel
+                </h5>
                 <p>
-                    Are you sure you want to {SelelectArea?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectArea?.areaName}</b>?
+                    Are you sure you want to{' '}
+                    {SelelectArea?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    <b>{SelelectArea?.areaName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button
