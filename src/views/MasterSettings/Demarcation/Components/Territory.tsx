@@ -591,7 +591,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
                                 }}
                             />
                         </FormItem>
-
+    <span className="mb-2 text-xs block">If available, please enter old Territory Code code</span>
                         <FormItem
                             invalid={Boolean(errors.territoryCode)}
                             errorMessage={errors.territoryCode?.message}

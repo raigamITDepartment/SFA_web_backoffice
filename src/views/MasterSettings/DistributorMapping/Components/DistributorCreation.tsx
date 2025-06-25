@@ -377,33 +377,7 @@ const DistributorCreation = () => {
                                 }}
                             />
                         </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.sapAgencyCode)}
-                            errorMessage={errors.sapAgencyCode?.message}
-                        >
-                            <Controller
-                                name="sapAgencyCode"
-                                control={control}
-                                render={({ field }) =>
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="SAP Agency Code"
-                                        {...field}
-                                    />
-                                }
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required';
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }}
-                            />
-                        </FormItem>
+                      
                         <FormItem
                             invalid={Boolean(errors.mobile)}
                             errorMessage={errors.mobile?.message}
