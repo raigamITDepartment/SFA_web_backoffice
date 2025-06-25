@@ -287,6 +287,8 @@ const DistributorAgencyMapping = () => {
                                 }}
                             />
                         </FormItem>
+
+                           <span className="mb-2 text-xs block">Select Multiple agency</span> 
                         <FormItem
                             invalid={Boolean(errors.agencyName)}
                             errorMessage={errors.agencyName?.message}

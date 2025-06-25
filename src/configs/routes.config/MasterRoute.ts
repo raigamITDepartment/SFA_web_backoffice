@@ -79,6 +79,15 @@ const MasterRoute: Routes = [
         authority: [],
     },
 
+       {
+        key: 'MasterMenu.collapse.Demarcation',
+        path: '/Master-menu-Demarcation-/:id/AreaRegionEdit',
+        component: lazy(
+            () => import('@/views/MasterSettings/Demarcation/Edit/AreaRegionEdit'),
+        ),
+        authority: [],
+    },
+
     {
         key: 'MasterMenu.collapse.Demarcation',
         path: '/Master-menu-Demarcation-/:id/Territory',

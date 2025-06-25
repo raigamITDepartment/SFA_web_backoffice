@@ -27,6 +27,7 @@ import type { Library } from '@googlemaps/js-api-loader'
 type FormSchema = {
     distributor: string
     warehouseName: string
+    sapAgencyCode: string
     isActive: boolean
     location: string
 }
@@ -250,7 +251,7 @@ function DistributorWarehouse() {
                                 </FormItem>
 
                                 <FormItem
-                                    label="Warehouse Name"
+                                    label="Warehouse Details"
                                     invalid={Boolean(errors.warehouseName)}
                                     errorMessage={errors.warehouseName?.message}
                                 >
@@ -268,6 +269,34 @@ function DistributorWarehouse() {
                                         )}
                                     />
                                 </FormItem>
+
+                                  <FormItem
+                            invalid={Boolean(errors.sapAgencyCode)}
+                            errorMessage={errors.sapAgencyCode?.message}
+                        >
+                            <Controller
+                                name="sapAgencyCode"
+                                control={control}
+                                render={({ field }) =>
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="SAP Agency Code"
+                                        {...field}
+                                    />
+                                }
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required';
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }}
+                            />
+                        </FormItem>
 
                                 <FormItem
                                     label="Location"

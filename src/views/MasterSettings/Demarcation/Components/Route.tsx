@@ -63,9 +63,12 @@ interface Route {
 
 export type AddRouteFormSchema = {
     userId: number;
+    //area: number | null;
     territoryId: number | null;
     routeName: string;
     routeCode: string,
+    OldrouteCode: string,
+    OldrouteId: string,
     displayOrder: number,
     isActive: boolean;
 };
@@ -76,6 +79,8 @@ const validationSchema: ZodType<AddRouteFormSchema> = z.object({
     territoryId: z.number({ required_error: 'Please select territory' }),
     routeName: z.string({ required_error: 'Route name is required' }),
     routeCode: z.string({ required_error: 'Route code is required' }),
+    OldrouteCode: z.string({ required_error: 'Old Route code is required' }),
+    OldrouteId: z.string({ required_error: 'Old Route Id is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
     isActive: z.boolean(),
 });
@@ -470,6 +475,7 @@ const Route = (props: AddRouteFormSchema) => {
                                 }}
                             />
                         </FormItem>
+                      
 
                         <FormItem
                             invalid={Boolean(errors.routeCode)}
@@ -510,6 +516,63 @@ const Route = (props: AddRouteFormSchema) => {
                                         type="text"
                                         autoComplete="off"
                                         placeholder="Route Name"
+                                        {...field}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+         <span className="mb-2 text-xs block">If available, please enter old Route code</span>
+                            <FormItem
+                            invalid={Boolean(errors.OldrouteCode)}
+                            errorMessage={errors.OldrouteCode?.message}
+                        >
+                            <Controller
+                                name="OldrouteCode"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Old Route Code"
+                                        {...field}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+
+                         <span className="mb-2 text-xs block">If available, please enter old Route Id</span>
+                            <FormItem
+                            invalid={Boolean(errors.OldrouteId)}
+                            errorMessage={errors.OldrouteId?.message}
+                        >
+                            <Controller
+                                name="OldrouteId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        type="text"
+                                        autoComplete="off"
+                                        placeholder="Old Route Code"
                                         {...field}
                                     />
                                 )}
