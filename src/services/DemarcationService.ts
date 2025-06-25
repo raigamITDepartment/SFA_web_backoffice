@@ -1084,5 +1084,53 @@ export const mapAreaRegion = async (payload: MapAreaRegionPayload) => {
     }
 };
 
+export const getAreaRegionById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching areaRegions by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch areaRegions by Id.');
+    }
+};
+
+export interface UpdateAreaRegionPayload {
+    userId: number;
+    areaId: number | null;
+    regionId: number | null;
+    isActive: boolean;
+}
+export const updateAreaRegion = async (payload: UpdateAreaRegionPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during areaRegions update:', error, payload);
+        throw new Error(error.response?.data?.message || 'areaRegions update failed.');
+    }
+};
+
 
 

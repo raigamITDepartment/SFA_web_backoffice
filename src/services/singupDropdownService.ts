@@ -367,6 +367,7 @@ export interface SignupPayload {
     channelId: number | null;
     subChannelId: number | null;
     regionId: number | null;
+    rangeId: number | null;
     areaList: number[]
     territoryId: number | null;
     agencyId: number | null;
