@@ -61,7 +61,6 @@ interface Area {
 
 export type AddAreaFormSchema = {
     userId: number;
-    regionId: number | null;
     areaName: string;
     areaCode: string;
     displayOrder: number,
@@ -71,7 +70,6 @@ export type AddAreaFormSchema = {
 
 const validationSchema: ZodType<AddAreaFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
-    regionId: z.number({ required_error: 'Please select region' }),
     areaName: z.string({ required_error: 'Region name is required' }),
     areaCode: z.string({ required_error: 'Region code is required' }),
     displayOrder: z.number({ required_error: 'Display order is required' }),
@@ -181,7 +179,6 @@ const Area = (props: AddAreaFormSchema) => {
             resolver: zodResolver(validationSchema),
             defaultValues: {
                 userId: userIdNumber,
-                regionId: null,
                 areaName: '',
                 areaCode: '',
                 displayOrder:1,
@@ -189,54 +186,7 @@ const Area = (props: AddAreaFormSchema) => {
             },
         });
 
-    const selectedChannelId = useWatch({
-        control,
-        name: 'channelId',
-    });
             
-    useEffect(() => {
-        const loadSubChannels = async () => {
-            if (!selectedChannelId) {
-                setSubChannel([]);
-                return;
-            }
-            try {
-                const subChannelOptions = await getAllSubChannelsByChannelId(selectedChannelId);
-                setSubChannel(subChannelOptions);
-            } catch (error) {
-                setMessage?.('Failed to load sub channels.');
-                setSubChannel([]);
-            }
-        };
-
-        loadSubChannels();
-    }, [selectedChannelId, setMessage]);
-
-
-    const selectedSubChannelId = useWatch({
-        control,
-        name: 'subChannelId',
-    });
-
-    useEffect(() => {
-    const loadRegions = async () => {
-        if (!selectedSubChannelId) {
-            setRegion([]);
-            return;
-        }
-        try {
-            console.log(selectedSubChannelId,'selected subchannels');
-            const regionOptions = await getAllRegionsBySubChannelId(selectedSubChannelId);
-             console.log(regionOptions,'regions');
-            setRegion(regionOptions);
-        } catch (error) {
-            setMessage?.('Failed to load regions.');
-            setRegion([]);
-        }
-    };
-
-        loadRegions();
-    }, [selectedSubChannelId, setMessage]);
 
 
     const handleDialogConfirm = async () => {
@@ -275,7 +225,6 @@ const Area = (props: AddAreaFormSchema) => {
     }
     const columns = useMemo<ColumnDef<Area>[]>(
         () => [
-            { header: 'Region', accessorKey: 'regionName' },
             { header: 'Area Code', accessorKey: 'areaCode' },
             { header: 'Area Name', accessorKey: 'areaName' },
             {
@@ -438,92 +387,6 @@ const Area = (props: AddAreaFormSchema) => {
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
                     <h5 className="mb-2">Area Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                         <FormItem
-                            invalid={Boolean(errors.channelId)}
-                            errorMessage={errors.channelId?.message}
-                        >
-                            <Controller
-                                name="channelId"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Channel"
-                                        options={channel}
-                                        value={channel.find(option => option.value === field.value) || null}
-                                        onChange={(option) => field.onChange(option?.value ?? null)}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-
-                        <FormItem
-                            invalid={Boolean(errors.subChannelId)}
-                            errorMessage={errors.subChannelId?.message}
-                        >
-                            <Controller
-                                name="subChannelId"
-                                control={control}
-                                render={({ field }) => (
-                                     <Select
-                                            size="sm"
-                                            placeholder="Select Sub Channel"
-                                            options={subChannel}
-                                            value={subChannel.find(option => option.value === field.value) || null}
-                                            onChange={(option) => field.onChange(option?.value ?? null)}
-                                        />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-
-                        <FormItem
-                              invalid={Boolean(errors.regionId)}
-                            errorMessage={errors.regionId?.message}
-                        >
-                            <Controller
-                                name="regionId"
-                                control={control}
-                                render={({ field }) => (
-                                     <Select
-                                            size="sm"
-                                            placeholder="Select Region"
-                                            options={region}
-                                            value={region.find(option => option.value === field.value) || null}
-                                            onChange={(option) => field.onChange(option?.value ?? null)}
-                                        />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
 
                         <FormItem
                             invalid={Boolean(errors.areaCode)}

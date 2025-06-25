@@ -5,11 +5,11 @@ import Table from '@/components/ui/Table'
 import Card from '@/components/ui/Card'
 import Pagination from '@/components/ui/Pagination'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline,  MdBlock, MdCheckCircleOutline } from 'react-icons/md'
+import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 import Tag from '@/components/ui/Tag'
 import { useForm, Controller } from 'react-hook-form'
 import { FormItem, Form } from '@/components/ui/Form'
- import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
     useReactTable,
     getCoreRowModel,
@@ -27,15 +27,21 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import { fetchRoutes, addNewRoute, deleteRoute } from '@/services/DemarcationService'
+import {
+    addNewArea,
+    getAllSubChannelsByChannelId,
+    getAllRegionsBySubChannelId,
+    deleteAreaRegion,
+    fetchAreaRegion,mapAreaRegion
+} from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
-import { fetchAreas, fetchTerritories, getTerritoriesByAreaId} from '@/services/singupDropdownService'
-import { useWatch } from 'react-hook-form';
+import { fetchChannels, fetchAreas } from '@/services/singupDropdownService'
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useWatch } from 'react-hook-form'
 import { HiCheckCircle } from 'react-icons/hi'
-
+import CreatableSelect from 'react-select/creatable'
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -47,43 +53,31 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ]
 
-interface Route {
-    id: number,
-    channelCode: string;
-    subChannelCode: string;
-    regionCode: string;
-    areaCode: string;
-    territoryCode: string;
-    routeCode: string;
-    routeName: string;
-    isActive: boolean;
-    territoryName:string;
+interface Area {
+    id: number
+    channelCode: string
+    subChannelCode: string
+    regionCode: string
+    areaCode: string
+    areaName: string
+    isActive: boolean
+    regionName: string
 }
 
-
-export type AddRouteFormSchema = {
+export type AddAreaRegionFormSchema = {
     userId: number;
-    //area: number | null;
-    territoryId: number | null;
-    routeName: string;
-    routeCode: string,
-    OldrouteCode: string,
-    OldrouteId: string,
-    displayOrder: number,
+    areaId: number | null;
+    regionId: number | null;
     isActive: boolean;
 };
 
-
-const validationSchema: ZodType<AddRouteFormSchema> = z.object({
-    userId: z.number().min(1, 'User ID is required'), 
-    territoryId: z.number({ required_error: 'Please select territory' }),
-    routeName: z.string({ required_error: 'Route name is required' }),
-    routeCode: z.string({ required_error: 'Route code is required' }),
-    OldrouteCode: z.string({ required_error: 'Old Route code is required' }),
-    OldrouteId: z.string({ required_error: 'Old Route Id is required' }),
-    displayOrder: z.number({ required_error: 'Display order is required' }),
+const validationSchema: ZodType<AddAreaRegionFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'),
+    areaId: z.number({ required_error: 'Please select area' }).nullable(),
+    regionId: z.number({ required_error: 'Please select region' }).nullable(),
     isActive: z.boolean(),
 });
+
 
 interface DebouncedInputProps
     extends Omit<
@@ -135,45 +129,45 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-const Route = (props: AddRouteFormSchema) => {
+const Area = (props: AddAreaRegionFormSchema) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const token = sessionStorage.getItem('accessToken')
-    const userId = sessionStorage.getItem('userId');
+    const userId = sessionStorage.getItem('userId')
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const { disableSubmit = false, className, setMessage } = props
     const [globalFilter, setGlobalFilter] = useState('')
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [pageSize, setPageSize] = useState(10)
-    const [routeData, setRouteData] = useState<Route[]>([])
-    const [SelelectRoute, setSelelectRoute] = useState<Route | null>(null)
+    const [area, setArea] = useState<any>([])
+    const [SelelectArea, setSelelectArea] = useState<Area | null>(null)
+    const [SelelectRegion, setSelelectRegion] = useState<any[] | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const [channel, setChannel] = useState<any>([])
     const [subChannel, setSubChannel] = useState<any>([])
     const [region, setRegion] = useState<any>([])
-    const [area, setArea] = useState<any>([])
-    const [range, setRange] = useState<any>([])
-    const [territory, setTerritory] = useState<any>([])
-    const navigate = useNavigate()  
+    const [areaRegion, setAreaRegion] = useState<any>([])
+    const navigate = useNavigate()
 
-    const userIdNumber = Number(userId);
+    const userIdNumber = Number(userId)
 
-
-    const loadRoutes = async () => {
+    const loadAreaRegions = async () => {
         try {
-            const res = await fetchRoutes()
-            setRouteData(res)
+            const res = await fetchAreaRegion()
+            setAreaRegion(res)
         } catch (err) {
-            console.error('Failed to load routes:', err)
+            console.error('Failed to load areas:', err)
         }
     }
+
     useEffect(() => {
-        loadRoutes();
-    }, []);
+        loadAreaRegions()
+    }, [])
 
     useEffect(() => {
         const loadArea = async () => {
             try {
                 const areaOptions = await fetchAreas(token)
                 setArea(areaOptions)
+                
             } catch (error) {
                 setMessage?.('Failed to load areas.')
             }
@@ -181,59 +175,95 @@ const Route = (props: AddRouteFormSchema) => {
         loadArea()
     }, [setMessage])
 
+    useEffect(() => {
+        const loadChannel = async () => {
+            try {
+                const channelOptions = await fetchChannels(token)
+                setChannel(channelOptions)
+            } catch (error) {
+                setMessage?.('Failed to load channels.')
+            }
+        }
+        loadChannel()
+    }, [setMessage])
+
     const {
         handleSubmit,
         formState: { errors },
         control,
-        reset
-    } = useForm<AddRouteFormSchema>({
+        reset,
+    } = useForm<AddAreaRegionFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
             userId: userIdNumber,
-            territoryId: null,
-            routeName: '',
-            routeCode: '',
-            displayOrder:1,
-            isActive: true, 
+            areaId: null,
+            regionId: null,
+            isActive: true,
         },
     })
 
-    const selectedAreaId = useWatch({
+    const selectedChannelId = useWatch({
         control,
-        name: 'area',
-    });
+        name: 'channelId',
+    })
 
-        useEffect(() => {
-        const loadTerritoriesByArea = async () => {
-            if (!selectedAreaId) {
-                setTerritory([]);
-                return;
+    useEffect(() => {
+        const loadSubChannels = async () => {
+            if (!selectedChannelId) {
+                setSubChannel([])
+                return
+            }
+            try {
+                console.log(selectedChannelId, 'selectedChannelId')
+                const subChannelOptions =
+                await getAllSubChannelsByChannelId(selectedChannelId)
+                setSubChannel(subChannelOptions)
+                console.log(subChannel, 'sc')
+            } catch (error) {
+                setMessage?.('Failed to load sub channels.')
+                setSubChannel([])
+            }
+        }
+
+        loadSubChannels()
+    }, [selectedChannelId, setMessage])
+
+    const selectedSubChannelId = useWatch({
+        control,
+        name: 'subChannelId',
+    })
+
+    useEffect(() => {
+        const loadRegions = async () => {
+            if (!selectedSubChannelId) {
+                setRegion([])
+                return
             }
 
             try {
-                const territoryOptions = await getTerritoriesByAreaId(selectedAreaId);
-                setTerritory(territoryOptions);
+                const regionOptions =
+                    await getAllRegionsBySubChannelId(selectedSubChannelId)
+                setRegion(regionOptions)
             } catch (error) {
-                setMessage?.('Failed to load territories.');
-                setTerritory([]);
+                setMessage?.('Failed to load regions.')
+                setRegion([])
             }
-        };
+        }
 
-        loadTerritoriesByArea();
-    }, [selectedAreaId, setMessage]);
-
+        loadRegions()
+    }, [selectedSubChannelId, setMessage])
 
     const handleDialogConfirm = async () => {
         setDialogIsOpen(false)
-        if (SelelectRoute) {
-            const isDeactivating = SelelectRoute?.isActive;
+        if (SelelectArea) {
+            const isDeactivating = SelelectArea?.isActive
             toast.push(
                 <Alert
                     showIcon
                     type={isDeactivating ? 'danger' : 'success'}
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    {isDeactivating ? 'Deactivating' : 'Activating'} Route
+                    {isDeactivating ? 'Deactivating' : 'Activating'} Area
                 </Alert>,
                 {
                     offsetX: 5,
@@ -244,23 +274,27 @@ const Route = (props: AddRouteFormSchema) => {
                 },
             )
             try {
-                await deleteRoute(SelelectRoute.id);
-                setRouteData(prev => prev.filter(u => u.id !== SelelectRoute.id))
+                await deleteAreaRegion(SelelectArea.id)
+                setAreaData((prev) =>
+                    prev.filter((u) => u.id !== SelelectArea.id),
+                )
             } catch (error) {
-                console.error('Failed to deactivate route:', error)
+                console.error('Failed to delete area:', error)
             } finally {
-                setSelelectRoute(null)
+                setSelelectArea(null)
             }
         }
     }
-    const handleEditClick = (ROCode:Route) => {
-        navigate(`/Master-menu-Demarcation-/${ROCode.id}/Route`)
+
+    const handleEditClick = (ArCode: Area) => {
+      //  navigate(`/Master-menu-Demarcation-/${ARCode.id}/Area`)
+   navigate(`/Master-menu-Demarcation-/${ArCode.id}/AreaRegionEdit`)
+     
     }
-    const columns = useMemo<ColumnDef<Route>[]>(
+    const columns = useMemo<ColumnDef<Area>[]>(
         () => [
-            { header: 'Territory', accessorKey: 'territoryName' },
-            { header: 'Route Code', accessorKey: 'routeCode' },
-            { header: 'Route Name', accessorKey: 'routeName' },
+            { header: 'Region', accessorKey: 'regionName' },
+            { header: 'Area Name', accessorKey: 'areaName' },
             {
                 header: 'Is Active',
                 accessorKey: 'isActive',
@@ -282,27 +316,27 @@ const Route = (props: AddRouteFormSchema) => {
                 header: 'Actions',
                 id: 'actions',
                 cell: ({ row }) => {
-                    const ROCode = row.original
+                    const ArCode = row.original
                     return (
                         <div className="flex space-x-2">
-                            {ROCode.isActive && (
+                            {ArCode.isActive && (
                                 <FaRegEdit
                                     className="text-blue-500 text-base cursor-pointer"
                                     title="Edit"
-                                    onClick={() => handleEditClick(ROCode)}
+                                    onClick={() => handleEditClick(ArCode)}
                                 />
                             )}
-                            {ROCode.isActive ? (
+                            {ArCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
                                     title="Deactivate User"
-                                    onClick={() => handleDeleteClick(ROCode)}
+                                    onClick={() => handleDeleteClick(ArCode)}
                                 />
                             ) : (
                                 <MdCheckCircleOutline
                                     className="text-green-500 text-lg cursor-pointer"
                                     title="Activate User"
-                                    onClick={() => handleDeleteClick(ROCode)}
+                                    onClick={() => handleDeleteClick(ArCode)}
                                 />
                             )}
                         </div>
@@ -313,7 +347,8 @@ const Route = (props: AddRouteFormSchema) => {
         [],
     )
 
-    const data = routeData
+    const data = areaRegion
+
     const totalData = data.length
 
     const table = useReactTable({
@@ -340,25 +375,36 @@ const Route = (props: AddRouteFormSchema) => {
         setPageSize(newSize)
         table.setPageSize(newSize)
     }
-    const handleDeleteClick = (ROCode: Route) => {
-        setSelelectRoute(ROCode)
+
+    const handleDeleteClick = (ArCode: Area) => {
+        setSelelectArea(ArCode)
         setDialogIsOpen(true)
     }
 
     const handleDialogClose = () => {
         setDialogIsOpen(false)
-        setSelelectRoute(null)
+        setSelelectArea(null)
     }
 
-    const onSubmit = async (values: AddRouteFormSchema) => {
-        console.log('clicked');
-        if (isSubmitting) return // Prevent double submit
-        setIsSubmitting(true)
+    const onSubmit = async (values: AddAreaRegionFormSchema) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
-            const result = await addNewRoute(values, token);
+            const payload = {
+                areaRegionsDTOList: [
+                    {
+                        userId: values.userId,
+                        areaId: values.areaId!,
+                        regionId: values.regionId!,
+                        isActive: values.isActive,
+                    },
+                ],
+            };
+
+            const result = await mapAreaRegion(payload);
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message)
+                setMessage?.(result.message);
             } else {
                 toast.push(
                     <Alert
@@ -366,12 +412,9 @@ const Route = (props: AddRouteFormSchema) => {
                         type="success"
                         className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
                     >
-                        <HiCheckCircle
-                            className="text-green-500 mb-2"
-                            size={48}
-                        />
+                        <HiCheckCircle className="text-green-500 mb-2" size={48} />
                         <div className="mt-2 text-green-700 font-semibold text-lg text-center">
-                            New Route created successfully!
+                            New Area-Region mapped successfully!
                         </div>
                     </Alert>,
                     {
@@ -380,18 +423,18 @@ const Route = (props: AddRouteFormSchema) => {
                         transitionType: 'fade',
                         block: false,
                         placement: 'top-end',
-                    },
-                )
+                    }
+                );
                 reset();
-                await loadRoutes();
+                await loadAreaRegions();
             }
-        }catch (err: any) {
+        } catch (err: any) {
             const backendMessage =
                 err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
+                typeof err.response.data.payload === 'object'
                     ? Object.values(err.response.data.payload).join(', ')
                     : err?.response?.data?.message ||
-                    'An error occurred during creating new Route. Please try again.'
+                    'An error occurred during mapping new Area-Region. Please try again.';
 
             toast.push(
                 <Alert
@@ -407,24 +450,28 @@ const Route = (props: AddRouteFormSchema) => {
                     transitionType: 'fade',
                     block: false,
                     placement: 'top-end',
-                },
-            )
+                }
+            );
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
         }
     };
+
+
     return (
         <div>
-            <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <h5 className='mb-2'></h5>
-                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col lg:flex-row xl:flex-row gap-4">
+                <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
+                    <h5 className="mb-2">Area Region Mapping</h5>
+                    <br></br>
+
+                    <h6 className="mb-2"> Step 01</h6>
                         <FormItem
-                            invalid={Boolean(errors.area)}
-                            errorMessage={errors.area?.message}
+                            invalid={Boolean(errors.areaId)}
+                            errorMessage={errors.areaId?.message}
                         >
                             <Controller
-                                name="area"
+                                name="areaId"
                                 control={control}
                                 render={({ field }) => (
                                      <Select
@@ -447,19 +494,52 @@ const Route = (props: AddRouteFormSchema) => {
                                 }}
                             />
                         </FormItem>
+
+                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+
+                        <h6 className="mb-2"> Step 02</h6>
                         <FormItem
-                            invalid={Boolean(errors.territoryId)}
-                            errorMessage={errors.territoryId?.message}
+                            invalid={Boolean(errors.channelId)}
+                            errorMessage={errors.channelId?.message}
                         >
                             <Controller
-                                name="territoryId"
+                                name="channelId"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        size="sm"
+                                        placeholder="Select Channel"
+                                        options={channel}
+                                        value={channel.find(option => option.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
+                                    />
+                                )}
+                                rules={{
+                                    validate: {
+                                        required: (value) => {
+                                            if (!value) {
+                                                return 'Required'
+                                            }
+                                            return
+                                        },
+                                    },
+                                }}
+                            />
+                        </FormItem>
+       <span className="mb-2 text-xs block">Select Multiple Sub Channnel</span>
+                        <FormItem
+                            invalid={Boolean(errors.subChannelId)}
+                            errorMessage={errors.subChannelId?.message}
+                        >
+                            <Controller
+                                name="subChannelId"
                                 control={control}
                                 render={({ field }) => (
                                      <Select
                                             size="sm"
-                                            placeholder="Select Territory"
-                                            options={territory}
-                                            value={territory.find(option => option.value === field.value) || null}
+                                            placeholder="Select Sub Channel"
+                                            options={subChannel}
+                                            value={subChannel.find(option => option.value === field.value) || null}
                                             onChange={(option) => field.onChange(option?.value ?? null)}
                                         />
                                 )}
@@ -475,77 +555,22 @@ const Route = (props: AddRouteFormSchema) => {
                                 }}
                             />
                         </FormItem>
-                      
-
+   <span className="mb-2 text-xs block">Select Multiple Region</span>
                         <FormItem
-                            invalid={Boolean(errors.routeCode)}
-                            errorMessage={errors.routeCode?.message}
+                            invalid={Boolean(errors.regionId)}
+                            errorMessage={errors.regionId?.message}
                         >
                             <Controller
-                                name="routeCode"
+                                name="regionId"
                                 control={control}
                                 render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Route Code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-                        <FormItem
-                            invalid={Boolean(errors.routeName)}
-                            errorMessage={errors.routeName?.message}
-                        >
-                            <Controller
-                                name="routeName"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Route Name"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-         <span className="mb-2 text-xs block">If available, please enter old Route code</span>
-                            <FormItem
-                            invalid={Boolean(errors.OldrouteCode)}
-                            errorMessage={errors.OldrouteCode?.message}
-                        >
-                            <Controller
-                                name="OldrouteCode"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Old Route Code"
-                                        {...field}
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Region"
+                                            options={region}
+                                            value={region.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
+                                        />
                                 )}
                                 rules={{
                                     validate: {
@@ -560,36 +585,7 @@ const Route = (props: AddRouteFormSchema) => {
                             />
                         </FormItem>
 
-                         <span className="mb-2 text-xs block">If available, please enter old Route Id</span>
-                            <FormItem
-                            invalid={Boolean(errors.OldrouteId)}
-                            errorMessage={errors.OldrouteId?.message}
-                        >
-                            <Controller
-                                name="OldrouteId"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Old Route Code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
-
-                        <FormItem>
+                        {/* <FormItem>
                             <Controller
                                 name="isActive"
                                 control={control}
@@ -599,7 +595,7 @@ const Route = (props: AddRouteFormSchema) => {
                                     </Checkbox>
                                 )}
                             />
-                        </FormItem>
+                        </FormItem> */}
 
                         <FormItem>
                             <Button variant="solid" block type="submit">
@@ -704,9 +700,13 @@ const Route = (props: AddRouteFormSchema) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">{SelelectRoute?.isActive ? 'Deactivate' : 'Activate'} Route</h5>
+                <h5 className="mb-4">
+                    {SelelectArea?.isActive ? 'Deactivate' : 'Activate'} Channel
+                </h5>
                 <p>
-                   Are you sure you want to {SelelectRoute?.isActive ? 'Deactivate' : 'Activate'} <b>{SelelectRoute?.routeName}</b>?
+                    Are you sure you want to{' '}
+                    {SelelectArea?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    <b>{SelelectArea?.areaName}</b>?
                 </p>
                 <div className="text-right mt-6">
                     <Button
@@ -735,4 +735,4 @@ const Route = (props: AddRouteFormSchema) => {
     )
 }
 
-export default Route
+export default Area

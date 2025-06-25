@@ -6,8 +6,6 @@ import {
 import type { NavigationTree } from '@/@types/navigation'
 
 const AdminModuleNavigationConfig: NavigationTree[] = [
-  
-   
     {
         key: 'AdminModule',
         path: '',
@@ -17,7 +15,6 @@ const AdminModuleNavigationConfig: NavigationTree[] = [
         type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
         subMenu: [
-
             {
                 key: 'UserModule',
                 path: '/single-menu-view',
@@ -27,7 +24,6 @@ const AdminModuleNavigationConfig: NavigationTree[] = [
                 type: NAV_ITEM_TYPE_COLLAPSE,
                 authority: [],
                 subMenu: [
-        
                     {
                         key: 'ModifiyUser',
                         path: '/User-menu-ModifiyUser',
@@ -38,13 +34,8 @@ const AdminModuleNavigationConfig: NavigationTree[] = [
                         authority: [],
                         subMenu: [],
                     },
-                  
-               
-        
-        
                 ],
             },
-
             {
                 key: 'InvoiceReverse',
                 path: '',
@@ -63,24 +54,32 @@ const AdminModuleNavigationConfig: NavigationTree[] = [
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],
                         subMenu: [],
-                      
                     },
-
-
-                     {
-                        key: 'Acutual Reverse',
+                    {
+                        key: 'AcutualReverse',
                         path: '/Admin-menu-AcutualReverse',
                         title: 'Actual Reverse',
-                        translateKey: 'nav.Admin.Acutual Reverse',
+                        translateKey: 'nav.Admin.AcutualReverse',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],
                         subMenu: [],
-                      
                     },
                 ]
+            },
+            // Corrected ShopTransfer configuration
+            {
+                key: 'ShopTransfer',
+                path: '/Admin-menu-ShopTransfer',
+                title: 'Shop Transfer',
+                translateKey: 'nav.AdminModule.ShopTransfer',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM, // Changed to single menu item
+                authority: [],
+                subMenu: [], // Removed redundant submenu
             },
         ],
     },
 ]
+
 export default AdminModuleNavigationConfig

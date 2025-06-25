@@ -162,7 +162,7 @@ const SubChannelEdit = (props: UpdateSubChannelFormSchema) => {
         <div>
             <div className="flex flex-col lg:flex-row xl:flex-row gap-4">
                 <Card bordered={false} className="lg:w-1/3 xl:w-1/3 h-1/2">
-                      <h5 className="mb-2">Sub-Channel update</h5>
+                    <h5 className="mb-2">Sub-Channel update</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
                             invalid={Boolean(errors.channelId)}
@@ -200,6 +200,7 @@ const SubChannelEdit = (props: UpdateSubChannelFormSchema) => {
                                 }}
                             />
                         </FormItem>
+
                         <FormItem
                             invalid={Boolean(errors.subChannelCode)}
                             errorMessage={errors.subChannelCode?.message}

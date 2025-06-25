@@ -457,7 +457,6 @@ export const fetchAreas = async () => {
 
 export interface AddAreaPayload {
     userId: number;
-    regionId: number | null;
     areaName: string;
     areaCode: string;
     displayOrder: number,
@@ -510,7 +509,6 @@ export const deleteArea = async (id: number | string) => {
 };
 export interface UpdateAreaPayload {
     id: number;
-    regionId: number | null;
     userId: number;
     areaName: string;
     areaCode: string;
@@ -586,6 +584,7 @@ export const fetchTerritories = async () => {
 
 export interface AddTerritoryPayload {
     userId: number;
+    subChannelId: number | null;
     rangeId: number | null;
     areaId: number | null;
     territoryName: string;
@@ -641,6 +640,7 @@ export const deleteTerritory = async (id: number | string) => {
 export interface UpdateTerritoryPayload {
     id: number;
     regionId: number | null;
+    subChannelId: number | null;
     userId: number;
     areaName: string;
     areaCode: string;
@@ -1007,9 +1007,82 @@ export const fetchCountry = async () => {
 
 
 
+//arearegion mapping
+export const fetchAreaRegion = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
 
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
 
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching areaRegions:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load areaRegions.');
+    }
+};
+export const deleteAreaRegion = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
 
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.delete(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions/deactivateAreaRegion/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error deleting areaRegions:', error);
+        throw new Error(error.response?.data?.message || 'Failed to delete areaRegions.');
+    }
+};
+export interface AreaRegionDTO {
+    userId: number;
+    areaId: number;
+    regionId: number;
+    isActive: boolean;
+}
+
+export interface MapAreaRegionPayload {
+    areaRegionsDTOList: AreaRegionDTO[];
+}
+
+export const mapAreaRegion = async (payload: MapAreaRegionPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during mapping:', error, payload);
+        throw new Error(error.response?.data?.message || 'Mapping failed.');
+    }
+};
 
 
 
