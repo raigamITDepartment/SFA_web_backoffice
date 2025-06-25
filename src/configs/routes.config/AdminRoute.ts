@@ -22,9 +22,9 @@ const UserRoute: Routes = [
         component: lazy(() => import('@/views/Admin 2/BookingReverse')),
         authority: [],
     },
-   
 
-    
+
+
     {
         key: 'UserModule.AcutualReverse',
         path: '/Admin-menu-AcutualReverse',
@@ -36,6 +36,13 @@ const UserRoute: Routes = [
         key: 'UserModule.EditUser',
         path: '/users/:id/edit',
         component: lazy(() => import('@/views/auth/SignUp/components/UserEdit')),
+        authority: [],
+    },
+
+    {
+        key: 'UserModule.ShopTransfer',
+        path: '/Admin-menu-ShopTransfer',
+        component: lazy(() => import('@/views/Admin 2/ShopTransfer/ShopTransfer')),
         authority: [],
     },
 
