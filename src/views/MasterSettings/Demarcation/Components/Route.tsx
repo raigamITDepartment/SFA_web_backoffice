@@ -63,13 +63,12 @@ interface Route {
 
 export type AddRouteFormSchema = {
     userId: number;
-    //area: number | null;
     territoryId: number | null;
     routeName: string;
-    routeCode: string,
-    OldrouteCode: string,
-    OldrouteId: string,
-    displayOrder: number,
+    routeCode?: number | null;
+    oldRouteCode?: number | null;
+    oldRouteId?: number | null;
+    displayOrder: number;
     isActive: boolean;
 };
 
@@ -78,9 +77,9 @@ const validationSchema: ZodType<AddRouteFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
     territoryId: z.number({ required_error: 'Please select territory' }),
     routeName: z.string({ required_error: 'Route name is required' }),
-    routeCode: z.string({ required_error: 'Route code is required' }),
-    OldrouteCode: z.string({ required_error: 'Old Route code is required' }),
-    OldrouteId: z.string({ required_error: 'Old Route Id is required' }),
+    routeCode: z.number({ required_error: 'Route code is required' }),
+    oldRouteCode: z.number().nullable().optional(),
+    oldRouteId: z.number().nullable().optional(),
     displayOrder: z.number({ required_error: 'Display order is required' }),
     isActive: z.boolean(),
 });
@@ -146,11 +145,7 @@ const Route = (props: AddRouteFormSchema) => {
     const [routeData, setRouteData] = useState<Route[]>([])
     const [SelelectRoute, setSelelectRoute] = useState<Route | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
-    const [channel, setChannel] = useState<any>([])
-    const [subChannel, setSubChannel] = useState<any>([])
-    const [region, setRegion] = useState<any>([])
     const [area, setArea] = useState<any>([])
-    const [range, setRange] = useState<any>([])
     const [territory, setTerritory] = useState<any>([])
     const navigate = useNavigate()  
 
@@ -188,14 +183,17 @@ const Route = (props: AddRouteFormSchema) => {
         reset
     } = useForm<AddRouteFormSchema>({
         resolver: zodResolver(validationSchema),
-        defaultValues: {
-            userId: userIdNumber,
-            territoryId: null,
-            routeName: '',
-            routeCode: '',
-            displayOrder:1,
-            isActive: true, 
-        },
+    defaultValues: {
+        userId: userIdNumber,
+        territoryId: null,
+        routeName: '',
+        routeCode: null,
+        oldRouteCode: null,
+        oldRouteId: null,
+        displayOrder: 1,
+        isActive: true,
+    },
+
     })
 
     const selectedAreaId = useWatch({
@@ -475,34 +473,23 @@ const Route = (props: AddRouteFormSchema) => {
                                 }}
                             />
                         </FormItem>
-                      
-
                         <FormItem
                             invalid={Boolean(errors.routeCode)}
                             errorMessage={errors.routeCode?.message}
                         >
-                            <Controller
-                                name="routeCode"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Route Code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
+                        <Controller
+                            name="routeCode"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="number"
+                                    autoComplete="off"
+                                    placeholder="Route Code"
+                                    value={field.value ?? ''}
+                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                />
+                            )}
+                        />
                         </FormItem>
                         <FormItem
                             invalid={Boolean(errors.routeName)}
@@ -531,62 +518,46 @@ const Route = (props: AddRouteFormSchema) => {
                                 }}
                             />
                         </FormItem>
-         <span className="mb-2 text-xs block">If available, please enter old Route code</span>
-                            <FormItem
-                            invalid={Boolean(errors.OldrouteCode)}
-                            errorMessage={errors.OldrouteCode?.message}
+                        <span className="mb-2 text-xs block">If available, please enter old Route code</span>
+                        <FormItem
+                            invalid={Boolean(errors.oldRouteCode)}
+                            errorMessage={errors.oldRouteCode?.message}
                         >
-                            <Controller
-                                name="OldrouteCode"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Old Route Code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
+                        <Controller
+                            name="oldRouteCode"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="number"
+                                    autoComplete="off"
+                                    placeholder="Old Route Code"
+                                    value={field.value ?? ''}
+                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                />
+                            )}
+                        />
+
                         </FormItem>
 
                          <span className="mb-2 text-xs block">If available, please enter old Route Id</span>
-                            <FormItem
-                            invalid={Boolean(errors.OldrouteId)}
-                            errorMessage={errors.OldrouteId?.message}
+                        <FormItem
+                            invalid={Boolean(errors.oldRouteId)}
+                            errorMessage={errors.oldRouteId?.message}
                         >
-                            <Controller
-                                name="OldrouteId"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Old Route Code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
+                        <Controller
+                            name="oldRouteId"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="number"
+                                    autoComplete="off"
+                                    placeholder="Old Route Id"
+                                    value={field.value ?? ''}
+                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                />
+                            )}
+                        />
+
                         </FormItem>
 
                         <FormItem>

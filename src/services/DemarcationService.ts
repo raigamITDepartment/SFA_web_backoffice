@@ -716,7 +716,9 @@ export interface AddRoutePayload {
     userId: number;
     territoryId: number | null;
     routeName: string;
-    routeCode: string,
+    routeCode: number,
+    oldRouteId: number;
+    oldRouteCode: number;
     displayOrder: number,
     isActive: boolean;
 }
@@ -870,11 +872,9 @@ export interface AddAgencyPayload {
     userId: number;
     channelId: number | null;
     agencyName: string;
-    agencyCode: string,
-    bankGuarantee: string,
-    creditLimit: string,
-    latitude: string,
-    longitude: string,
+    agencyCode: number | null,
+    territoryId: number | null;
+    oldAgencyCode: number | null;
     isActive: boolean;
 }
 
@@ -950,11 +950,9 @@ export interface UpdateAgencyPayload {
     userId: number;
     channelId: number | null;
     agencyName: string;
-    agencyCode: string,
-    bankGuarantee: string,
-    creditLimit: string,
-    latitude: string,
-    longitude: string,
+    agencyCode: number | null,
+    territoryId: number | null;
+    oldAgencyCode: number | null;
     isActive: boolean;
 }
 export const updateAgency = async (payload: UpdateAgencyPayload, token: string) => {
@@ -1108,6 +1106,7 @@ export const getAreaRegionById = async (id: number | string) => {
 };
 
 export interface UpdateAreaRegionPayload {
+    id: number;
     userId: number;
     areaId: number | null;
     regionId: number | null;
