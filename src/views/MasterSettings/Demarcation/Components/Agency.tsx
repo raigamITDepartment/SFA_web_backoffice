@@ -27,7 +27,7 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { Button, toast, Alert } from '@/components/ui'
 import Checkbox from '@/components/ui/Checkbox'
-import {fetchChannels, fetchSubChannels, fetchRegions, fetchAreas, fetchTerritories} from '@/services/singupDropdownService'
+import {fetchChannels, fetchTerritories} from '@/services/singupDropdownService'
 import { fetchAgencies, fetchRoutesOptions, addNewAgency, deleteAgency } from '@/services/DemarcationService'
 import Dialog from '@/components/ui/Dialog'
 import { z } from 'zod'
@@ -86,11 +86,9 @@ export type AddAgencyFormSchema = {
     userId: number;
     channelId: number | null;
     agencyName: string;
-    agencyCode: string,
-    bankGuarantee: string,
-    creditLimit: string,
-    latitude: string,
-    longitude: string,
+    agencyCode: number | null,
+    territoryId: number | null;
+    oldAgencyCode?: number | null;
     isActive: boolean;
 };
 
@@ -98,12 +96,10 @@ export type AddAgencyFormSchema = {
 const validationSchema: ZodType<AddAgencyFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
     channelId: z.number({ required_error: 'Please select channel' }),
+    territoryId: z.number({ required_error: 'Please select territory' }),
     agencyName: z.string({ required_error: 'Agency name is required' }),
-    agencyCode: z.string({ required_error: 'Agency code is required' }),
-    bankGuarantee: z.string({ required_error: 'Bank guarantee is required' }),
-    creditLimit: z.string({ required_error: 'Credit limit is required' }),
-    latitude: z.string({ required_error: 'Latitude is required' }),
-    longitude: z.string({ required_error: 'Longitude is required' }),
+    agencyCode: z.number({ required_error: 'Agency code is required' }),
+    oldAgencyCode: z.number().nullable().optional(),
     isActive: z.boolean(),
 });
 
@@ -181,8 +177,6 @@ const Agency = (props: AddAgencyFormSchema) => {
     useEffect(() => {
         loadAgency();
     }, []);
-        
-
 
     useEffect(() => {
                 const loadChannel = async () => {
@@ -194,42 +188,6 @@ const Agency = (props: AddAgencyFormSchema) => {
                     }
                 }
                 loadChannel()
-    }, [setMessage])
-        
-    useEffect(() => {
-        const loadSubChannel = async () => {
-            try {
-                const subChannelOptions = await fetchSubChannels(token)
-                setSubChannel(subChannelOptions)
-            } catch (error) {
-                setMessage?.('Failed to load sub channels.')
-            }
-        }
-        loadSubChannel()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadRegion = async () => {
-            try {
-                const regionOptions = await fetchRegions(token)
-                setRegion(regionOptions)
-            } catch (error) {
-                setMessage?.('Failed to load regions.')
-            }
-        }
-        loadRegion()
-    }, [setMessage])
-
-    useEffect(() => {
-        const loadArea = async () => {
-            try {
-                const areaOptions = await fetchAreas(token)
-                setArea(areaOptions)
-            } catch (error) {
-                setMessage?.('Failed to load areas.')
-            }
-        }
-        loadArea()
     }, [setMessage])
 
     useEffect(() => {
@@ -400,15 +358,14 @@ const Agency = (props: AddAgencyFormSchema) => {
         defaultValues: {
             userId: userIdNumber,
             channelId: null,
+            territoryId: null,
             agencyName: '',
-            agencyCode: '',
-            bankGuarantee: '',
-            creditLimit: '',
-            latitude: '',
-            longitude:'',
+            agencyCode: null,
+            oldAgencyCode: null,
             isActive: true, 
         },
     })
+
 
     const onSubmit = async (values: AddAgencyFormSchema) => {
         if (isSubmitting) return // Prevent double submit
@@ -506,36 +463,6 @@ const Agency = (props: AddAgencyFormSchema) => {
                                 }}
                             />
                         </FormItem>
-
-
-                          <FormItem
-                            invalid={Boolean(errors.area)}
-                            errorMessage={errors.area?.message}
-                        >
-                            <Controller
-                                name="area"
-                                control={control}
-                                render={({ field }) => (
-                                     <Select
-                                            size="sm"
-                                            placeholder="Select Area"
-                                            options={area}
-                                            value={area.find(option => option.value === field.value) || null}
-                                            onChange={(option) => field.onChange(option?.value ?? null)}
-                                        />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
-                        </FormItem>
                         <FormItem
                             invalid={Boolean(errors.territoryId)}
                             errorMessage={errors.territoryId?.message}
@@ -570,27 +497,18 @@ const Agency = (props: AddAgencyFormSchema) => {
                             errorMessage={errors.agencyCode?.message}
                         >
                             <Controller
-                                name="agencyCode"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Agency Code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
+                            name="agencyCode"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="number"
+                                    autoComplete="off"
+                                    placeholder="Agency Code"
+                                    value={field.value ?? ''}
+                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                />
+                            )}
+                        />
                         </FormItem>
 
                         <FormItem
@@ -620,33 +538,24 @@ const Agency = (props: AddAgencyFormSchema) => {
                                 }}
                             />
                         </FormItem>
-                <span className="mb-2 text-xs block">If available, please enter old agency code</span>
+                     <span className="mb-2 text-xs block">If available, please enter old agency code</span>
                         <FormItem
-                            invalid={Boolean(errors.bankGuarantee)}
-                            errorMessage={errors.bankGuarantee?.message}
+                            invalid={Boolean(errors.oldAgencyCode)}
+                            errorMessage={errors.oldAgencyCode?.message}
                         >
-                            <Controller
-                                name="bankGuarantee"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        type="text"
-                                        autoComplete="off"
-                                        placeholder="Old Agency code"
-                                        {...field}
-                                    />
-                                )}
-                                rules={{
-                                    validate: {
-                                        required: (value) => {
-                                            if (!value) {
-                                                return 'Required'
-                                            }
-                                            return
-                                        },
-                                    },
-                                }}
-                            />
+                         <Controller
+                            name="oldAgencyCode"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="number"
+                                    autoComplete="off"
+                                    placeholder="Route Code"
+                                    value={field.value ?? ''}
+                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                />
+                            )}
+                        />
                         </FormItem>
 
                        
