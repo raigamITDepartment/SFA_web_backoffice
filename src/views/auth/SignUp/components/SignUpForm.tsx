@@ -370,14 +370,21 @@ const SignUpForm = (props: SignUpFormProps) => {
                     },
                 )
             }
-        } catch (err: any) {
-            console.error('Signup failed:', err.message)
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during signup. Please try again.'
+        }catch (err: any) {
+            let backendMessage = 'An error occurred during onboardin new user. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -394,9 +401,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
+            );
         } finally {
-            setIsSubmitting(false)
+    setIsSubmitting(false)
         }
     }
 

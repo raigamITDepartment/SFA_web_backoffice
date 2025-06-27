@@ -346,12 +346,20 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                 await loadSubChannels();
             }
         }catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during creating new sub channel. Please try again.'
+            let backendMessage = 'An error occurred during creating new Sub-Channel. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -368,8 +376,8 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
-        } finally {
+            );
+        }finally {
             setIsSubmitting(false)
         }
     };

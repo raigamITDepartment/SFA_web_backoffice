@@ -249,7 +249,7 @@ const Region = (props: AddRegionFormSchema) => {
     const columns = useMemo<ColumnDef<Region>[]>(
         () => [
             { header: 'Channel', accessorKey: 'channelName' },
-            { header: 'Sub-Channel', accessorKey: 'subChannelCode' },
+            { header: 'Sub-Channel', accessorKey: 'subChannelName' },
             { header: 'Region Code', accessorKey: 'regionCode' },
             { header: 'Region Name', accessorKey: 'regionName' },
             {
@@ -349,6 +349,7 @@ const Region = (props: AddRegionFormSchema) => {
         setIsSubmitting(true)
         try {
             const result = await addNewRegion(values, token);
+            
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
@@ -379,12 +380,20 @@ const Region = (props: AddRegionFormSchema) => {
                 await loadRegions();
             }
         }catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during creating new region. Please try again.'
+            let backendMessage = 'An error occurred during creating new Region. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -401,9 +410,9 @@ const Region = (props: AddRegionFormSchema) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
-        } finally {
-            setIsSubmitting(false)
+            );
+        }finally {
+    setIsSubmitting(false)
         }
     };
 

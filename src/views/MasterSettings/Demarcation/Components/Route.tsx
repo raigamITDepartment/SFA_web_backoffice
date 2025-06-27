@@ -384,12 +384,20 @@ const Route = (props: AddRouteFormSchema) => {
                 await loadRoutes();
             }
         }catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during creating new Route. Please try again.'
+            let backendMessage = 'An error occurred during creating new Route. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -406,9 +414,9 @@ const Route = (props: AddRouteFormSchema) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
+            );
         } finally {
-            setIsSubmitting(false)
+    setIsSubmitting(false)
         }
     };
     return (

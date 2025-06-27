@@ -132,6 +132,8 @@ function AuthProvider({ children }: AuthProviderProps) {
         try {
             await apiSignOut()
         } finally {
+            sessionStorage.clear()
+            localStorage.clear() 
             handleSignOut()
             navigatorRef.current?.navigate(appConfig.unAuthenticatedEntryPath)
         }
