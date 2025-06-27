@@ -172,6 +172,7 @@ const AreaEdit = (props: UpdateAreaRegionFormSchema) => {
                     <h5 className="mb-2">Area-Region update</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                         <FormItem
+                         label="Area"
                             invalid={Boolean(errors.areaId)}
                             errorMessage={errors.areaId?.message}
                         >
@@ -200,9 +201,10 @@ const AreaEdit = (props: UpdateAreaRegionFormSchema) => {
                             />
                         </FormItem>
 
-                        <h6 className="mb-2"> Step 02</h6>
+                        <h6 className="mb-2"> </h6>
 
                         <FormItem
+                            label="Region"
                             invalid={Boolean(errors.regionId)}
                             errorMessage={errors.regionId?.message}
                         >

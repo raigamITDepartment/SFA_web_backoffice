@@ -241,7 +241,7 @@ const Channel = (props: AddChannelFormSchema) => {
                             {CHCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Channel"
                                     onClick={() => handleDeleteClick(CHCode)}
                                 />
                             ) : (

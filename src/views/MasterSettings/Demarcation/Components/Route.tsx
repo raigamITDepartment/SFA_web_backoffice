@@ -293,7 +293,7 @@ const Route = (props: AddRouteFormSchema) => {
                             {ROCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Route"
                                     onClick={() => handleDeleteClick(ROCode)}
                                 />
                             ) : (

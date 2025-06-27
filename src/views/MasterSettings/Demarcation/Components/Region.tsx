@@ -286,7 +286,7 @@ const Region = (props: AddRegionFormSchema) => {
                                    {RGCode.isActive ? (
                                        <MdBlock
                                            className="text-red-500 text-lg cursor-pointer"
-                                           title="Deactivate User"
+                                           title="Deactivate Region"
                                            onClick={() => handleDeleteClick(RGCode)}
                                        />
                                    ) : (
