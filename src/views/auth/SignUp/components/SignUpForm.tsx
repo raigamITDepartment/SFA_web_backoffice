@@ -334,6 +334,7 @@ const SignUpForm = (props: SignUpFormProps) => {
             mobileNo: data.mobileNo,
             isActive: true,
             gpsStatus: true,
+            rangeId: data.range ?? null,
             superUserId: 1,
         }
 

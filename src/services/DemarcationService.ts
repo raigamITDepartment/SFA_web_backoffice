@@ -716,7 +716,9 @@ export interface AddRoutePayload {
     userId: number;
     territoryId: number | null;
     routeName: string;
-    routeCode: string,
+    routeCode: number,
+    oldRouteId: number;
+    oldRouteCode: number;
     displayOrder: number,
     isActive: boolean;
 }
@@ -870,11 +872,9 @@ export interface AddAgencyPayload {
     userId: number;
     channelId: number | null;
     agencyName: string;
-    agencyCode: string,
-    bankGuarantee: string,
-    creditLimit: string,
-    latitude: string,
-    longitude: string,
+    agencyCode: number | null,
+    territoryId: number | null;
+    oldAgencyCode: number | null;
     isActive: boolean;
 }
 
@@ -950,11 +950,9 @@ export interface UpdateAgencyPayload {
     userId: number;
     channelId: number | null;
     agencyName: string;
-    agencyCode: string,
-    bankGuarantee: string,
-    creditLimit: string,
-    latitude: string,
-    longitude: string,
+    agencyCode: number | null,
+    territoryId: number | null;
+    oldAgencyCode: number | null;
     isActive: boolean;
 }
 export const updateAgency = async (payload: UpdateAgencyPayload, token: string) => {
@@ -1081,6 +1079,55 @@ export const mapAreaRegion = async (payload: MapAreaRegionPayload) => {
     } catch (error: any) {
         console.error('Error during mapping:', error, payload);
         throw new Error(error.response?.data?.message || 'Mapping failed.');
+    }
+};
+
+export const getAreaRegionById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching areaRegions by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch areaRegions by Id.');
+    }
+};
+
+export interface UpdateAreaRegionPayload {
+    id: number;
+    userId: number;
+    areaId: number | null;
+    regionId: number | null;
+    isActive: boolean;
+}
+export const updateAreaRegion = async (payload: UpdateAreaRegionPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/areaRegions`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during areaRegions update:', error, payload);
+        throw new Error(error.response?.data?.message || 'areaRegions update failed.');
     }
 };
 
