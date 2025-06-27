@@ -255,6 +255,7 @@ const Agency = (props: AddAgencyFormSchema) => {
     const columns = useMemo<ColumnDef<Agency>[]>(
         () => [
             { header: 'Channel', accessorKey: 'channelName' },
+            { header: 'Territory', accessorKey: 'TerritoryName' },
             { header: 'Agency Code', accessorKey: 'agencyCode' },
             { header: 'Agency Name', accessorKey: 'agencyName' },
               { header: 'Range', accessorKey: 'Range' },
@@ -292,7 +293,7 @@ const Agency = (props: AddAgencyFormSchema) => {
                             {RGCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Agancy"
                                     onClick={() => handleDeleteClick(RGCode)}
                                 />
                             ) : (
@@ -550,7 +551,7 @@ const Agency = (props: AddAgencyFormSchema) => {
                                 <Input
                                     type="number"
                                     autoComplete="off"
-                                    placeholder="Route Code"
+                                    placeholder="Old Agancy Code"
                                     value={field.value ?? ''}
                                     onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                                 />

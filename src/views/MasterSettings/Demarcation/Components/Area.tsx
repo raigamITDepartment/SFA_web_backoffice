@@ -261,7 +261,7 @@ const Area = (props: AddAreaFormSchema) => {
                             {ARCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Area "
                                     onClick={() => handleDeleteClick(ARCode)}
                                 />
                             ) : (

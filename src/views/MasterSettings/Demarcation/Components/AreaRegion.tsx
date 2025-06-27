@@ -329,7 +329,7 @@ const Area = (props: AddAreaRegionFormSchema) => {
                             {ArCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Area Region Mapping"
                                     onClick={() => handleDeleteClick(ArCode)}
                                 />
                             ) : (

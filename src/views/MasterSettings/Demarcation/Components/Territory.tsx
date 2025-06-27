@@ -326,7 +326,7 @@ const Territory = (props: AddTerritoryFormSchema) => {
                             {TRCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Territory"
                                     onClick={() => handleDeleteClick(TRCode)}
                                 />
                             ) : (

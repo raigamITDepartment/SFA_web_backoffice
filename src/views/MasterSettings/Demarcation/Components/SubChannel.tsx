@@ -238,7 +238,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                             {SubCHCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate sub channel"
                                     onClick={() => handleDeleteClick(SubCHCode)}
                                 />
                             ) : (
