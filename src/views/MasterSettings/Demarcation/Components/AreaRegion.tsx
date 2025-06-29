@@ -41,7 +41,7 @@ import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useWatch } from 'react-hook-form'
 import { HiCheckCircle } from 'react-icons/hi'
-import CreatableSelect from 'react-select/creatable'
+
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 

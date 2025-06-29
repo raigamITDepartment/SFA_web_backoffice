@@ -4,7 +4,9 @@ import SignUpForm from './components/SignUpForm'
 import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
 import { useThemeStore } from '@/Store/themeStore'
+import { useEffect, useState } from 'react'
 import UserTable from './components/UserTable'
+import { fetchUsers } from '@/services/singupDropdownService'
 
 type SignUpProps = {
     disableSubmit?: boolean
@@ -16,8 +18,21 @@ export const SignUpBase = ({
     disableSubmit,
 }: SignUpProps) => {
     const [message, setMessage] = useTimeOutMessage()
-
     const mode = useThemeStore((state) => state.mode)
+    const [users, setUsers] = useState<any[]>([])
+
+    const loadUsers = async () => {
+            try {
+                const res = await fetchUsers()
+                setUsers(res)
+            } catch (err) {
+                console.error('Failed to load users:', err)
+            }
+        }
+
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
     return (
         <>
@@ -44,6 +59,7 @@ export const SignUpBase = ({
                     <SignUpForm
                         disableSubmit={disableSubmit}
                         setMessage={setMessage}
+                        onSuccess={loadUsers}
                         role="defaultRole"
                         gender="defaultGender"
                         region="defaultRegion"
@@ -55,22 +71,9 @@ export const SignUpBase = ({
 
                 {/* Right Column (8/12 width) */}
                 <div className="w-full lg:w-3/5 mt-1 lg:mt-0">
-                    <UserTable />
+                    <UserTable users={users} />
                 </div>
             </div>
-
-            {/* <div>
-                <div className="mt-6 text-center">
-                    <span>Already have an account? </span>
-                    <ActionLink
-                        to={signInUrl}
-                        className="heading-text font-bold"
-                        themeColor={false}
-                    >
-                        Sign in
-                    </ActionLink>
-                </div>
-            </div> */}
         </>
     )
 }

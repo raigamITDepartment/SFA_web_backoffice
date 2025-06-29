@@ -32,8 +32,6 @@ import { fetchChannels, fetchCountry, addNewChannel, deleteChannel } from '@/ser
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { HiCheckCircle } from 'react-icons/hi'
-import { co } from '@fullcalendar/core/internal-common'
 
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
@@ -316,7 +314,7 @@ const Channel = (props: AddChannelFormSchema) => {
         if (isSubmitting) return // Prevent double submit
         setIsSubmitting(true)
         try {
-            const result = await addNewChannel(values, token);
+            const result = await addNewChannel(values);
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)

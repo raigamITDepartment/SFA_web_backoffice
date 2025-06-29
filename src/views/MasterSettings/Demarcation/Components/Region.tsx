@@ -162,7 +162,7 @@ const Region = (props: AddRegionFormSchema) => {
     useEffect(() => {
             const loadChannel = async () => {
                 try {
-                    const channelOptions = await fetchChannels(token)
+                    const channelOptions = await fetchChannels()
                     setChannel(channelOptions)
                 } catch (error) {
                     setMessage?.('Failed to load channels.')
