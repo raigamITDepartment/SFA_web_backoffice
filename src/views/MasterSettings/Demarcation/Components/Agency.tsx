@@ -258,7 +258,7 @@ const Agency = (props: AddAgencyFormSchema) => {
             { header: 'Territory', accessorKey: 'territoryName' },
             { header: 'Agency Code', accessorKey: 'agencyCode' },
             { header: 'Agency Name', accessorKey: 'agencyName' },
-              { header: 'Range', accessorKey: 'Range' },
+            { header: 'Range', accessorKey: 'range' },
             {
                 header: 'Is Active',
                 accessorKey: 'isActive',
