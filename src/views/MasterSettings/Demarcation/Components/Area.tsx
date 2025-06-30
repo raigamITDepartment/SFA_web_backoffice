@@ -261,7 +261,7 @@ const Area = (props: AddAreaFormSchema) => {
                             {ARCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Area "
                                     onClick={() => handleDeleteClick(ARCode)}
                                 />
                             ) : (
@@ -353,12 +353,20 @@ const Area = (props: AddAreaFormSchema) => {
                 await loadAreas();
             }
         }catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during creating new Area. Please try again.'
+            let backendMessage = 'An error occurred during creating new Area. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -375,7 +383,7 @@ const Area = (props: AddAreaFormSchema) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
+            );
         } finally {
             setIsSubmitting(false)
         }

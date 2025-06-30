@@ -255,9 +255,10 @@ const Agency = (props: AddAgencyFormSchema) => {
     const columns = useMemo<ColumnDef<Agency>[]>(
         () => [
             { header: 'Channel', accessorKey: 'channelName' },
+            { header: 'Territory', accessorKey: 'territoryName' },
             { header: 'Agency Code', accessorKey: 'agencyCode' },
             { header: 'Agency Name', accessorKey: 'agencyName' },
-              { header: 'Range', accessorKey: 'Range' },
+            { header: 'Range', accessorKey: 'range' },
             {
                 header: 'Is Active',
                 accessorKey: 'isActive',
@@ -292,7 +293,7 @@ const Agency = (props: AddAgencyFormSchema) => {
                             {RGCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Agancy"
                                     onClick={() => handleDeleteClick(RGCode)}
                                 />
                             ) : (
@@ -372,6 +373,7 @@ const Agency = (props: AddAgencyFormSchema) => {
         setIsSubmitting(true)
         try {
             const result = await addNewAgency(values, token);
+            console.log(result,'result');
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
@@ -401,13 +403,22 @@ const Agency = (props: AddAgencyFormSchema) => {
                 reset();
                 await loadAgency();
             }
-        }catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during creating new Agency. Please try again.'
+        } catch (err: any) {
+
+            let backendMessage = 'An error occurred during creating new Agency. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -424,11 +435,13 @@ const Agency = (props: AddAgencyFormSchema) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
-        } finally {
-            setIsSubmitting(false)
+            );
         }
-    };
+
+        finally {
+                    setIsSubmitting(false)
+                }
+        };
     return (
         <div>
             <div className="flex flex-col lg:flex-row xl:flex-row gap-4">
@@ -550,7 +563,7 @@ const Agency = (props: AddAgencyFormSchema) => {
                                 <Input
                                     type="number"
                                     autoComplete="off"
-                                    placeholder="Route Code"
+                                    placeholder="Old Agancy Code"
                                     value={field.value ?? ''}
                                     onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                                 />

@@ -32,8 +32,6 @@ import { fetchChannels, fetchCountry, addNewChannel, deleteChannel } from '@/ser
 import { z } from 'zod'
 import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { HiCheckCircle } from 'react-icons/hi'
-import { co } from '@fullcalendar/core/internal-common'
 
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
@@ -241,7 +239,7 @@ const Channel = (props: AddChannelFormSchema) => {
                             {CHCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Channel"
                                     onClick={() => handleDeleteClick(CHCode)}
                                 />
                             ) : (
@@ -316,7 +314,7 @@ const Channel = (props: AddChannelFormSchema) => {
         if (isSubmitting) return // Prevent double submit
         setIsSubmitting(true)
         try {
-            const result = await addNewChannel(values, token);
+            const result = await addNewChannel(values);
 
             if (result?.status === 'failed') {
                 setMessage?.(result.message)
@@ -343,30 +341,39 @@ const Channel = (props: AddChannelFormSchema) => {
                 await loadChannels();
             }
         }catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during creating new channel. Please try again.'
-
-            toast.push(
-                <Alert
-                    showIcon
-                    type="danger"
-                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
-                >
-                    {backendMessage}
-                </Alert>,
-                {
-                    offsetX: 5,
-                    offsetY: 100,
-                    transitionType: 'fade',
-                    block: false,
-                    placement: 'top-end',
-                },
-            )
-        } finally {
+        
+                    let backendMessage = 'An error occurred during creating new Channel. Please try again.';
+        
+                    const response = err?.response;
+                    const data = response?.data;
+        
+                    if (data) {
+                        if (typeof data.payload === 'string') {
+                            backendMessage = data.payload;
+                        } else if (typeof data.message === 'string') {
+                            backendMessage = data.message;
+                        }
+                    } else if (typeof err.message === 'string') {
+                        backendMessage = err.message;
+                    }
+        
+                    toast.push(
+                        <Alert
+                            showIcon
+                            type="danger"
+                            className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                        >
+                            {backendMessage}
+                        </Alert>,
+                        {
+                            offsetX: 5,
+                            offsetY: 100,
+                            transitionType: 'fade',
+                            block: false,
+                            placement: 'top-end',
+                        },
+                    );
+                } finally {
             setIsSubmitting(false)
         }
     };

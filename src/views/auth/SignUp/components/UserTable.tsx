@@ -42,6 +42,10 @@ type Person = {
     isActive?: boolean
 }
 
+interface UserTableProps {
+  users: Person[]
+}
+
 interface DebouncedInputProps
     extends Omit<
         InputHTMLAttributes<HTMLInputElement>,
@@ -94,52 +98,27 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-// Sample data for initial render
-const sampleData: Person[] = [
-    {
-        id: 1,
-        userName: 'jdoe',
-        roleId: 1,
-        email: 'jdoe@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        role: 'Admin',
-        userType: 'Internal',
-        isActive: true,
-    },
-    {
-        id: 2,
-        userName: 'asmith',
-        roleId: 2,
-        email: 'asmith@example.com',
-        firstName: 'Alice',
-        lastName: 'Smith',
-        role: 'User',
-        userType: 'External',
-        isActive: false,
-    },
-]
+const UserTable = ({ users }: UserTableProps) => {
 
-const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const [data, setData] = useState<Person[]>(sampleData)
+    const [data, setData] = useState<Person[]>([])
     const [selectedUser, setSelectedUser] = useState<Person | null>(null)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
     const navigate = useNavigate()
 
-    useEffect(() => {
-        const loadUsers = async () => {
+    const loadUsers = async () => {
             try {
                 const res = await fetchUsers()
                 setData(res)
             } catch (err) {
-                // If fetch fails, keep sample data
                 console.error('Failed to load users:', err)
             }
         }
-        loadUsers()
-    }, [])
+
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
     const handleDeleteClick = (user: Person) => {
         setSelectedUser(user)
@@ -351,4 +330,4 @@ const Filtering = () => {
     )
 }
 
-export default Filtering
+export default UserTable

@@ -41,7 +41,7 @@ import type { ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useWatch } from 'react-hook-form'
 import { HiCheckCircle } from 'react-icons/hi'
-import CreatableSelect from 'react-select/creatable'
+
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -329,7 +329,7 @@ const Area = (props: AddAreaRegionFormSchema) => {
                             {ArCode.isActive ? (
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
-                                    title="Deactivate User"
+                                    title="Deactivate Area Region Mapping"
                                     onClick={() => handleDeleteClick(ArCode)}
                                 />
                             ) : (
@@ -428,13 +428,21 @@ const Area = (props: AddAreaRegionFormSchema) => {
                 reset();
                 await loadAreaRegions();
             }
-        } catch (err: any) {
-            const backendMessage =
-                err?.response?.data?.payload &&
-                typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during mapping new Area-Region. Please try again.';
+        }catch (err: any) {
+            let backendMessage = 'An error occurred during creating new Area-Region. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -450,9 +458,9 @@ const Area = (props: AddAreaRegionFormSchema) => {
                     transitionType: 'fade',
                     block: false,
                     placement: 'top-end',
-                }
+                },
             );
-        } finally {
+        }finally {
             setIsSubmitting(false);
         }
     };

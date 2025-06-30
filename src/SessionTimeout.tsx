@@ -1,40 +1,10 @@
-// import { useEffect } from 'react'
-// import { useNavigate } from 'react-router-dom'
-// import { useAuth } from '@/auth'
-
-
-// const SessionTimeout: React.FC = () => {
-//     const navigate = useNavigate()
-//     const { signOut } = useAuth()
-
-//     useEffect(() => {
-//         const checkSessionExpiry = () => {
-//             const loginTime = parseInt(sessionStorage.getItem('loginTime') || '0', 10)
-//             const sessionTimeout = parseInt(sessionStorage.getItem('sessionTimeout') || '0', 10)
-//             const now = Date.now()
-
-//             if (loginTime && sessionTimeout && now - loginTime > sessionTimeout) {
-//                 sessionStorage.clear()
-//                 alert('Session expired. Please login again.')
-//                 signOut()
-//             }
-//         }
-
-//         const interval = setInterval(checkSessionExpiry, 60 * 1000)
-//         return () => clearInterval(interval)
-//     }, [signOut])
-
-//     return null
-// }
-
-// export default SessionTimeout
-
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth'
 import Dialog from '@/components/ui/Dialog'
 import Button from '@/components/ui/Button'
 import { HiExclamationCircle } from 'react-icons/hi'
+
 
 const SessionTimeout: React.FC = () => {
     const navigate = useNavigate()
@@ -50,9 +20,10 @@ const SessionTimeout: React.FC = () => {
             if (loginTime && sessionTimeout && now - loginTime > sessionTimeout) {
                 sessionStorage.clear()
                 setIsOpen(true)
+                signOut() 
             }
         }
-
+        checkSessionExpiry()
         const interval = setInterval(checkSessionExpiry, 60 * 1000)
         return () => clearInterval(interval)
     }, [signOut])

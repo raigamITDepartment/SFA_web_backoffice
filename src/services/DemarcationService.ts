@@ -1133,3 +1133,185 @@ export const updateAreaRegion = async (payload: UpdateAreaRegionPayload, token: 
 
 
 
+//distributor mapping
+//creation 
+export const fetchDistributors = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/distributor`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching distributors:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load distributors.');
+    }
+};
+export const deleteDistributor = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.delete(
+            `${AuthService_URL}/api/v1/userDemarcation/distributor/deactivateDistributor/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error deleting distributors:', error);
+        throw new Error(error.response?.data?.message || 'Failed to delete distributors.');
+    }
+};
+export const distributorOptions = async () => {
+
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/distributor`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+        const activeDistributors= response.data.payload.filter(
+            (distributor: any) => distributor.isActive === true
+        );
+
+        return activeDistributors.map((distributor: any) => ({
+            label: distributor.distributorName,
+            value: distributor.id,
+        }));
+
+    } catch (error: any) {
+        console.error('Error fetching distributor:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load distributor.');
+    }
+};
+export interface DistributorPayload {
+    userId: number;
+    distributorName: string;
+    email: string;
+    address1?: string | null;
+    address2?: string | null;
+    address3?: string | null;
+    mobileNo: string;
+    isActive: boolean;
+}
+export const addNewDistributor = async (payload: DistributorPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/distributor`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during adding new distributor:', error, payload);
+        throw new Error(error.response?.data?.message || 'Add new distributor failed.');
+    }
+};
+//agency mapping
+export const fetchAgencyDistributors = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/agencyDistributor`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching agency distributors:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load agency distributors.');
+    }
+};
+export const deleteAgencyDistributors  = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.delete(
+            `${AuthService_URL}/api/v1/userDemarcation/agencyDistributor/deactivateAgencyDistributor/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error deleting distributors:', error);
+        throw new Error(error.response?.data?.message || 'Failed to delete distributors.');
+    }
+};
+export interface AgencyMappingDTO {
+    userId: number;
+    agencyId: number | null;
+    distributorId: number | null;
+    isActive: boolean;
+}
+
+export interface MapAgencyPayload {
+    agencyDistributorDTOList: AgencyMappingDTO[];
+}
+
+export const mapAgency = async (payload: MapAgencyPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/userDemarcation/agencyDistributor`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during mapping:', error, payload);
+        throw new Error(error.response?.data?.message || 'Mapping failed.');
+    }
+};

@@ -34,6 +34,8 @@ import CreatableSelect from 'react-select/creatable'
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
     setMessage?: (message: string) => void
+    onSuccess?: () => void
+    loadUsers?: () => Promise<void>
     role: string
     gender: string
     region: string
@@ -88,7 +90,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
         territory: z.number().optional(),
         range: z.number().optional(),
         agency: z.number().optional(),
-        area: z.array(z.number()).min(1, 'Please select at least one area'),
+        area: z.number().optional(),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: 'Password not match',
@@ -96,7 +98,13 @@ const validationSchema: ZodType<SignUpFormSchema> = z
     })
 
 const SignUpForm = (props: SignUpFormProps) => {
-    const { disableSubmit = false, className, setMessage } = props
+    const {
+    disableSubmit = false,
+    className,
+    setMessage,
+    onSuccess,
+    loadUsers,
+    } = props
     const token = sessionStorage.getItem('accessToken')
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [departments, setDepartments] = useState<any>([])
@@ -121,6 +129,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         formState: { errors },
         control,
         watch,
+        reset,
     } = useForm<SignUpFormSchema>({
         resolver: zodResolver(validationSchema),
     })
@@ -177,7 +186,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         }
         const loadTerritories = async () => {
             try {
-                const territoryOptions = await fetchTerritories(token)
+                const territoryOptions = await fetchTerritories()
                 setTerritory(territoryOptions)
             } catch (error) {
                 setMessage?.('Failed to load territories.')
@@ -189,7 +198,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadRegion = async () => {
             try {
-                const regionOptions = await fetchRegions(token)
+                const regionOptions = await fetchRegions()
                 setRegion(regionOptions)
             } catch (error) {
                 setMessage?.('Failed to load regions.')
@@ -201,7 +210,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadChannel = async () => {
             try {
-                const channelOptions = await fetchChannels(token)
+                const channelOptions = await fetchChannels()
                 setChannel(channelOptions)
             } catch (error) {
                 setMessage?.('Failed to load channels.')
@@ -213,7 +222,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadChannel = async () => {
             try {
-                const subChannelOptions = await fetchSubChannels(token)
+                const subChannelOptions = await fetchSubChannels()
                 setSubChannel(subChannelOptions)
             } catch (error) {
                 setMessage?.('Failed to load sub channels.')
@@ -225,7 +234,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadArea = async () => {
             try {
-                const areaOptions = await fetchAreas(token)
+                const areaOptions = await fetchAreas()
                 setArea(areaOptions)
             } catch (error) {
                 setMessage?.('Failed to load areas.')
@@ -237,7 +246,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadRange = async () => {
             try {
-                const rangeOptions = await fetchRanges(token)
+                const rangeOptions = await fetchRanges()
                 setRange(rangeOptions)
             } catch (error) {
                 setMessage?.('Failed to load ranges.')
@@ -249,7 +258,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadRange = async () => {
             try {
-                const agencyOptions = await fetchAgencies(token)
+                const agencyOptions = await fetchAgencies()
                 setAgency(agencyOptions)
             } catch (error) {
                 setMessage?.('Failed to load ranges.')
@@ -261,7 +270,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadRange = async () => {
             try {
-                const userTypes = await fetchUserTypes(token)
+                const userTypes = await fetchUserTypes()
                 setUserType(userTypes)
             } catch (error) {
                 setMessage?.('Failed to load user types.')
@@ -273,7 +282,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     useEffect(() => {
         const loadRange = async () => {
             try {
-                const userRole = await fetchUserRoles(token)
+                const userRole = await fetchUserRoles()
                 setUserRole(userRole)
             } catch (error) {
                 setMessage?.('Failed to load user types.')
@@ -340,8 +349,6 @@ const SignUpForm = (props: SignUpFormProps) => {
 
         //register new user
         try {
-            console.log('Sending payload:', JSON.stringify(payload, null, 2))
-
             const result = await signupUser(payload)
 
             if (result?.status === 'failed') {
@@ -369,15 +376,25 @@ const SignUpForm = (props: SignUpFormProps) => {
                         placement: 'top-end',
                     },
                 )
+                reset();
+                await loadUsers?.();
+                onSuccess?.();
             }
-        } catch (err: any) {
-            console.error('Signup failed:', err.message)
-            const backendMessage =
-                err?.response?.data?.payload &&
-                    typeof err.response.data.payload === 'object'
-                    ? Object.values(err.response.data.payload).join(', ')
-                    : err?.response?.data?.message ||
-                    'An error occurred during signup. Please try again.'
+        }catch (err: any) {
+            let backendMessage = 'An error occurred during onboardin new user. Please try again.';
+
+            const response = err?.response;
+            const data = response?.data;
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload;
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message;
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message;
+            }
 
             toast.push(
                 <Alert
@@ -394,9 +411,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                     block: false,
                     placement: 'top-end',
                 },
-            )
+            );
         } finally {
-            setIsSubmitting(false)
+        setIsSubmitting(false)
         }
     }
 
