@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, Component, ReactNode } from 'react'
+import React, { useMemo, useState, useRef, Component, ReactNode, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Table from '@/components/ui/Table'
@@ -23,6 +23,7 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import { LoadScript, Autocomplete, GoogleMap, Marker } from '@react-google-maps/api'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { Library } from '@googlemaps/js-api-loader'
+import { fetchDistributorWarehouses } from '@/services/DemarcationService'
 
 type FormSchema = {
     distributor: string
@@ -122,6 +123,22 @@ function DistributorWarehouse() {
     const [scriptLoaded, setScriptLoaded] = useState(false)
     const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: 7.8731, lng: 80.7718 })
     const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(null)
+    const [warehouse, setWarehouse] =  useState<WarehouseRow[]>([])
+
+    const loadWarehouses = async () => {
+        try {
+            const warehouseOptions = await fetchDistributorWarehouses();
+            setWarehouse(warehouseOptions);
+            console.log('Fetched distributors:', warehouseOptions);
+
+        } catch (err) {
+            console.error('Failed to load users:', err);
+        }
+    };
+
+    useEffect(() => {
+        loadWarehouses();
+    }, []);
 
     const handleEdit = (row: WarehouseRow) => {
         // Implement edit functionality here

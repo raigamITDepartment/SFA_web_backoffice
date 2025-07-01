@@ -9,54 +9,157 @@ import { useParams } from 'react-router-dom'
 import Dialog from '@/components/ui/Dialog'
 import { HiCheckCircle } from 'react-icons/hi'
 import { toast, Alert } from '@/components/ui'
+import { findAgencyDistributorById, distributorOptions, updateDistributorAgency } from '@/services/DemarcationService'
+import {fetchAgencies} from '@/services/singupDropdownService'
+import { useNavigate } from 'react-router-dom'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import type { ZodType } from 'zod'
 
 type FormSchema = {
     distributorName: string;
     agencyName: string;
     isActive: boolean;
 }
+export type UpdateDistributorAgencyFormSchema = {
+    userId: number;
+    agencyId: number[]; 
+    distributorId: number | null;
+    agencyCode:number | null;
+    isActive: boolean;
+};
 
-function DistributorAgencyEdit() {
+
+const validationSchema: ZodType<UpdateDistributorAgencyFormSchema> = z.object({
+    userId: z.number().min(1, 'User ID is required'),
+    agencyId: z.array(z.number()).min(1, 'Please select at least one agency'),
+    distributorId: z.number({ required_error: 'Please select distributor' }).nullable(),
+    agencyCode: z.number({ required_error: 'Please add agency code' }).nullable(),
+    isActive: z.boolean(),
+});
+
+function DistributorAgencyEdit(props: UpdateDistributorAgencyFormSchema) {
     const { id } = useParams();
+    const navigate = useNavigate()
+    const token = sessionStorage.getItem('accessToken')
+    const userId = sessionStorage.getItem('userId');
+    const userIdNumber = Number(userId);
+    const [distributorData, setDistributorData] = useState<any[]>([])
+    const [agency, setAgency] = useState<any>([])
+    const [distributor, setDistributor] = useState<any>([])
+    const { disableSubmit = false, className, setMessage } = props
     const [successDialog, setSuccessDialog] = useState(false);
+
+    useEffect(() => {
+        if (!token) {
+            setMessage?.('No auth token found.');
+            return;
+        }
+        if (!id) {
+            setMessage?.('No user ID found.');
+            return;
+        }
+
+        const loadDistributorDetails = async () => {
+            try {
+                const distributorDetails = await findAgencyDistributorById(id);
+                setDistributorData(distributorDetails);
+
+                reset({
+                    id: distributorDetails.id,
+                    userId: distributorDetails.userId,
+                    distributorId: distributorDetails.distributorId,
+                    agencyId: distributorDetails.agencyId,
+                    agencyCode: distributorDetails.agencyCode,
+                    isActive: distributorDetails.isActive ?? false,
+                });
+            } catch (error) {
+                setMessage?.('Failed to load distributor data.');
+            }
+        };
+
+
+        loadDistributorDetails()
+    }, [token, id, setMessage]);
+
+    useEffect(() => {
+            const loadAgencies = async () => {
+                try {
+                    const agencyOptions = await fetchAgencies()
+                    setAgency(agencyOptions)
+                } catch (error) {
+                    setMessage?.('Failed to load channels.')
+                }
+            }
+            loadAgencies()
+    }, [setMessage]);
+
+    useEffect(() => {
+            const loadDistributors = async () => {
+                try {
+                    const distributorOption = await distributorOptions()
+                    setDistributor(distributorOption)
+                } catch (error) {
+                    setMessage?.('Failed to load channels.')
+                }
+            }
+            loadDistributors()
+    }, [setMessage])
 
     const {
         handleSubmit,
         formState: { errors },
         control,
         reset,
-    } = useForm<FormSchema>({
+    } = useForm<UpdateDistributorAgencyFormSchema>({
         defaultValues: {
-            distributorName: '',
-            agencyName: '',
+            userId: userIdNumber,
+            agencyId: [], 
+            distributorId: null,
+            agencyCode:1,
             isActive: true,
         },
     })
 
-    // Example: Fetch and set data by id (replace with your actual fetch logic)
-    useEffect(() => {
-        if (id) {
-            // Simulate fetch
-            // Replace with your API call
-            const fetchData = async () => {
-                // Example: fetched data
-                const fetched = {
-                    distributorName: 'Distributor 1',
-                    agencyName: 'Agency 2',
-                    isActive: true,
-                }
-                reset(fetched)
-            }
-            fetchData()
+   const onSubmit = async (values: UpdateDistributorAgencyFormSchema) => {
+        if (!token) {
+            setMessage?.('Auth token not found.');
+            return;
         }
-    }, [id, reset])
 
-    const onSubmit = async (values: FormSchema) => {
-        await new Promise((r) => setTimeout(r, 500))
-        setSuccessDialog(true)
-        reset(values)
-    }
+        try {
+            const payload = {
+                id: id,
+                userId: userIdNumber,
+                agencyId: values.agencyId,
+                distributorId: values.distributorId,
+                agencyCode: 1,
+                isActive: values.isActive,
+            };
 
+            await updateDistributorAgency(payload, token);
+
+            toast.push(
+                <Alert className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center">
+                    <div className="mt-2 text-amber-600 font-semibold text-lg text-center">
+                        Distributor-Agency updated successfully!
+                    </div>
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                },
+            );
+            reset();
+            navigate(-1);
+        } catch (error: any) {
+            console.error('Failed to update Distributor-Agency:', error);
+            setMessage?.(error.message || 'Failed to update Distributor-Agency');
+        }
+    };
     const handleSuccessDialogClose = () => {
         setSuccessDialog(false);
         toast.push(
@@ -83,87 +186,51 @@ function DistributorAgencyEdit() {
                 <h5 className='mb-2'>Edit Distributor Agency Mapping</h5>
                 <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                     <FormItem
-                        invalid={Boolean(errors.distributorName)}
-                        errorMessage={errors.distributorName?.message}
+                        invalid={Boolean(errors.distributorId)}
+                        errorMessage={errors.distributorId?.message}
                     >
                         <Controller
-                            name="distributorName"
+                            name="distributorId"
                             control={control}
-                            render={({ field }) =>
+                            render={({ field }) => (
                                 <Select
                                     size="sm"
                                     placeholder="Select Distributor"
-                                    options={[
-                                        { label: 'Distributor 1', value: 'Distributor 1' },
-                                        { label: 'Distributor 2', value: 'Distributor 2' },
-                                        { label: 'Distributor 3', value: 'Distributor 3' },
-                                        { label: 'Distributor 4', value: 'Distributor 4' },
-                                        { label: 'Distributor 5', value: 'Distributor 5' },
-                                    ]}
-                                    value={
-                                        [
-                                            { label: 'Distributor 1', value: 'Distributor 1' },
-                                            { label: 'Distributor 2', value: 'Distributor 2' },
-                                            { label: 'Distributor 3', value: 'Distributor 3' },
-                                            { label: 'Distributor 4', value: 'Distributor 4' },
-                                            { label: 'Distributor 5', value: 'Distributor 5' },
-                                        ].find(option => option.value === field.value) || null
-                                    }
-                                    onChange={(selectedOption) => field.onChange(selectedOption?.value)}
+                                    options={distributor}
+                                    value={distributor.find(option => option.value === field.value) || null}
+                                    onChange={(option) => field.onChange(option?.value ?? null)}
                                 />
-                            }
-                            rules={{
-                                validate: {
-                                    required: (value) => {
-                                        if (!value) {
-                                            return 'Required';
-                                        }
-                                        return;
-                                    }
-                                }
-                            }}
+                            )}
                         />
                     </FormItem>
                     <FormItem
-                        invalid={Boolean(errors.agencyName)}
-                        errorMessage={errors.agencyName?.message}
+                        label="Select Agency"
+                        invalid={Boolean(errors.agencyId)}
+                        errorMessage={errors.agencyId?.message}
+                        style={{ flex: 1, marginLeft: '10px' }}
                     >
                         <Controller
-                            name="agencyName"
+                            name="agencyId"
                             control={control}
-                            render={({ field }) =>
-                                <Select<{ label: string; value: string }>
+                            render={({ field }) => (
+                                <Select
                                     size="sm"
-                                    placeholder="Select Agency"
-                                    options={[
-                                        { label: 'Agency 1', value: 'Agency 1' },
-                                        { label: 'Agency 2', value: 'Agency 2' },
-                                        { label: 'Agency 3', value: 'Agency 3' },
-                                        { label: 'Agency 4', value: 'Agency 4' },
-                                        { label: 'Agency 5', value: 'Agency 5' },
-                                    ]}
-                                    value={
-                                        [
-                                            { label: 'Agency 1', value: 'Agency 1' },
-                                            { label: 'Agency 2', value: 'Agency 2' },
-                                            { label: 'Agency 3', value: 'Agency 3' },
-                                            { label: 'Agency 4', value: 'Agency 4' },
-                                            { label: 'Agency 5', value: 'Agency 5' },
-                                        ].find(option => option.value === field.value) || null
-                                    }
-                                    onChange={(selectedOption) => field.onChange(selectedOption?.value)}
+                                    className="mb-4"
+                                    placeholder="Please Select agency"
+                                    options={agency}
+                                    value={agency.find(
+                                        (option: { value: number }) =>
+                                            option.value ===
+                                            Number(field.value),
+                                    )}
+                                    onChange={(
+                                        option: {
+                                            label: string
+                                            value: number
+                                        } | null,
+                                    ) => field.onChange(option?.value)}
                                 />
-                            }
-                            rules={{
-                                validate: {
-                                    required: (value) => {
-                                        if (!value) {
-                                            return 'Required';
-                                        }
-                                        return;
-                                    }
-                                }
-                            }}
+                            )}
                         />
                     </FormItem>
                     <FormItem>
