@@ -109,6 +109,9 @@ const TerritoryWise = () => {
     const [areaFilter, setAreaFilter] = useState('');
     const [rangeFilter, setRangeFilter] = useState('');
 
+    // Month filter state
+    const [monthRange, setMonthRange] = useState<[Date | null, Date | null]>([null, null]);
+
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
@@ -162,16 +165,31 @@ const TerritoryWise = () => {
         },
     ]);
 
-    // Filtered territories based on select filters
+    // Filtered territories based on select filters and month filter
     const filteredTerritories = useMemo(() => {
-        return territories.filter(t =>
-            (!channelFilter || t.channel === channelFilter) &&
-            (!subChannelFilter || t.subChannel === subChannelFilter) &&
-            (!regionFilter || t.region === regionFilter) &&
-            (!areaFilter || t.area === areaFilter) &&
-            (!rangeFilter || t.range === rangeFilter)
-        );
-    }, [territories, channelFilter, subChannelFilter, regionFilter, areaFilter, rangeFilter]);
+        return territories.filter(t => {
+            const baseFilter =
+                (!channelFilter || t.channel === channelFilter) &&
+                (!subChannelFilter || t.subChannel === subChannelFilter) &&
+                (!regionFilter || t.region === regionFilter) &&
+                (!areaFilter || t.area === areaFilter) &&
+                (!rangeFilter || t.range === rangeFilter);
+
+            if (!monthRange[0] || !monthRange[1]) return baseFilter;
+
+            // Parse territory dateRange (format: "YYYY-MM-DD ~ YYYY-MM-DD")
+            const [startStr, endStr] = (t.dateRange || '').split('~').map(s => s.trim());
+            if (!startStr || !endStr) return false;
+            const terrStart = new Date(startStr);
+            const terrEnd = new Date(endStr);
+            const filterStart = monthRange[0];
+            const filterEnd = monthRange[1];
+
+            // Check if ranges overlap
+            const overlap = terrStart <= filterEnd && terrEnd >= filterStart;
+            return baseFilter && overlap;
+        });
+    }, [territories, channelFilter, subChannelFilter, regionFilter, areaFilter, rangeFilter, monthRange]);
 
     const columns = useMemo<ColumnDef<Territory>[]>(() => [
         { header: 'Area Code', accessorKey: 'areaCode' },
@@ -552,7 +570,15 @@ const TerritoryWise = () => {
                                         />
                                         <DatePickerRange
                                             placeholder="Select dates range"
-                                            value={territory.dateRange}
+                                            value={
+                                                (() => {
+                                                    if (!territory.dateRange) return [null, null];
+                                                    const [start, end] = territory.dateRange.split('~').map(s => s.trim());
+                                                    const startDate = start ? new Date(start) : null;
+                                                    const endDate = end ? new Date(end) : null;
+                                                    return [isNaN(startDate as any) ? null : startDate, isNaN(endDate as any) ? null : endDate];
+                                                })()
+                                            }
                                         // onChange={...} // Add if you want to allow editing
                                         />
                                         <Button
@@ -604,13 +630,21 @@ const TerritoryWise = () => {
 
                 <Card bordered={false} className='w-full overflow-auto'>
                     <div>
-                        <DebouncedInput
-                            value={globalFilter ?? ''}
-                            className="font-xs shadow border border-block"
-                            placeholder="Search all columns..."
-                            onChange={(value) => setGlobalFilter(String(value))}
-                        />
-
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
+                            <DebouncedInput
+                                value={globalFilter ?? ''}
+                                className="font-xs shadow border border-block"
+                                placeholder="Search all columns..."
+                                onChange={(value) => setGlobalFilter(String(value))}
+                            />
+                            <div>
+                                <DatePickerRange
+                                    placeholder="Filter by Date Range"
+                                    value={monthRange}
+                                    onChange={setMonthRange}
+                                />
+                            </div>
+                        </div>
                         <div className="min-w-[900px]">
                             <Table>
                                 <THead>
