@@ -101,8 +101,6 @@ export type AddDistributorFormSchema = {
     isActive: boolean;
 };
 
-
-
 const validationSchema: ZodType<AddDistributorFormSchema> = z.object({
     userId: z.number().min(1, 'User ID is required'), 
     distributorName: z.string({ required_error: 'Distributor name is required' }),
@@ -306,7 +304,6 @@ const DistributorCreation = (props: AddDistributorFormSchema) => {
             isActive: true,
         },
     });
-
 
     const onSubmit = async (values: AddDistributorFormSchema) => {
         if (isSubmitting) return // Prevent double submit

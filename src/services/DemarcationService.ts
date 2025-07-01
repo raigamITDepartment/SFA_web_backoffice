@@ -1239,6 +1239,56 @@ export const addNewDistributor = async (payload: DistributorPayload) => {
         throw new Error(error.response?.data?.message || 'Add new distributor failed.');
     }
 };
+export const getDistributorById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/distributor/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching distributor by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch distributor by Id.');
+    }
+};
+export interface UpdateDistributorPayload {
+    userId: number;
+    distributorName: string;
+    email: string;
+    address1?: string | null;
+    address2?: string | null;
+    address3?: string | null;
+    mobileNo: string;
+    isActive: boolean;
+}
+export const updateDistributor = async (payload: UpdateDistributorPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/distributor`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during areaRegions update:', error, payload);
+        throw new Error(error.response?.data?.message || 'areaRegions update failed.');
+    }
+};
 //agency mapping
 export const fetchAgencyDistributors = async () => {
     try {
@@ -1289,11 +1339,9 @@ export interface AgencyMappingDTO {
     distributorId: number | null;
     isActive: boolean;
 }
-
 export interface MapAgencyPayload {
     agencyDistributorDTOList: AgencyMappingDTO[];
 }
-
 export const mapAgency = async (payload: MapAgencyPayload) => {
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -1313,5 +1361,74 @@ export const mapAgency = async (payload: MapAgencyPayload) => {
     } catch (error: any) {
         console.error('Error during mapping:', error, payload);
         throw new Error(error.response?.data?.message || 'Mapping failed.');
+    }
+};
+export const findAgencyDistributorById = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/agencyDistributor/findById/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error fetching agencyDistributor by Id:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch agencyDistributor by Id.');
+    }
+};
+export interface UpdateDistributorAgencyPayload {
+    userId: number;
+    agencyId: number | null;
+    distributorId: number | null;
+    agencyCode:number | null;
+    isActive: boolean;
+}
+export const updateDistributorAgency = async (payload: UpdateDistributorAgencyPayload, token: string) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/userDemarcation/agencyDistributor`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error('Error during agencyDistributor update:', error, payload);
+        throw new Error(error.response?.data?.message || 'agencyDistributor update failed.');
+    }
+};
+//distributor warehouse
+export const fetchDistributorWarehouses = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/agencyWarehouse`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching agencyWarehouse:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load agencyWarehouse.');
     }
 };

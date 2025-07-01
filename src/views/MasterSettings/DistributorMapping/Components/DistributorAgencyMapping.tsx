@@ -94,7 +94,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-export type MapAreaRegionFormSchema = {
+export type MapDistributorAgency = {
     userId: number;
     agencyId: number[]; 
     distributorId: number | null;
@@ -102,7 +102,7 @@ export type MapAreaRegionFormSchema = {
 };
 
 
-const validationSchema: ZodType<MapAreaRegionFormSchema> = z.object({
+const validationSchema: ZodType<MapDistributorAgency> = z.object({
     userId: z.number().min(1, 'User ID is required'),
     agencyId: z.array(z.number()).min(1, 'Please select at least one agency'),
     distributorId: z.number({ required_error: 'Please select region' }).nullable(),
@@ -111,7 +111,7 @@ const validationSchema: ZodType<MapAreaRegionFormSchema> = z.object({
 
 
 
-const DistributorAgencyMapping = (props: MapAreaRegionFormSchema) => {
+const DistributorAgencyMapping = (props: MapDistributorAgency) => {
     const token = sessionStorage.getItem('accessToken')
     const userId = sessionStorage.getItem('userId');
     const userIdNumber = Number(userId);
@@ -303,7 +303,7 @@ const DistributorAgencyMapping = (props: MapAreaRegionFormSchema) => {
         formState: { errors },
         control,
         reset,
-    } = useForm<MapAreaRegionFormSchema>({
+    } = useForm<MapDistributorAgency>({
         resolver: zodResolver(validationSchema),
         defaultValues: {
             userId: userIdNumber,
@@ -313,7 +313,7 @@ const DistributorAgencyMapping = (props: MapAreaRegionFormSchema) => {
         }
     });
 
-    const onSubmit = async (values: MapAreaRegionFormSchema) => {
+    const onSubmit = async (values: MapDistributorAgency) => {
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
