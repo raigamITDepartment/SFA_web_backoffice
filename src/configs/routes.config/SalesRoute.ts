@@ -10,20 +10,20 @@ const SalesRoute: Routes = [
 
     {
         key: 'SalesMenu.CategoryAdd',
-       path: '/Salesmenu/CategoryAdd',
-      // path: '/Sales-menu-CategoryAdd',
+        path: '/Salesmenu/CategoryAdd',
+        // path: '/Sales-menu-CategoryAdd',
         component: lazy(() => import('@/views/SalesDetails/CategoryAdd/CategoryAdd')),
         authority: [ADMIN, USER],
         meta: {
             pageContainerType: 'contained',
         },
     },
-   
+
 
 
     {
         key: 'SalesMenu.FreeIssue',
-          path:  '/Salesmenu/FreeIssue',
+        path: '/Salesmenu/FreeIssue',
         component: lazy(() => import('@/views/SalesDetails/FreeIssue')),
         authority: [],
     },
@@ -36,21 +36,21 @@ const SalesRoute: Routes = [
         authority: [],
     },
 
-  
+
 
     {
         key: 'SalesMenu.ItemAdd',
-      path: '/Salesmenu/ItemAdd',
+        path: '/Salesmenu/ItemAdd',
         component: lazy(() => import('@/views/SalesDetails/Products/ProductCreate')),
         authority: [],
     },
 
     {
-            key: 'SalesMenu.ItemSequence',
-            path: '/Salesmenu/ItemSequence',
-            component: lazy(() => import('@/views/SalesDetails/ItemSequence/ItemSequence')),
-            authority: [],
-     },
+        key: 'SalesMenu.ItemSequence',
+        path: '/Salesmenu/ItemSequence',
+        component: lazy(() => import('@/views/SalesDetails/ItemSequence/ItemSequence')),
+        authority: [],
+    },
 
     {
         key: 'SalesMenu.PriceUpdate',
@@ -60,7 +60,7 @@ const SalesRoute: Routes = [
     },
 
 
-  
+
     {
         key: 'SalesMenu.Stock',
         path: '/Salesmenu/Stock',
@@ -77,22 +77,22 @@ const SalesRoute: Routes = [
 
     {
         key: 'SalesMenu.WorkingDay',
-        path:'/Salesmenu/WorkingDay',
+        path: '/Salesmenu/WorkingDay',
         component: lazy(() => import('@/views/SalesDetails/WorkingDay/WorkingDay')),
         authority: [],
     },
 
     {
         key: 'SalesMenu.Invoice',
-        path:'/Salesmenu/Invoice',
+        path: '/Salesmenu/Invoice',
         component: lazy(() => import('@/views/SalesDetails/Invoice/Invoice')),
         authority: [],
     },
 
- 
+
     {
         key: 'SalesMenu.Target',
-        path:'/Salesmenu/Target',
+        path: '/Salesmenu/Target',
         component: lazy(() => import('@/views/SalesDetails/Target/Target')),
         authority: [],
     },
@@ -109,7 +109,21 @@ const SalesRoute: Routes = [
         component: lazy(() => import('@/views/SalesDetails/CategoryAdd/Components/Edit/MainCategoryEdit')),
         authority: [],
     },
-    
+
+    {
+        key: 'SalesMenu.SubCategoryEdit',
+        path: '/Salesmenu/SubCategoryEdit',
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd/Components/Edit/SubCategoryEdit')),
+        authority: [],
+    },
+
+    {
+        key: 'SalesMenu.SubSubCategoryEdit',
+        path: '/Salesmenu/SubSubCategoryEdit',
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd/Components/Edit/SubSubCategoryEdit')),
+        authority: [],
+    },
+
 
 ]
 

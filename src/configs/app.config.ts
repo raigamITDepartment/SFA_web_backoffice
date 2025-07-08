@@ -13,6 +13,7 @@ const appConfig: AppConfig = {
     apiPrefix: '/api',
     authenticatedEntryPath:  `${DASHBOARDS_PREFIX_PATH}/ecommerce`,
      unAuthenticatedEntryPath: '/sign-in',
+     
     locale: 'en',
     accessTokenPersistStrategy: 'cookies',
     enableMock: true,

@@ -48,7 +48,7 @@ const pageSizeOptions = [
     { value: 50, label: '50 / page' },
 ];
 
-const { DatePickerRange } = DatePicker
+const { DatePickerRange } = DatePicker;
 
 interface Territory {
     areaCode: string;
@@ -109,7 +109,10 @@ const TerritoryWise = () => {
     const [areaFilter, setAreaFilter] = useState('');
     const [rangeFilter, setRangeFilter] = useState('');
 
-    // Month filter state
+    // Date range state for the first card
+    const [targetDateRange, setTargetDateRange] = useState<[Date | null, Date | null]>([null, null]);
+
+    // Date range filter for the table
     const [monthRange, setMonthRange] = useState<[Date | null, Date | null]>([null, null]);
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -291,7 +294,7 @@ const TerritoryWise = () => {
                     type="danger"
                     className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
                 >
-                    Territory target for <b>{selectedTerritory.territoryName}</b> removed!
+                    Territory target for <b>{selectedTerritory?.territoryName}</b> removed!
                 </Alert>,
                 {
                     offsetX: 5,
@@ -340,37 +343,96 @@ const TerritoryWise = () => {
         setRangeFilter(watch('range'));
     }, [watch('channel'), watch('subChannel'), watch('region'), watch('area'), watch('range')]);
 
-    const onSubmit = async (values: FormSchema) => {
+    // --- 2nd Card Form State ---
+    const [territoryForm, setTerritoryForm] = useState({
+        territoryName: '',
+        targetValue: '',
+    });
+
+    // When date range changes in first card, clear 2nd card fields
+    useEffect(() => {
+        setTerritoryForm({
+            territoryName: '',
+            targetValue: '',
+        });
+    }, [targetDateRange[0], targetDateRange[1]]);
+
+    const handleTerritoryFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setTerritoryForm(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleTerritoryFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!territoryForm.territoryName || !territoryForm.targetValue) {
+            toast.push(
+                <Alert
+                    showIcon
+                    type="warning"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    Please fill in both Territory Name and Target Value.
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                }
+            );
+            return;
+        }
         setTerritories(prev => [
             ...prev,
             {
                 areaCode: 'A' + (prev.length + 1).toString().padStart(2, '0'),
                 territoryCode: 'T' + (prev.length + 1).toString().padStart(2, '0'),
-                territoryName: values.territoryName || `Territory ${prev.length + 1}`,
-                targetValue: values.targetValue || '',
+                territoryName: territoryForm.territoryName,
+                targetValue: territoryForm.targetValue,
                 pcTarget: '',
-                dateRange: values.dateRange
-                    ? `${values.dateRange[0]?.toLocaleDateString?.() ?? ''} ~ ${values.dateRange[1]?.toLocaleDateString?.() ?? ''}`
+                dateRange: targetDateRange[0] && targetDateRange[1]
+                    ? `${targetDateRange[0].toLocaleDateString()} ~ ${targetDateRange[1].toLocaleDateString()}`
                     : '',
-                isActive: values.isActive,
-                channel: values.channel,
-                subChannel: values.subChannel,
-                region: values.region,
-                area: values.area,
-                range: values.range,
+                isActive: true,
+                channel: channelFilter,
+                subChannel: subChannelFilter,
+                region: regionFilter,
+                area: areaFilter,
+                range: rangeFilter,
             },
         ]);
         setSuccessDialog(true);
-        reset();
+        setTerritoryForm({
+            territoryName: '',
+            targetValue: '',
+        });
+    };
+
+    const handleTerritoryFormDiscard = () => {
+        setTerritoryForm({
+            territoryName: '',
+            targetValue: '',
+        });
+    };
+
+    // Add this function before the return statement
+    const onsubmit: import('react-hook-form').SubmitHandler<FormSchema> = (data) => {
+        // You can handle form submission here, e.g., set filters, show a toast, etc.
+        // For now, do nothing or add your logic as needed.
     };
 
     return (
         <div>
             <div className='flex flex-col gap-4'>
 
+                {/* First Card: Filters and Date Range */}
                 <Card bordered={false} className='w-full h-1/2'>
                     <h5 className='mb-2'>Territory Wise Target</h5>
-                    <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
+                    <Form size="sm" onSubmit={handleSubmit(onsubmit)}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <FormItem
                                 invalid={Boolean(errors.channel)}
@@ -475,40 +537,6 @@ const TerritoryWise = () => {
                                 />
                             </FormItem>
                             <FormItem
-                                invalid={Boolean(errors.area)}
-                                errorMessage={errors.area?.message}
-                            >
-                                <Controller
-                                    name="area"
-                                    control={control}
-                                    render={({ field }) =>
-                                        <Select
-                                            size="md"
-                                            placeholder="Select Area"
-                                            options={[
-                                                { label: 'Area 1', value: 'Area 1' } as any,
-                                                { label: 'Area 2', value: 'Area 2' },
-                                            ]}
-                                            value={field.value}
-                                            onChange={(selectedOption) => {
-                                                field.onChange(selectedOption);
-                                                setAreaFilter(selectedOption ?? '');
-                                            }}
-                                        />
-                                    }
-                                    rules={{
-                                        validate: {
-                                            required: (value) => {
-                                                if (!value) {
-                                                    return 'Required';
-                                                }
-                                                return;
-                                            }
-                                        }
-                                    }}
-                                />
-                            </FormItem>
-                            <FormItem
                                 invalid={Boolean(errors.range)}
                                 errorMessage={errors.range?.message}
                             >
@@ -542,92 +570,103 @@ const TerritoryWise = () => {
                                     }}
                                 />
                             </FormItem>
+                            {/* Date range picker*/}
+                            <FormItem>
+                                <DatePickerRange
+                                    placeholder="Select date range"
+                                    value={targetDateRange}
+                                    onChange={setTargetDateRange}
+                                />
+                            </FormItem>
                         </div>
+                        <div className="flex justify-end mt-4">
+                            <Button
+                                className="lg:w-32 xl:w-32 mr-2 sm:w-full"
+                                variant="solid"
+                                type="submit"
+                            >
+                                Submit
+                            </Button>
+                            <Button
+                                    className="lg:w-32 xl:w-32 sm:w-full"
+                                    type="button"
+                                    clickFeedback={false}
+                                    onClick={handleTerritoryFormDiscard}
+                                >
+                                    Discard
+                                </Button>
+                        </div>
+                    </Form>
+                </Card>
 
-                        <FormItem>
-                            <span className="font-bold ">Territory List:</span>
-                            <div className="flex flex-col gap-2 mt-6">
-                                {filteredTerritories.length === 0 && (
-                                    <div className="text-gray-400 italic">No territories found.</div>
-                                )}
-                                {filteredTerritories.map((territory) => (
-                                    <div key={territory.territoryCode} className="flex items-center gap-4">
-                                        <Input
-                                            disabled
-                                            type="text"
-                                            autoComplete="off"
-                                            placeholder="Territory Name"
-                                            value={territory.territoryName}
-                                            className="mb-0"
-                                        />
-                                        <Input
-                                            type="text"
-                                            autoComplete="off"
-                                            placeholder="Target Value"
-                                            value={territory.targetValue}
-                                            className="mb-0"
-                                        // onChange={...} // Add if you want to allow editing
-                                        />
-                                        <DatePickerRange
-                                            placeholder="Select dates range"
-                                            value={
-                                                (() => {
-                                                    if (!territory.dateRange) return [null, null];
-                                                    const [start, end] = territory.dateRange.split('~').map(s => s.trim());
-                                                    const startDate = start ? new Date(start) : null;
-                                                    const endDate = end ? new Date(end) : null;
-                                                    return [isNaN(startDate as any) ? null : startDate, isNaN(endDate as any) ? null : endDate];
-                                                })()
-                                            }
-                                        // onChange={...} // Add if you want to allow editing
-                                        />
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            className="lg:w-25 xl:w-25 sm:w-full text-red-600 border-red-600 border-2 hover:border-3 hover:border-red-400 hover:ring-0 hover:text-red-600 hover:text-sm"
-                                            onClick={() => {
-                                                setTerritories(prev =>
-                                                    prev.map(t =>
-                                                        t.territoryCode === territory.territoryCode
-                                                            ? { ...t, targetValue: '', dateRange: '' }
-                                                            : t
-                                                    )
-                                                );
-                                            }}
-                                        >
-                                            Clear
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </FormItem>
 
-                        <FormItem>
-                            <div className="flex justify-center gap-4">
+                {/* Second Card: Add Territory*/}
+                <Card bordered={false} className='w-full h-1/2'>
+                
+                    <form onSubmit={handleTerritoryFormSubmit}>
+                        <h6 className='mb-2'>Area Name</h6>
+                        <div className="flex flex-col md:flex-row md:items-end gap-4">
+                        
+                            {/* <FormItem className="flex-1">
+                                
+                                <Input
+                                    type="text"
+                                    name="territoryName"
+                                    autoComplete="off"
+                                    placeholder="Territory Name"
+                                    value={territoryForm.territoryName}
+                                    onChange={handleTerritoryFormChange}
+                                />
+                            </FormItem> */}
+                            <FormItem className="flex-1 flex flex-col justify-end">
+                                <span className="h-10 flex items-center px-2 font-bold">
+                                    {/* Replace with your static or dynamic territory name as needed */}
+                                    Territory 1 Name
+                                </span>
+                            </FormItem>
+                            <FormItem className="flex-1">
+                                
+                                <Input
+                                    type="text"
+                                    name="targetValue"
+                                    autoComplete="off"
+                                    placeholder="Target Value"
+                                    value={territoryForm.targetValue}
+                                    onChange={handleTerritoryFormChange}
+                                />
+                            </FormItem>
+                            <FormItem className="flex-1 min-w-[220px]">
+                            
+                                <DatePickerRange
+                                    placeholder="Select date range"
+                                    value={targetDateRange}
+                                    onChange={() => { }}
+                                    disabled
+                                />
+                            </FormItem>
+                           
+                        </div>
+                         <div className="flex gap-2 mt-6 md:mt-0">
                                 <Button
-                                    className="lg:w-70 xl:w-70 sm:w-full"
+                                    className="lg:w-32 xl:w-32 sm:w-full"
                                     variant="solid"
-                                    block
                                     type="submit"
                                 >
                                     Submit
                                 </Button>
                                 <Button
-                                    className="lg:w-70 xl:w-70 sm:w-full"
+                                    className="lg:w-32 xl:w-32 sm:w-full"
                                     type="button"
-                                    block
                                     clickFeedback={false}
-                                    onClick={() => {
-                                        reset();
-                                    }}
+                                    onClick={handleTerritoryFormDiscard}
                                 >
                                     Discard
                                 </Button>
                             </div>
-                        </FormItem>
-                    </Form>
+                    </form>
                 </Card>
 
+                {/* Table Card */}
                 <Card bordered={false} className='w-full overflow-auto'>
                     <div>
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
