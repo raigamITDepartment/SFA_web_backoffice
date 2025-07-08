@@ -43,6 +43,7 @@ const pageSizeOptions = [
 ];
 
 interface MainCategory {
+    id: string;
     MainCategoryCode: string;
     MainCategoryName: string;
     isActive?: boolean;
@@ -133,9 +134,9 @@ const MainCategory = () => {
     ], []);
 
     const [data] = useState<MainCategory[]>([
-        { MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true, CategoryType: 'Type 1' },
-        { MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false, CategoryType: 'Type 2' },
-        { MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true, CategoryType: 'Type 1' },
+        { id: '1', MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true, CategoryType: 'Type 1' },
+        { id: '2', MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false, CategoryType: 'Type 2' },
+        { id: '3', MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true, CategoryType: 'Type 1' },
     ]);
 
     const totalData = data.length;
@@ -170,8 +171,13 @@ const MainCategory = () => {
     };
 
     const handleEdit = (MainCategory: MainCategory) => {
-        // Navigate to MainCategoryEdit page
-        navigate('/Salesmenu/MainCategoryEdit');
+        // Pass the id to MainCategoryEdit page
+        navigate('/Salesmenu/MainCategoryEdit', { state: {
+            id: MainCategory.id,
+            MainCategoryName: MainCategory.MainCategoryName,
+            CategoryType: MainCategory.CategoryType,
+            isActive: MainCategory.isActive,
+         } });
     };
 
     const handleDelete = (MainCategory: MainCategory) => {
