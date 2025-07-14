@@ -5,6 +5,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import Tag from '@/components/ui/Tag';
 import Tooltip from '@/components/ui/Tooltip';
 import DataTable from '@/components/shared/DataTable';
+import Input from '@/components/ui/Input';
 import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable';
 import type { TableQueries } from '@/@types/common';
 
@@ -14,7 +15,7 @@ const outletService = {
     // In real app, replace with actual API call:
     // const response = await fetch(`/api/outlets?page=${params.pageIndex}&size=${params.pageSize}`);
     // return response.json();
-    
+
     // Mock implementation
     return new Promise(resolve => {
       setTimeout(() => {
@@ -87,6 +88,42 @@ const generateSampleOutlets = (count: number): Outlet[] => {
   }));
 };
 
+// DebouncedInput Component
+interface DebouncedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  debounce?: number;
+}
+
+function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...props }: DebouncedInputProps) {
+  const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange(value);
+    }, debounce);
+    return () => clearTimeout(timeout);
+  }, [value, onChange, debounce]);
+
+  return (
+    <div className="flex justify-end">
+      <div className="flex items-center mb-4">
+        <span className="mr-2">Search:</span>
+        <Input
+          size="sm"
+          {...props}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+}
+
 // Components
 const NameColumn = ({ row }: { row: Outlet }) => (
   <div className="flex items-center">
@@ -118,6 +155,7 @@ const ActionColumn = ({ onEdit, onView }: { onEdit: () => void; onView: () => vo
 const OutletListTable = () => {
   const navigate = useNavigate();
   const [outlets, setOutlets] = useState<Outlet[]>([]);
+  const [allOutlets, setAllOutlets] = useState<Outlet[]>([]);
   const [totalOutlets, setTotalOutlets] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedOutlets, setSelectedOutlets] = useState<Outlet[]>([]);
@@ -126,13 +164,14 @@ const OutletListTable = () => {
     pageSize: 10,
     sort: { key: '', order: '' },
   });
+  const [search, setSearch] = useState('');
 
   // API Integration Point
   const fetchOutlets = async () => {
     setLoading(true);
     try {
       const response = await outletService.getOutlets(tableData);
-      setOutlets(response.data);
+      setAllOutlets(response.data);
       setTotalOutlets(response.total);
     } catch (error) {
       console.error('Failed to fetch outlets:', error);
@@ -144,13 +183,40 @@ const OutletListTable = () => {
 
   useEffect(() => {
     fetchOutlets();
+    // eslint-disable-next-line
   }, [tableData]);
 
+  // Filter outlets by search
+  useEffect(() => {
+    if (!search) {
+      setOutlets(allOutlets);
+    } else {
+      const lower = search.toLowerCase();
+      setOutlets(
+        allOutlets.filter(
+          outlet =>
+            outlet.name.toLowerCase().includes(lower) ||
+            outlet.outletId.toLowerCase().includes(lower) ||
+            outlet.category.toLowerCase().includes(lower) ||
+            outlet.route.toLowerCase().includes(lower) ||
+            outlet.range.toLowerCase().includes(lower) ||
+            outlet.address1.toLowerCase().includes(lower) ||
+            outlet.address2.toLowerCase().includes(lower) ||
+            outlet.address3.toLowerCase().includes(lower) ||
+            outlet.ownerName.toLowerCase().includes(lower) ||
+            outlet.mobileNumber.toLowerCase().includes(lower)
+        )
+      );
+    }
+  }, [search, allOutlets]);
+
   // Action Handlers
-  const handleEdit = (outlet: Outlet) => navigate(`/outlets/edit/${outlet.id}`);
+  // const handleEdit = (outlet: Outlet) => navigate(`/outlets/edit/${outlet.id}`);
+  const handleEdit = (outlet: Outlet) =>
+    navigate(`/outlets/edit/${outlet.id}`, { state: { outlet } });
   const handleView = (outlet: Outlet) => navigate(`/outlets/${outlet.id}`);
   const handleRowSelect = (checked: boolean, outlet: Outlet) => {
-    setSelectedOutlets(prev => 
+    setSelectedOutlets(prev =>
       checked ? [...prev, outlet] : prev.filter(o => o.id !== outlet.id)
     );
   };
@@ -186,8 +252,8 @@ const OutletListTable = () => {
       header: 'Approved',
       accessorKey: 'isApproved',
       cell: ({ row }) => (
-        <Tag className={row.original.isApproved 
-          ? 'bg-emerald-200 text-gray-900' 
+        <Tag className={row.original.isApproved
+          ? 'bg-emerald-200 text-gray-900'
           : 'bg-red-200 text-gray-900'}>
           {row.original.isApproved ? 'Approved' : 'Not Approved'}
         </Tag>
@@ -206,32 +272,39 @@ const OutletListTable = () => {
       header: '',
       id: 'actions',
       cell: ({ row }) => (
-        <ActionColumn 
-          onEdit={() => handleEdit(row.original)} 
-          onView={() => handleView(row.original)} 
+        <ActionColumn
+          onEdit={() => handleEdit(row.original)}
+          onView={() => handleView(row.original)}
         />
       )
     }
   ], []);
 
   return (
-    <DataTable
-      selectable
-      columns={columns}
-      data={outlets}
-      loading={loading}
-      pagingData={{
-        total: totalOutlets,
-        pageIndex: tableData.pageIndex as number,
-        pageSize: tableData.pageSize as number,
-      }}
-      onPaginationChange={handlePagination}
-      onSelectChange={handlePageSize}
-      onSort={handleSort}
-      onCheckBoxChange={handleRowSelect}
-      onIndeterminateCheckBoxChange={handleAllSelect}
-      checkboxChecked={outlet => selectedOutlets.some(o => o.id === outlet.id)}
-    />
+    <>
+      <DebouncedInput
+        value={search}
+        onChange={setSearch}
+        placeholder="Search all columns..."
+      />
+      <DataTable
+        selectable
+        columns={columns}
+        data={outlets}
+        loading={loading}
+        pagingData={{
+          total: totalOutlets,
+          pageIndex: tableData.pageIndex as number,
+          pageSize: tableData.pageSize as number,
+        }}
+        onPaginationChange={handlePagination}
+        onSelectChange={handlePageSize}
+        onSort={handleSort}
+        onCheckBoxChange={handleRowSelect}
+        onIndeterminateCheckBoxChange={handleAllSelect}
+        checkboxChecked={outlet => selectedOutlets.some(o => o.id === outlet.id)}
+      />
+    </>
   );
 };
 

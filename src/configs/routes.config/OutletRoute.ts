@@ -34,14 +34,23 @@ const OutletRoute: Routes = [
         ),
         authority: [],
     },
-    {
-        key: 'OutletModule.editOutlet',
-        path: '/Outlet-Module-editOutlet',
+    // {
+    //     key: 'OutletModule.editOutlet',
+    //     path: '/Outlet-Module-editOutlet',
+    //     component: lazy(
+    //         () => import('@/views/OutletModule/CreateCustomer/CustomerEdit'),
+    //     ),
+    //     authority: [],
+    // },
+        {
+        key: 'outlets.edit',
+        path: '/outlets/edit/:outletId',
         component: lazy(
-            () => import('@/views/OutletModule/CreateCustomer/CustomerEdit'),
+            () => import('@/views/OutletModule/Customers/Edit/OutletEdit')
         ),
         authority: [],
     },
+
 
 ]
 
