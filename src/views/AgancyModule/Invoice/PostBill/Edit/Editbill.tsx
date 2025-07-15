@@ -479,6 +479,26 @@ function Editbill() {
               ))}
             </TBody>
           </Table>
+          {/* Invoice Total Summary */}
+          <div className="flex justify-end mt-4 pr-4">
+            <div className="w-full md:w-1/2 lg:w-1/3">
+              <div className="bg-gray-100 dark:bg-gray-800/50 rounded-xl shadow-inner p-4 space-y-3">
+                <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+                  <span>Sub Total</span>
+                  <span className="font-medium text-gray-800 dark:text-gray-100">
+                    Rs. {itemsData.reduce((sum, item) => sum + item.grandTotal, 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="border-t border-gray-300 dark:border-gray-600 pt-2 mt-2 flex justify-between items-center text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  <span>Total</span>
+                  <span className="text-blue-600 dark:text-blue-400">
+                    Rs. {itemsData.reduce((sum, item) => sum + item.grandTotal, 0).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </Card>
 

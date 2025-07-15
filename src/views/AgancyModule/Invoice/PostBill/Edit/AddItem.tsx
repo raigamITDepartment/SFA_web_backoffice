@@ -245,24 +245,7 @@ const AddItem = () => {
           </FormItem>
         </div>
 
-        {/* Totals View Section */}
-        <div className="mt-10 border-t pt-6">
-          <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Invoice Total</h3>
-          <div className="space-y-2 text-lg">
-            <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-              <span className="font-medium text-gray-900 dark:text-white">Rs. 0.00</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Discount</span>
-              <span className="font-medium text-gray-900 dark:text-white">Rs. 0.00</span>
-            </div>
-            <div className="flex justify-between border-t pt-2 font-bold text-xl">
-              <span className="text-gray-700 dark:text-white">Total</span>
-              <span className="text-gray-900 dark:text-white">Rs. 0.00</span>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Action Buttons */}
         <div className="flex justify-end mt-10 gap-4">
