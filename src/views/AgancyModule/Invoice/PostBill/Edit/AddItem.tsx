@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router-dom';
+
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Card from '@/components/ui/Card';
-import { Button, toast, Alert } from '@/components/ui';
-import { useNavigate } from 'react-router-dom';
+import { Button, toast, Alert, Form, FormItem } from '@/components/ui';
 
-// Interface
 interface AddItemFormData {
   itemNo: string;
   itemName: string;
@@ -24,7 +24,6 @@ interface AddItemFormData {
   discount: number;
 }
 
-// Validation schema
 const schema = z.object({
   itemNo: z.string().min(1, 'Item No is required'),
   itemName: z.string().min(1, 'Item Name is required'),
@@ -40,28 +39,26 @@ const schema = z.object({
   discount: z.number().min(0, 'Discount must be 0 or more'),
 });
 
-// Sample dropdown options
 const itemNameOptions = [
   { value: 'Item A', label: 'Item A' },
   { value: 'Item B', label: 'Item B' },
   { value: 'Item C', label: 'Item C' },
 ];
 
-// Optional mapping
 const itemDetailsMap: Record<string, { itemNo: string; itemPrice: number }> = {
   'Item A': { itemNo: 'ITEM-001', itemPrice: 10.0 },
   'Item B': { itemNo: 'ITEM-002', itemPrice: 15.5 },
   'Item C': { itemNo: 'ITEM-003', itemPrice: 20.0 },
 };
 
-const Form: React.FC = () => {
+const AddItem = () => {
   const navigate = useNavigate();
 
   const {
     handleSubmit,
     control,
-    setValue,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<AddItemFormData>({
     resolver: zodResolver(schema),
@@ -83,7 +80,7 @@ const Form: React.FC = () => {
 
   const selectedItemName = watch('itemName');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedItemName && itemDetailsMap[selectedItemName]) {
       setValue('itemNo', itemDetailsMap[selectedItemName].itemNo);
       setValue('itemPrice', itemDetailsMap[selectedItemName].itemPrice);
@@ -110,79 +107,175 @@ const Form: React.FC = () => {
     setTimeout(() => navigate(-1), 1000);
   };
 
-  const onDiscard = () => navigate(-1);
-
   return (
-    <Card bordered={false} className="max-w-3xl mx-auto p-8 shadow-md">
-      <h3 className="text-2xl font-semibold mb-8 text-gray-800 dark:text-gray-100">
-        Add New Item
-      </h3>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          {/* All Input Fields */}
-          {[
-            { name: 'itemName', label: 'Item Name', isSelect: true, required: true },
-            { name: 'itemNo', label: 'Item No', disabled: true },
-            { name: 'qty', label: 'Quantity', required: true },
-            { name: 'itemPrice', label: 'Item Price', disabled: true },
-            { name: 'goodReturnQty', label: 'Good Return Quantity' },
-            { name: 'goodReturnPrice', label: 'Good Return Price' },
-            { name: 'marketReturnQty', label: 'Market Return Quantity' },
-            { name: 'marketReturnPrice', label: 'Market Return Price' },
-            { name: 'goodReturnFree', label: 'Good Return Free' },
-            { name: 'marketReturnFree', label: 'Market Return Free' },
-            { name: 'freeIssue', label: 'Free Issue' },
-            { name: 'discount', label: 'Discount' },
-          ].map(({ name, label, isSelect, disabled, required }) => (
-            <div key={name}>
-              <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-                {label} {required && <span className="text-red-600">*</span>}
-              </label>
-              <Controller
-                name={name as keyof AddItemFormData}
-                control={control}
-                render={({ field }) =>
-                  isSelect ? (
-                    <Select
-                      options={itemNameOptions}
-                      value={itemNameOptions.find(opt => opt.value === field.value) || null}
-                      onChange={option => field.onChange(option?.value)}
-                      placeholder="Select Item"
-                      isClearable
-                    />
-                  ) : (
-                    <Input
-                      {...field}
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      placeholder={label}
-                      disabled={disabled}
-                      onChange={e => field.onChange(Number(e.target.value))}
-                    />
-                  )
-                }
-              />
-              {errors[name as keyof AddItemFormData] && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors[name as keyof AddItemFormData]?.message}
-                </p>
+    <Card bordered={false} className="max-w-4xl mx-auto p-10 shadow-xl bg-white dark:bg-gray-900 rounded-2xl">
+      <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">Add Item</h2>
+
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        {/* Item Name - full width */}
+        <div className="mb-8">
+          <FormItem label="Item Name" invalid={!!errors.itemName} errorMessage={errors.itemName?.message}>
+            <Controller
+              name="itemName"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  options={itemNameOptions}
+                  value={itemNameOptions.find(opt => opt.value === field.value) || null}
+                  onChange={opt => field.onChange(opt?.value)}
+                  placeholder="Select Item"
+                  isClearable
+                  className="w-full"
+                />
               )}
-            </div>
-          ))}
+            />
+          </FormItem>
         </div>
 
-        <div className="flex justify-between mt-8 gap-4">
-          <Button type="button" onClick={onDiscard} className="flex-1">
-            Discard
+        {/* Unified Grid for All Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormItem label="Item Code" invalid={!!errors.itemNo} errorMessage={errors.itemNo?.message}>
+            <Controller
+              name="itemNo"
+              control={control}
+              render={({ field }) => (
+                <Input {...field} readOnly className="bg-gray-100 dark:bg-gray-700" />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Quantity" invalid={!!errors.qty} errorMessage={errors.qty?.message}>
+            <Controller
+              name="qty"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" min={1} {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Item Price" invalid={!!errors.itemPrice} errorMessage={errors.itemPrice?.message}>
+            <Controller
+              name="itemPrice"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} readOnly className="bg-gray-100 dark:bg-gray-700" />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Discount" invalid={!!errors.discount} errorMessage={errors.discount?.message}>
+            <Controller
+              name="discount"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" min={0} {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Free Issue" invalid={!!errors.freeIssue} errorMessage={errors.freeIssue?.message}>
+            <Controller
+              name="freeIssue"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Good Return Qty" invalid={!!errors.goodReturnQty} errorMessage={errors.goodReturnQty?.message}>
+            <Controller
+              name="goodReturnQty"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Good Return Price" invalid={!!errors.goodReturnPrice} errorMessage={errors.goodReturnPrice?.message}>
+            <Controller
+              name="goodReturnPrice"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Good Return Free" invalid={!!errors.goodReturnFree} errorMessage={errors.goodReturnFree?.message}>
+            <Controller
+              name="goodReturnFree"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Market Return Qty" invalid={!!errors.marketReturnQty} errorMessage={errors.marketReturnQty?.message}>
+            <Controller
+              name="marketReturnQty"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Market Return Price" invalid={!!errors.marketReturnPrice} errorMessage={errors.marketReturnPrice?.message}>
+            <Controller
+              name="marketReturnPrice"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+
+          <FormItem label="Market Return Free" invalid={!!errors.marketReturnFree} errorMessage={errors.marketReturnFree?.message}>
+            <Controller
+              name="marketReturnFree"
+              control={control}
+              render={({ field }) => (
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+              )}
+            />
+          </FormItem>
+        </div>
+
+        {/* Totals View Section */}
+        <div className="mt-10 border-t pt-6">
+          <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Invoice Total</h3>
+          <div className="space-y-2 text-lg">
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+              <span className="font-medium text-gray-900 dark:text-white">Rs. 0.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Discount</span>
+              <span className="font-medium text-gray-900 dark:text-white">Rs. 0.00</span>
+            </div>
+            <div className="flex justify-between border-t pt-2 font-bold text-xl">
+              <span className="text-gray-700 dark:text-white">Total</span>
+              <span className="text-gray-900 dark:text-white">Rs. 0.00</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end mt-10 gap-4">
+          <Button type="button" onClick={() => navigate(-1)}>
+            Cancel
           </Button>
-          <Button variant="solid" type="submit" className="flex-1">
+          <Button type="submit" variant="solid">
             Add Item
           </Button>
         </div>
-      </form>
+      </Form>
     </Card>
   );
 };
 
-export default Form;
+export default AddItem;
