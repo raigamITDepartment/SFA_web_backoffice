@@ -14,7 +14,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
-import { Button,toast,Alert } from '@/components/ui'; 
+import { Button, toast, Alert, Tag } from '@/components/ui'; 
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
@@ -23,8 +23,10 @@ interface Invoice {
   invoiceNo: string;
   route: string;
   shop: string;
+  territoryCode: string; // Added territory code
   value: number;
   status: string;
+  date: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -83,15 +85,22 @@ const statusOptions = [
 
 function CancelBill() {
   const [data, setData] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', value: 1500, status: 'Cancel' },
-    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', value: 2300, status: 'Cancel' },
-    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', value: 1750, status: 'Cancel' },
-    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', value: 4200, status: 'Cancel' },
-    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', value: 3100, status: 'Cancel' },
+    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', territoryCode: 'T001', value: 1500, status: 'Cancel', date: '2023-07-01' },
+    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', territoryCode: 'T002', value: 2300, status: 'Cancel', date: '2023-07-02' },
+    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', territoryCode: 'T003', value: 1750, status: 'Cancel', date: '2023-07-03' },
+    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', territoryCode: 'T001', value: 4200, status: 'Cancel', date: '2023-07-04' },
+    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', territoryCode: 'T002', value: 3100, status: 'Cancel', date: '2023-07-05' },
   ]);
   
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
+  const [filterDate, setFilterDate] = useState('');
+
+  const filteredData = useMemo(() => {
+    return filterDate 
+      ? data.filter(invoice => invoice.date === filterDate)
+      : data;
+  }, [data, filterDate]);
 
   const handleStatusChange = (invoiceId: number, newStatus: string) => {
     setData(prevData => 
@@ -102,7 +111,7 @@ function CancelBill() {
   };
 
   const handleSubmit = () => {
-    console.log('Submitting late delivery data:', data);
+    console.log('Submitting canceled invoices data:', data);
     toast.push(
       <Alert showIcon type="success" className="dark:bg-gray-700 w-64 sm:w-80 md:w-96">
         Submitted Successfully
@@ -117,18 +126,26 @@ function CancelBill() {
     );
   };
 
-  
-
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
     { header: 'Invoice No:', accessorKey: 'invoiceNo' },
     { header: 'Route', accessorKey: 'route' },
+    { 
+      header: 'Territory Code', 
+      accessorKey: 'territoryCode',
+    },
     { header: 'Shop', accessorKey: 'shop' },
+    
     { 
       header: 'Value', 
       accessorKey: 'value',
       cell: ({ getValue }) => (
         <div className="font-medium">Rs. {getValue<number>().toLocaleString()}</div>
       )
+    },
+    {
+      header: 'Date',
+      accessorKey: 'date',
+      cell: ({ getValue }) => <div>{getValue<string>()}</div>,
     },
     { 
       header: 'Status', 
@@ -138,7 +155,7 @@ function CancelBill() {
           size="sm"
           options={statusOptions}
           value={statusOptions.find(option => option.value === row.original.status)}
-          onChange={(option) => handleStatusChange(row.original.id, option?.value || 'Late Delivery')}
+          onChange={(option) => handleStatusChange(row.original.id, option?.value || 'Cancel')}
           className="min-w-[150px]"
         />
       )
@@ -146,7 +163,7 @@ function CancelBill() {
   ], []);
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     state: { globalFilter },
@@ -168,18 +185,28 @@ function CancelBill() {
     table.setPageSize(newSize);
   };
 
-  const totalData = data.length;
+  const totalData = filteredData.length;
 
   return (
     <div className="p-6 w-full mx-auto">
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
         <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Canceled Invoices</h3>
-          <div className="w-full sm:w-64">
-            <DebouncedInput
-              value={globalFilter ?? ''}
-              placeholder="Search invoices..."
-              onChange={(value) => setGlobalFilter(String(value))}
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <div className="w-full sm:w-64">
+              <DebouncedInput
+                value={globalFilter ?? ''}
+                placeholder="Search invoices..."
+                onChange={(value) => setGlobalFilter(String(value))}
+              />
+            </div>
+            <Input
+              size="sm"
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              placeholder="Filter by date"
+              className="w-full sm:w-48"
             />
           </div>
         </div>
@@ -242,7 +269,6 @@ function CancelBill() {
         </div>
 
         <div className="flex justify-end mt-8 space-x-4">
-          
           <Button 
             variant="solid" 
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 shadow-md"

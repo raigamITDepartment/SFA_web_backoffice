@@ -124,6 +124,13 @@ const SalesRoute: Routes = [
         authority: [],
     },
 
+    {
+        key: 'SalesMenu.CategoryTypeEdit',
+        path: '/Salesmenu/CategoryTypeEdit',
+        component: lazy(() => import('@/views/SalesDetails/CategoryAdd/Components/Edit/CategoryTypeEdit')),
+        authority: [],
+    },
+
 
 ]
 

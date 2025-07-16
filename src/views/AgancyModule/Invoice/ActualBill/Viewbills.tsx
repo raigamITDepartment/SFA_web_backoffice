@@ -1,11 +1,453 @@
-import React from 'react'
+import Card from '@/components/ui/Card';
+import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import Table from '@/components/ui/Table';
+import Pagination from '@/components/ui/Pagination';
+import { FaRegEdit, FaSearch, FaCalendarAlt } from "react-icons/fa";
+import { MdOutlineRotateLeft } from 'react-icons/md';
+import React, { useMemo, useState } from 'react';
+import { useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, flexRender } from '@tanstack/react-table';
+import { rankItem } from '@tanstack/match-sorter-utils';
+import type { ColumnDef, FilterFn } from '@tanstack/react-table';
+import type { InputHTMLAttributes } from 'react';
+import Tag from '@/components/ui/Tag';
+import { Button, toast, Alert } from '@/components/ui';
+import { useNavigate } from 'react-router-dom';
+import Dialog from '@/components/ui/Dialog';
 
-function Viewbills() {
-  return (
-    <div>
-      View Actual bills
-    </div>
-  )
+const { Tr, Th, Td, THead, TBody, Sorter } = Table;
+
+interface Invoice {
+  id: number;
+  invoiceNo: string;
+  route: string;
+  shop: string;
+  territoryCode: string;
+  value: number;
+  status: string;
+  date: string; // YYYY-MM-DD
 }
 
-export default Viewbills
+interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  debounce?: number;
+}
+
+function DebouncedInput({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: DebouncedInputProps) {
+  const [value, setValue] = useState(initialValue);
+
+  React.useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange(value);
+    }, debounce);
+    return () => clearTimeout(timeout);
+  }, [value, onChange, debounce]);
+
+  return (
+    <div className="relative w-full max-w-xs">
+      <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
+      <Input
+        size="sm"
+        className="pl-10 pr-4 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        {...props}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder={props.placeholder}
+      />
+    </div>
+  );
+}
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value);
+  addMeta({ itemRank });
+  return itemRank.passed;
+};
+
+const pageSizeOptions = [
+  { value: 10, label: '10 / page' },
+  { value: 20, label: '20 / page' },
+  { value: 30, label: '30 / page' },
+  { value: 40, label: '40 / page' },
+  { value: 50, label: '50 / page' },
+];
+
+const statusOptions = [
+  { value: 'Print', label: 'Print' },
+  { value: 'Late Delivery', label: 'Late Delivery' },
+  { value: 'Cancel', label: 'Cancel' },
+];
+
+function Viewbills() {
+  const agencyName = "Example Agency";
+  const distributorName = "Example Distributor";
+  const territory = "Central";
+  const navigate = useNavigate();
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+
+  const [data, setData] = useState<Invoice[]>([
+    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', territoryCode: 'T001', value: 1500, status: 'Actual', date: '2023-07-01' },
+    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', territoryCode: 'T002', value: 2300, status: 'Actual', date: '2023-07-03' },
+    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', territoryCode: 'T003', value: 1750, status: 'Actual', date: '2023-07-05' },
+    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', territoryCode: 'T001', value: 4200, status: 'Actual', date: '2023-07-01' },
+    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', territoryCode: 'T002', value: 3100, status: 'Actual', date: '2023-07-04' },
+    { id: 6, invoiceNo: 'INV-2023-006', route: 'Route B', shop: 'Shop 6', territoryCode: 'T003', value: 1980, status: 'Actual', date: '2023-07-05' },
+    { id: 7, invoiceNo: 'INV-2023-007', route: 'Route E', shop: 'Shop 7', territoryCode: 'T001', value: 2750, status: 'Actual', date: '2023-07-06' },
+    { id: 8, invoiceNo: 'INV-2023-008', route: 'Route C', shop: 'Shop 8', territoryCode: 'T002', value: 3600, status: 'Actual', date: '2023-07-06' },
+  ]);
+
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [pageSize, setPageSize] = useState(10);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
+  const filteredData = useMemo(() => {
+    return data
+      .filter(invoice => {
+        const invoiceDate = invoice.date;
+        const afterFrom = fromDate ? invoiceDate >= fromDate : true;
+        const beforeTo = toDate ? invoiceDate <= toDate : true;
+        return afterFrom && beforeTo;
+      })
+      .filter(invoice => {
+        if (!globalFilter) return true;
+        const searchText = globalFilter.toLowerCase();
+        return Object.values(invoice).some(value =>
+          String(value).toLowerCase().includes(searchText)
+        );
+      });
+  }, [data, fromDate, toDate, globalFilter]);
+
+  const handleReverseClick = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setDialogIsOpen(true);
+  };
+
+  const handleDialogConfirm = () => {
+    setDialogIsOpen(false);
+    if (selectedInvoice) {
+      // Update the invoice status to "Reversed"
+      setData(prevData =>
+        prevData.map(invoice =>
+          invoice.id === selectedInvoice.id ? { ...invoice, status: 'Reversed' } : invoice
+        )
+      );
+      
+      // Show success toast
+      toast.push(
+        <Alert
+          showIcon
+          type="success"
+          className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+        >
+          Invoice {selectedInvoice.invoiceNo} reversed successfully!
+        </Alert>,
+        {
+          offsetX: 5,
+          offsetY: 100,
+          transitionType: 'fade',
+          block: false,
+          placement: 'top-end',
+        }
+      );
+    }
+  };
+
+  const handleDialogClose = () => {
+    setDialogIsOpen(false);
+    setSelectedInvoice(null);
+  };
+
+  const handleStatusChange = (invoiceId: number, newStatus: string) => {
+    setData(prevData =>
+      prevData.map(invoice =>
+        invoice.id === invoiceId ? { ...invoice, status: newStatus } : invoice
+      )
+    );
+  };
+
+  const handleSubmit = () => {
+    console.log('Submitting invoice data:', data);
+    toast.push(
+      <Alert showIcon type="success" className="dark:bg-gray-700 w-64 sm:w-80 md:w-96">
+        Invoice Data Submitted Successfully
+      </Alert>,
+      {
+        offsetX: 5,
+        offsetY: 100,
+        transitionType: 'fade',
+        block: false,
+        placement: 'top-end',
+      }
+    );
+  };
+
+  const columns = useMemo<ColumnDef<Invoice>[]>(() => [
+    { header: 'Invoice No', accessorKey: 'invoiceNo' },
+    { header: 'Route', accessorKey: 'route' },
+    {
+      header: 'Territory Code',
+      accessorKey: 'territoryCode',
+    },
+    { header: 'Shop', accessorKey: 'shop' },
+
+    {
+      header: 'Value',
+      accessorKey: 'value',
+      cell: ({ getValue }) => <div className="font-medium">Rs. {getValue<number>().toLocaleString()}</div>
+    },
+    {
+      header: 'Date',
+      accessorKey: 'date',
+      cell: ({ getValue }) => {
+        const dateStr = getValue<string>();
+        return new Date(dateStr).toLocaleDateString();
+      }
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: ({ row }) => (
+        <Tag
+          className={`${
+            row.original.status === 'Print' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-100' :
+            row.original.status === 'Late Delivery' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-100' :
+            row.original.status === 'Reversed' ? 'bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-100' :
+            'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-100'
+          } border-0 rounded`}
+        >
+          {row.original.status}
+        </Tag>
+      )
+    },
+    {
+      header: 'Action',
+      accessorKey: 'action',
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <MdOutlineRotateLeft
+            onClick={() => handleReverseClick(row.original)}
+            className="cursor-pointer text-red-600 text-lg hover:text-red-700 transition-colors"
+          />
+        </div>
+      ),
+    },
+  ], []);
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    filterFns: { fuzzy: fuzzyFilter },
+    state: { globalFilter },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize } },
+  });
+
+  const onPaginationChange = (page: number) => {
+    table.setPageIndex(page - 1);
+  };
+
+  const onSelectChange = (value = 0) => {
+    const newSize = Number(value);
+    setPageSize(newSize);
+    table.setPageSize(newSize);
+  };
+
+  return (
+    <div className="p-6 w-full mx-auto space-y-8 max-w-7xl">
+      {/* Distributor Info Card */}
+      <Card className="rounded-xl shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border border-blue-100 dark:border-gray-700 transition-all">
+        <div className="p-6">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl w-16 h-16 flex items-center justify-center shadow-md border border-blue-200 dark:border-gray-700">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{agencyName}</h2>
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-gray-800/50 p-4 rounded-lg border border-blue-100 dark:border-gray-700 shadow-sm">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    Distributor
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">{distributorName}</div>
+                </div>
+                <div className="bg-white dark:bg-gray-800/50 p-4 rounded-lg border border-blue-100 dark:border-gray-700 shadow-sm">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    Territory
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">{territory}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Filters and Table */}
+      <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Invoice List</h3>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {/* Global Search */}
+            <DebouncedInput
+              value={globalFilter ?? ''}
+              placeholder="Search invoices..."
+              onChange={(value) => setGlobalFilter(String(value))}
+            />
+
+            {/* Date Range with calendar icons */}
+            <div className="relative">
+              <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
+              <Input
+                type="date"
+                size="sm"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="pl-10 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                placeholder="From date"
+              />
+            </div>
+
+            <div className="relative">
+              <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
+              <Input
+                type="date"
+                size="sm"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="pl-10 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                placeholder="To date"
+              />
+            </div>
+          </div>
+        </div>
+
+        <Table className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700 shadow-sm">
+          <THead className="bg-blue-50 dark:bg-gray-900">
+            {table.getHeaderGroups().map(headerGroup => (
+              <Tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <Th
+                    key={header.id}
+                    className="text-gray-700 dark:text-gray-300 font-semibold select-none cursor-pointer"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <div className="flex items-center gap-1">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.column.getCanSort() && <Sorter sort={header.column.getIsSorted()} />}
+                    </div>
+                  </Th>
+                ))}
+              </Tr>
+            ))}
+          </THead>
+          <TBody>
+            {table.getRowModel().rows.length === 0 && (
+              <Tr>
+                <Td colSpan={columns.length} className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  No invoices found.
+                </Td>
+              </Tr>
+            )}
+            {table.getRowModel().rows.map((row, i) => (
+              <Tr
+                key={row.id}
+                className={i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900'}
+                // Add hover effect
+                onMouseEnter={e => (e.currentTarget.classList.add('bg-blue-100', 'dark:bg-blue-900'))}
+                onMouseLeave={e => (e.currentTarget.classList.remove('bg-blue-100', 'dark:bg-blue-900'))}
+              >
+                {row.getVisibleCells().map(cell => (
+                  <Td key={cell.id} className="text-gray-700 dark:text-gray-300 py-3 px-4">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Td>
+                ))}
+              </Tr>
+            ))}
+          </TBody>
+        </Table>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+          <Pagination
+            pageSize={table.getState().pagination.pageSize}
+            currentPage={table.getState().pagination.pageIndex + 1}
+            total={filteredData.length}
+            onChange={onPaginationChange}
+          />
+          <div className="min-w-[130px]">
+            <Select
+              size="sm"
+              isSearchable={false}
+              value={pageSizeOptions.find(option => option.value === pageSize)}
+              options={pageSizeOptions}
+              onChange={(option) => onSelectChange(option?.value)}
+              className="rounded-lg shadow-sm"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end mt-8">
+          <Button
+            variant="solid"
+            className="bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 text-white px-6 py-2 rounded-lg shadow-md transition"
+            onClick={handleSubmit}
+          >
+            Submit
+          </Button>
+        </div>
+      </Card>
+
+      {/* Reverse Invoice Dialog */}
+      <Dialog
+        isOpen={dialogIsOpen}
+        onClose={handleDialogClose}
+        onRequestClose={handleDialogClose}
+      >
+        <h5 className="mb-4">Reverse Invoice</h5>
+        <p>
+          Are you sure you want to reverse invoice <b>{selectedInvoice?.invoiceNo}</b>?
+        </p>
+        <div className="text-right mt-6">
+          <Button
+            className="mr-2"
+            clickFeedback={false}
+            customColorClass={({ active, unclickable }) =>
+              [
+                'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+                unclickable && 'opacity-50 cursor-not-allowed',
+                !active && !unclickable,
+              ]
+                .filter(Boolean)
+                .join(' ')
+            }
+            onClick={handleDialogClose}
+          >
+            Cancel
+          </Button>
+          <Button variant="solid" onClick={handleDialogConfirm}>
+            Confirm
+          </Button>
+        </div>
+      </Dialog>
+    </div>
+  );
+}
+
+export default Viewbills;

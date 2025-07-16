@@ -20,8 +20,10 @@ interface Invoice {
   invoiceNo: string;
   route: string;
   shop: string;
+  territoryCode: string;
   value: number;
   status: string;
+  date: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -86,18 +88,25 @@ function PrintBill() {
   const navigate = useNavigate();
 
   const [data, setData] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', value: 1500, status: 'Print' },
-    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', value: 2300, status: 'Late Delivery' },
-    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', value: 1750, status: 'Print' },
-    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', value: 4200, status: 'Cancel' },
-    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', value: 3100, status: 'Print' },
-    { id: 6, invoiceNo: 'INV-2023-006', route: 'Route B', shop: 'Shop 6', value: 1980, status: 'Late Delivery' },
-    { id: 7, invoiceNo: 'INV-2023-007', route: 'Route E', shop: 'Shop 7', value: 2750, status: 'Print' },
-    { id: 8, invoiceNo: 'INV-2023-008', route: 'Route C', shop: 'Shop 8', value: 3600, status: 'Cancel' },
+    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', territoryCode: 'T001', value: 1500, status: 'Print', date: '2023-07-01' },
+    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', territoryCode: 'T002', value: 2300, status: 'Late Delivery', date: '2023-07-03' },
+    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', territoryCode: 'T003', value: 1750, status: 'Print', date: '2023-07-05' },
+    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', territoryCode: 'T001', value: 4200, status: 'Cancel', date: '2023-07-01' },
+    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', territoryCode: 'T002', value: 3100, status: 'Print', date: '2023-07-04' },
+    { id: 6, invoiceNo: 'INV-2023-006', route: 'Route B', shop: 'Shop 6', territoryCode: 'T003', value: 1980, status: 'Late Delivery', date: '2023-07-05' },
+    { id: 7, invoiceNo: 'INV-2023-007', route: 'Route E', shop: 'Shop 7', territoryCode: 'T001', value: 2750, status: 'Print', date: '2023-07-06' },
+    { id: 8, invoiceNo: 'INV-2023-008', route: 'Route C', shop: 'Shop 8', territoryCode: 'T002', value: 3600, status: 'Cancel', date: '2023-07-06' },
   ]);
 
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
+  const [filterDate, setFilterDate] = useState('');
+
+  const filteredData = useMemo(() => {
+    return filterDate
+      ? data.filter(invoice => invoice.date === filterDate)
+      : data;
+  }, [data, filterDate]);
 
   const handleStatusChange = (invoiceId: number, newStatus: string) => {
     setData(prevData =>
@@ -127,33 +136,37 @@ function PrintBill() {
     );
   };
 
-  
-
   const getStatusTag = (status: string) => {
     const statusMap: Record<string, { color: string; text: string }> = {
       'Print': { color: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-100', text: 'Print' },
       'Late Delivery': { color: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-100', text: 'Late Delivery' },
       'Cancel': { color: 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-100', text: 'Cancel' },
     };
-
     const statusInfo = statusMap[status] || { color: '', text: status };
-    return (
-      <Tag className={`${statusInfo.color} border-0 rounded`}>
-        {statusInfo.text}
-      </Tag>
-    );
+    return <Tag className={`${statusInfo.color} border-0 rounded`}>{statusInfo.text}</Tag>;
   };
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
-    { header: 'Invoice No:', accessorKey: 'invoiceNo' },
+    { header: 'Invoice No', accessorKey: 'invoiceNo' },
     { header: 'Route', accessorKey: 'route' },
+    {
+      header: 'Territory Code',
+      accessorKey: 'territoryCode',
+    },
     { header: 'Shop', accessorKey: 'shop' },
+
     {
       header: 'Value',
       accessorKey: 'value',
-      cell: ({ getValue }) => (
-        <div className="font-medium">Rs. {getValue<number>().toLocaleString()}</div>
-      )
+      cell: ({ getValue }) => <div className="font-medium">Rs. {getValue<number>().toLocaleString()}</div>
+    },
+    {
+      header: 'Date',
+      accessorKey: 'date',
+      cell: ({ getValue }) => {
+        const dateStr = getValue<string>();
+        return new Date(dateStr).toLocaleDateString();
+      }
     },
     {
       header: 'Status',
@@ -183,7 +196,7 @@ function PrintBill() {
   ], []);
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     state: { globalFilter },
@@ -205,11 +218,8 @@ function PrintBill() {
     table.setPageSize(newSize);
   };
 
-  const totalData = data.length;
-
   return (
     <div className="p-6 w-full mx-auto space-y-6">
-      {/* Header Card */}
       <Card className="rounded-xl shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border border-blue-100 dark:border-gray-700 transition-all">
         <div className="p-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -239,15 +249,20 @@ function PrintBill() {
         </div>
       </Card>
 
-      {/* Table Card */}
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
         <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Invoice List</h3>
-          <div className="w-full sm:w-64">
+          <div className="flex flex-col sm:flex-row gap-2">
             <DebouncedInput
               value={globalFilter ?? ''}
               placeholder="Search invoices..."
               onChange={(value) => setGlobalFilter(String(value))}
+            />
+            <Input
+              type="date"
+              size="sm"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
             />
           </div>
         </div>
@@ -276,11 +291,9 @@ function PrintBill() {
           </THead>
           <TBody>
             {table.getRowModel().rows.map(row => (
-              <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              <Tr key={row.id}>
                 {row.getVisibleCells().map(cell => (
-                  <Td key={cell.id} className="py-3 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
+                  <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
                 ))}
               </Tr>
             ))}
@@ -291,7 +304,7 @@ function PrintBill() {
           <Pagination
             pageSize={table.getState().pagination.pageSize}
             currentPage={table.getState().pagination.pageIndex + 1}
-            total={totalData}
+            total={filteredData.length}
             onChange={onPaginationChange}
           />
           <div className="min-w-[130px]">
@@ -305,15 +318,7 @@ function PrintBill() {
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex justify-end mt-8 space-x-4">
-          {/* <Button
-            variant="default"
-            className="border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-2"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button> */}
+        <div className="flex justify-end mt-8">
           <Button
             variant="solid"
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 shadow-md"
