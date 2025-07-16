@@ -51,7 +51,9 @@ const itemDetailsMap: Record<string, { itemNo: string; itemPrice: number }> = {
   'Item C': { itemNo: 'ITEM-003', itemPrice: 20.0 },
 };
 
-const AddItem = () => {
+
+
+  function AddItem() {
   const navigate = useNavigate();
 
   const {

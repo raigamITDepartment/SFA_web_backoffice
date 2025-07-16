@@ -134,20 +134,16 @@ function Editbill() {
             [field]: typeof value === 'string' ? parseFloat(value) || 0 : value
           };
 
-          // Calculate discount amount
-          const discountAmount = (updatedItem.qty * updatedItem.itemPrice) * (updatedItem.discountPercentage / 100);
-
-          // Calculate net values
-          const netQty = updatedItem.qty - updatedItem.goodReturnQty - updatedItem.marketReturnQty;
-          const netValue =
-            (netQty * updatedItem.itemPrice) -
+          // Corrected grand total calculation
+          const grandTotal =
+            (updatedItem.qty * updatedItem.itemPrice) -
             (updatedItem.goodReturnQty * updatedItem.goodReturnPrice) -
             (updatedItem.marketReturnQty * updatedItem.marketReturnPrice) -
             discountAmount;
 
           return {
             ...updatedItem,
-            grandTotal: Math.max(0, netValue) // Ensure grand total doesn't go negative
+            grandTotal: grandTotal,
           };
         }
         return item;

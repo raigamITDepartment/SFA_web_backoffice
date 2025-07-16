@@ -4,12 +4,12 @@ import { lazy } from 'react'
 import type { Routes } from '@/@types/routes'
 
 const AgancyRoute: Routes = [
-
-
     {
         key: 'ActualInvoice',
         path: '/AgancyModule-Invoice-ActualInvoice',
-        component: lazy(() => import('@/views/AgancyModule/Invoice/ActualBill/Viewbills')),
+        component: lazy(
+            () => import('@/views/AgancyModule/Invoice/ActualBill/Viewbills'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -19,7 +19,9 @@ const AgancyRoute: Routes = [
     {
         key: 'PostInvoice',
         path: '/AgancyModule-Invoice-PostInvoice',
-        component: lazy(() => import('@/views/AgancyModule/Invoice/PostBill/Postbill')),
+        component: lazy(
+            () => import('@/views/AgancyModule/Invoice/PostBill/Postbill'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -30,7 +32,9 @@ const AgancyRoute: Routes = [
     {
         key: 'EditBill',
         path: '/EditBill/:invoiceId',
-        component: lazy(() => import('@/views/AgancyModule/Invoice/PostBill/Edit/Editbill')),
+        component: lazy(
+            () => import('@/views/AgancyModule/Invoice/PostBill/Edit/Editbill'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -41,7 +45,9 @@ const AgancyRoute: Routes = [
     {
         key: 'AddItem',
         path: '/AddItem/:invoiceId',
-        component: lazy(() => import('@/views/AgancyModule/Invoice/PostBill/Edit/AddItem')),
+        component: lazy(
+            () => import('@/views/AgancyModule/Invoice/PostBill/Edit/AddItem'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -52,7 +58,57 @@ const AgancyRoute: Routes = [
     {
         key: 'ManualInvoice',
         path: '/AgancyModule-Invoice-ManualInvoice',
-        component: lazy(() => import('@/views/AgancyModule/Invoice/ManualBill/CreateAgancybill')),
+        component: lazy(
+            () =>
+                import('@/views/AgancyModule/Invoice/ManualBill/CreateInvoice'),
+        ),
+        authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
+    },
+
+      {
+        key: 'invoiceFinish',
+        path: '/AgancyModule-Invoice-invoiceFinish',
+        component: lazy(
+            () =>
+                import('@/views/AgancyModule/Invoice/ManualBill/InvoiceFinish'),
+        ),
+        authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
+    },
+
+
+
+
+
+
+    {
+        key: 'CreateInvoiceScreen',
+        path:'/AgancyModule-Invoice-CreateInvoiceScreen',
+        component: lazy(
+            () =>
+                import('@/views/AgancyModule/Invoice/ManualBill/CreateInvoiceScreen'),
+        ),
+        authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
+    },
+
+   {
+        key: 'ItemDetails',
+        path: '/AgancyModule-Invoice-ItemDetails',
+        component: lazy(
+            () =>
+                import('@/views/AgancyModule/Invoice/ManualBill/ItemDetailsScreen'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -63,7 +119,9 @@ const AgancyRoute: Routes = [
     {
         key: 'ViewInvoice',
         path: '/AgancyModule-Invoice-ViewInvoice',
-        component: lazy(() => import('@/views/AgancyModule/Invoice/ViewInvoices/Invoices')),
+        component: lazy(
+            () => import('@/views/AgancyModule/Invoice/ViewInvoices/Invoices'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -74,7 +132,9 @@ const AgancyRoute: Routes = [
     {
         key: 'LoadingListView',
         path: '/LoadingList-LoadingListView',
-        component: lazy(() => import('@/views/AgancyModule/LoadingList/LoadingList')),
+        component: lazy(
+            () => import('@/views/AgancyModule/LoadingList/LoadingList'),
+        ),
         authority: [],
         meta: {
             allowedRoles: ['System Admin'],
@@ -96,11 +156,11 @@ const AgancyRoute: Routes = [
     {
         key: 'MarketReturn',
         path: '/Return-MarketReturn',
-        component: lazy(() => import('@/views/AgancyModule/Return/MarketReturn')),
+        component: lazy(
+            () => import('@/views/AgancyModule/Return/MarketReturn'),
+        ),
         authority: [],
     },
-
-
 ]
 
 export default AgancyRoute
