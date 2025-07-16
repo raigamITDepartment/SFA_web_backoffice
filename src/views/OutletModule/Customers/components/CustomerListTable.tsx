@@ -143,11 +143,11 @@ const ActionColumn = ({ onEdit, onView }: { onEdit: () => void; onView: () => vo
         <TbPencil />
       </div>
     </Tooltip>
-    <Tooltip title="View">
+    {/* <Tooltip title="View">
       <div className="text-xl cursor-pointer select-none font-semibold" onClick={onView}>
         <TbEye />
       </div>
-    </Tooltip>
+    </Tooltip> */}
   </div>
 );
 
