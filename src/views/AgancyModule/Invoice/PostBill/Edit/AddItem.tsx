@@ -46,7 +46,9 @@ const itemDetailsMap: Record<
   'Item C': { itemNo: 'ITEM-003', itemPrice: 20.0 },
 };
 
-const AddItem: React.FC = () => {
+
+
+  function AddItem() {
   const navigate = useNavigate();
 
   const {

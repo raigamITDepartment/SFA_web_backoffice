@@ -117,15 +117,15 @@ function Editbill() {
             [field]: typeof value === 'string' ? parseFloat(value) || 0 : value
           };
 
-          const netQty = updatedItem.qty - updatedItem.goodReturnQty - updatedItem.marketReturnQty;
-          const netValue =
-            (netQty * updatedItem.itemPrice) -
+          // Corrected grand total calculation
+          const grandTotal =
+            (updatedItem.qty * updatedItem.itemPrice) -
             (updatedItem.goodReturnQty * updatedItem.goodReturnPrice) -
             (updatedItem.marketReturnQty * updatedItem.marketReturnPrice);
 
           return {
             ...updatedItem,
-            grandTotal: netValue
+            grandTotal: grandTotal,
           };
         }
         return item;
