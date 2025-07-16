@@ -5,15 +5,18 @@ import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import React, { useMemo, useState } from 'react';
-import { useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, flexRender } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, flexRender } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
-import type { ColumnDef, FilterFn } from '@tanstack/react-table';
+import type { ColumnDef, FilterFn, ColumnSort } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import Tag from '@/components/ui/Tag';
 import { Button, toast, Alert } from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
+import DatePicker from '@/components/ui/DatePicker';
+import Dialog from '@/components/ui/Dialog';
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
+const { DatePickerRange } = DatePicker;
 
 interface Invoice {
   id: number;
@@ -98,15 +101,20 @@ function PrintBill() {
     { id: 8, invoiceNo: 'INV-2023-008', route: 'Route C', shop: 'Shop 8', territoryCode: 'T002', value: 3600, status: 'Cancel', date: '2023-07-06' },
   ]);
 
+  const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
-  const [filterDate, setFilterDate] = useState('');
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   const filteredData = useMemo(() => {
-    return filterDate
-      ? data.filter(invoice => invoice.date === filterDate)
-      : data;
-  }, [data, filterDate]);
+    return data.filter((item) => {
+      const itemDate = new Date(item.date);
+      const [from, to] = dateRange;
+      return (!from || itemDate >= from) && (!to || itemDate <= to);
+    });
+  }, [data, dateRange]);
 
   const handleStatusChange = (invoiceId: number, newStatus: string) => {
     setData(prevData =>
@@ -121,7 +129,11 @@ function PrintBill() {
   };
 
   const handleSubmit = () => {
-    console.log('Submitting invoice data:', data);
+    setDialogIsOpen(true);
+  };
+
+  const handleDialogConfirm = () => {
+    setDialogIsOpen(false);
     toast.push(
       <Alert showIcon type="success" className="dark:bg-gray-700 w-64 sm:w-80 md:w-96">
         Invoice Data Submitted Successfully
@@ -134,16 +146,11 @@ function PrintBill() {
         placement: 'top-end',
       }
     );
+    console.log('Submitting invoice data:', data);
   };
 
-  const getStatusTag = (status: string) => {
-    const statusMap: Record<string, { color: string; text: string }> = {
-      'Print': { color: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-100', text: 'Print' },
-      'Late Delivery': { color: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-100', text: 'Late Delivery' },
-      'Cancel': { color: 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-100', text: 'Cancel' },
-    };
-    const statusInfo = statusMap[status] || { color: '', text: status };
-    return <Tag className={`${statusInfo.color} border-0 rounded`}>{statusInfo.text}</Tag>;
+  const handleDialogClose = () => {
+    setDialogIsOpen(false);
   };
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
@@ -154,11 +161,10 @@ function PrintBill() {
       accessorKey: 'territoryCode',
     },
     { header: 'Shop', accessorKey: 'shop' },
-
     {
       header: 'Value',
       accessorKey: 'value',
-      cell: ({ getValue }) => <div className="font-medium">Rs. {getValue<number>().toLocaleString()}</div>
+      cell: ({ getValue }) => <div className="font-medium text-right pr-2">Rs. {getValue<number>().toLocaleString()}</div>
     },
     {
       header: 'Date',
@@ -199,24 +205,16 @@ function PrintBill() {
     data: filteredData,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
-    state: { globalFilter },
+    state: { globalFilter, sorting },
+    onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     initialState: { pagination: { pageSize } },
   });
-
-  const onPaginationChange = (page: number) => {
-    table.setPageIndex(page - 1);
-  };
-
-  const onSelectChange = (value = 0) => {
-    const newSize = Number(value);
-    setPageSize(newSize);
-    table.setPageSize(newSize);
-  };
 
   return (
     <div className="p-6 w-full mx-auto space-y-6">
@@ -250,33 +248,43 @@ function PrintBill() {
       </Card>
 
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
-        <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Invoice List</h3>
-          <div className="flex flex-col sm:flex-row gap-2">
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center">
+            <span className="mr-2">Search:</span>
             <DebouncedInput
               value={globalFilter ?? ''}
-              placeholder="Search invoices..."
               onChange={(value) => setGlobalFilter(String(value))}
+              placeholder="Search all columns..."
+              className="w-64"
             />
-            <Input
-              type="date"
+          </div>
+          <div className="w-64">
+            <DatePickerRange
+              value={dateRange}
+              onChange={(newRange) => setDateRange(newRange)}
+              placeholder="Select date range"
+              clearable={true}
               size="sm"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
             />
           </div>
         </div>
 
-        <Table className="overflow-x-auto">
+        <Table>
           <THead>
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <Tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
+                {headerGroup.headers.map((header) => (
                   <Th key={header.id}>
                     <div
-                      className={header.column.getCanSort()
-                        ? 'cursor-pointer select-none flex items-center gap-1'
-                        : 'flex items-center'}
+                      className={
+                        header.column.getCanSort()
+                          ? 'cursor-pointer select-none flex items-center gap-1'
+                          : ''
+                      }
                       onClick={header.column.getToggleSortingHandler()}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
@@ -290,9 +298,9 @@ function PrintBill() {
             ))}
           </THead>
           <TBody>
-            {table.getRowModel().rows.map(row => (
+            {table.getRowModel().rows.map((row) => (
               <Tr key={row.id}>
-                {row.getVisibleCells().map(cell => (
+                {row.getVisibleCells().map((cell) => (
                   <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
                 ))}
               </Tr>
@@ -305,7 +313,7 @@ function PrintBill() {
             pageSize={table.getState().pagination.pageSize}
             currentPage={table.getState().pagination.pageIndex + 1}
             total={filteredData.length}
-            onChange={onPaginationChange}
+            onChange={(page) => table.setPageIndex(page - 1)}
           />
           <div className="min-w-[130px]">
             <Select
@@ -313,7 +321,11 @@ function PrintBill() {
               isSearchable={false}
               value={pageSizeOptions.find(option => option.value === pageSize)}
               options={pageSizeOptions}
-              onChange={(option) => onSelectChange(option?.value)}
+              onChange={(option) => {
+                const size = option?.value ?? 10;
+                setPageSize(size);
+                table.setPageSize(size);
+              }}
             />
           </div>
         </div>
@@ -328,6 +340,33 @@ function PrintBill() {
           </Button>
         </div>
       </Card>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        isOpen={dialogIsOpen}
+        onClose={handleDialogClose}
+        onRequestClose={handleDialogClose}
+      >
+        <h5 className="mb-4">Confirm Submission</h5>
+        <p>
+          Are you sure you want to submit all invoice changes?
+        </p>
+        <div className="text-right mt-6">
+          <Button
+            className="mr-2"
+            onClick={handleDialogClose}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant="solid" 
+            color="blue"
+            onClick={handleDialogConfirm}
+          >
+            Confirm Submit
+          </Button>
+        </div>
+      </Dialog>
     </div>
   );
 }
