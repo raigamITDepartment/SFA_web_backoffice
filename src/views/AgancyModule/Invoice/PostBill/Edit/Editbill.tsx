@@ -134,10 +134,6 @@ function Editbill() {
             [field]: typeof value === 'string' ? parseFloat(value) || 0 : value
           };
 
-          // Corrected grand total calculation
-          const grandTotal =
-            (updatedItem.qty * updatedItem.itemPrice) -
-          // Corrected grand total calculation
           const grandTotal =
             (updatedItem.qty * updatedItem.itemPrice)
 
@@ -556,5 +552,6 @@ function Editbill() {
     </div>
   );
 }
+
 
 export default Editbill;
