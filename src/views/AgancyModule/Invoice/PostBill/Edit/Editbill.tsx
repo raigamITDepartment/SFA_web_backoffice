@@ -136,6 +136,9 @@ function Editbill() {
 
           // Corrected grand total calculation
           const grandTotal =
+            (updatedItem.qty * updatedItem.itemPrice) -
+          // Corrected grand total calculation
+          const grandTotal =
             (updatedItem.qty * updatedItem.itemPrice)
 
           const discountAmount = grandTotal * (updatedItem.discountPercentage / 100);
@@ -151,7 +154,6 @@ function Editbill() {
           return {
             ...updatedItem,
             grandTotal: grandTotal,
-            grandTotal: Math.max(0, netValue) // Ensure grand total doesn't go negative
           };
         }
         return item;

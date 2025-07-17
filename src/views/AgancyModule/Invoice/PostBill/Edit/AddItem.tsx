@@ -51,7 +51,13 @@ const itemDetailsMap: Record<string, { itemNo: string; itemPrice: number }> = {
   'Item C': { itemNo: 'ITEM-003', itemPrice: 20.0 },
 };
 
+<<<<<<<<< Temporary merge branch 1
 const AddItem = () => {
+=========
+
+
+  function AddItem() {
+>>>>>>>>> Temporary merge branch 2
   const navigate = useNavigate();
 
   const {
