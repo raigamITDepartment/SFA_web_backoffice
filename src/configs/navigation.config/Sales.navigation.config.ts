@@ -133,6 +133,16 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
+            {
+                key: 'ReverseRequests',
+                path: '/Salesmenu/ReverseRequests',
+                title: 'Reverse Requests',
+                translateKey: 'nav.SalesMenu.ReverseRequests',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
         ],
     },
 ]

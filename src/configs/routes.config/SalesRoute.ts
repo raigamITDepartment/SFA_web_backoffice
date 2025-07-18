@@ -131,6 +131,13 @@ const SalesRoute: Routes = [
         authority: [],
     },
 
+    {
+        key: 'SalesMenu.ReverseRequests',
+        path: '/Salesmenu/ReverseRequests',
+        component: lazy(() => import('@/views/SalesDetails/ReverseRequests/ReverseRequests')),
+        authority: [],
+    },
+
 
 ]
 

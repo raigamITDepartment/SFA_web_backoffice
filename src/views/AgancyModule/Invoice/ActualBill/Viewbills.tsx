@@ -119,7 +119,7 @@ const ViewBills = () => {
         type="success"
         className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
       >
-        Invoice {selectedInvoice?.invoiceNo} reversed successfully!
+        Invoice {selectedInvoice?.invoiceNo} submitted for reverse!
       </Alert>,
       {
         offsetX: 5,

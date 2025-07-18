@@ -120,7 +120,7 @@ const AgancyRoute: Routes = [
         key: 'ViewInvoice',
         path: '/AgancyModule-Invoice-ViewInvoice',
         component: lazy(
-            () => import('@/views/AgancyModule/Invoice/ViewInvoices/Invoices'),
+            () => import('@/views/AgancyModule/Invoice/ViewInvoices/ViewInvoices'),
         ),
         authority: [],
         meta: {
