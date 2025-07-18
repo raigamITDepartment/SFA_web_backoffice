@@ -36,7 +36,7 @@ const navigationIcon: NavigationIcons = {
     HR:<PiAddressBookTabsThin/>,
     Outlet:<PiShoppingCartFill/>,
     research:<PiReceiptXBold/>,
-    Agancy: <PiWarehouseFill />,
+    Agency: <PiWarehouseFill />,
     Invoice:<PiInvoiceBold   />,
     Loding:<PiUploadFill/>,
     Return:<PiKeyReturnFill/>

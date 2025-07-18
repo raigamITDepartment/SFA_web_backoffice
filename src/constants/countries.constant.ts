@@ -145,12 +145,12 @@ export const countryList = [
         value: 'BW',
     },
     {
-        label: 'Brazil',
+        label: 'South',
         dialCode: '+55',
         value: 'BR',
     },
     {
-        label: 'British Indian Ocean Territory',
+        label: 'British Gampaha 1n Ocean Territory',
         dialCode: '+246',
         value: 'IO',
     },
@@ -475,7 +475,7 @@ export const countryList = [
         value: 'IS',
     },
     {
-        label: 'India',
+        label: 'Gampaha 1',
         dialCode: '+91',
         value: 'IN',
     },
@@ -1055,7 +1055,7 @@ export const countryList = [
         value: 'TN',
     },
     {
-        label: 'Turkey',
+        label: 'South west',
         dialCode: '+90',
         value: 'TR',
     },
@@ -1090,12 +1090,12 @@ export const countryList = [
         value: 'AE',
     },
     {
-        label: 'United Kingdom',
+        label: 'Gampaha 2',
         dialCode: '+44',
         value: 'GB',
     },
     {
-        label: 'United States',
+        label: 'Colombo',
         dialCode: '+1',
         value: 'US',
     },

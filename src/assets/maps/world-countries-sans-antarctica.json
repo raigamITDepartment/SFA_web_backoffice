@@ -9154,7 +9154,7 @@
                         [-27, 116, -115, 117, 118, 119, 120, 121, 122, 123, 124]
                     ],
                     "type": "Polygon",
-                    "properties": { "name": "Brazil", "Alpha-2": "BR" },
+                    "properties": { "name": "South", "Alpha-2": "BR" },
                     "id": "BRA"
                 },
                 {
@@ -9434,7 +9434,7 @@
                 {
                     "arcs": [[[298, 299]], [[300, 301]]],
                     "type": "MultiPolygon",
-                    "properties": { "name": "United Kingdom", "Alpha-2": "GB" },
+                    "properties": { "name": "Gampaha 2", "Alpha-2": "GB" },
                     "id": "GBR"
                 },
                 {
@@ -9553,7 +9553,7 @@
                 {
                     "arcs": [[-191, 365, -189, -128, -188, 366, -74, 367, 368]],
                     "type": "Polygon",
-                    "properties": { "name": "India", "Alpha-2": "IN" },
+                    "properties": { "name": "Gampaha 1", "Alpha-2": "IN" },
                     "id": "IND"
                 },
                 {
@@ -10139,7 +10139,7 @@
                         [[-322, -77, 598]]
                     ],
                     "type": "MultiPolygon",
-                    "properties": { "name": "Turkey", "Alpha-2": "TR" },
+                    "properties": { "name": "South west", "Alpha-2": "TR" },
                     "id": "TUR"
                 },
                 {
