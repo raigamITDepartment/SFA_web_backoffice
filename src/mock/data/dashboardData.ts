@@ -370,31 +370,31 @@ export const eCommerceData = {
     customerDemographic: [
         {
             id: 'us',
-            name: 'United States',
+            name: 'Colombo South',
             value: 38.61,
             coordinates: [-95.7129, 37.0902],
         },
         {
             id: 'br',
-            name: 'Brazil',
+            name: 'South',
             value: 32.79,
             coordinates: [-51.9253, -14.235],
         },
         {
             id: 'in',
-            name: 'India',
+            name: 'Gampaha 1',
             value: 26.42,
             coordinates: [78.9629, 20.5937],
         },
         {
             id: 'uk',
-            name: 'United Kingdom',
+            name: 'Gampaha 2',
             value: 17.42,
             coordinates: [0.1278, 51.5074],
         },
         {
             id: 'tr',
-            name: 'Turkey',
+            name: 'South west',
             value: 12.85,
             coordinates: [28.9784, 41.0082],
         },

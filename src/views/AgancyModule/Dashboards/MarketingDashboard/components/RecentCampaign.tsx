@@ -153,7 +153,7 @@ const RecentCampaign = ({ data }: RecentCampaignProps) => {
                                     <NumericFormat
                                         displayType="text"
                                         value={campagin.budget}
-                                        prefix={'$'}
+                                        prefix={'Rs.'}
                                         thousandSeparator={true}
                                     />
                                 </Td>
