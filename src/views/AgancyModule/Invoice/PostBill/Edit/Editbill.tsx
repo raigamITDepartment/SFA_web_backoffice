@@ -18,9 +18,13 @@ interface InvoiceItem {
   itemPrice: number;
   goodReturnQty: number;
   goodReturnPrice: number;
+  goodReturnFree: number; // Added
   marketReturnQty: number;
   marketReturnPrice: number;
+  marketReturnFree: number; // Added
+  discountPercentage: number; // Added
   grandTotal: number;
+  freeIssue: number;
 }
 
 function Editbill() {
@@ -38,6 +42,7 @@ function Editbill() {
     shopName: 'SuperMart',
     shopCode: 'SM-001',
     route: 'Route C',
+    territoryCode: 'T001'
   };
 
   const [itemsData, setItemsData] = useState<InvoiceItem[]>([
@@ -49,9 +54,13 @@ function Editbill() {
       itemPrice: 150,
       goodReturnQty: 0,
       goodReturnPrice: 0,
+      goodReturnFree: 0,
       marketReturnQty: 0,
       marketReturnPrice: 0,
-      grandTotal: 1500
+      marketReturnFree: 0,
+      discountPercentage: 0,
+      grandTotal: 1500,
+      freeIssue: 0
     },
     {
       id: 2,
@@ -61,9 +70,13 @@ function Editbill() {
       itemPrice: 200,
       goodReturnQty: 1,
       goodReturnPrice: 200,
+      goodReturnFree: 0,
       marketReturnQty: 0,
       marketReturnPrice: 0,
-      grandTotal: 800
+      marketReturnFree: 0,
+      discountPercentage: 5,
+      grandTotal: 800,
+      freeIssue: 0
     },
     {
       id: 3,
@@ -73,9 +86,13 @@ function Editbill() {
       itemPrice: 50,
       goodReturnQty: 0,
       goodReturnPrice: 0,
+      goodReturnFree: 0,
       marketReturnQty: 2,
       marketReturnPrice: 100,
-      grandTotal: 900
+      marketReturnFree: 0,
+      discountPercentage: 10,
+      grandTotal: 900,
+      freeIssue: 0
     }
   ]);
 
@@ -117,15 +134,22 @@ function Editbill() {
             [field]: typeof value === 'string' ? parseFloat(value) || 0 : value
           };
 
+          const grandTotal =
+            (updatedItem.qty * updatedItem.itemPrice)
+
+          const discountAmount = grandTotal * (updatedItem.discountPercentage / 100);
+
+          // Calculate net values
           const netQty = updatedItem.qty - updatedItem.goodReturnQty - updatedItem.marketReturnQty;
           const netValue =
             (netQty * updatedItem.itemPrice) -
             (updatedItem.goodReturnQty * updatedItem.goodReturnPrice) -
-            (updatedItem.marketReturnQty * updatedItem.marketReturnPrice);
+            (updatedItem.marketReturnQty * updatedItem.marketReturnPrice) -
+            discountAmount;
 
           return {
             ...updatedItem,
-            grandTotal: netValue
+            grandTotal: grandTotal,
           };
         }
         return item;
@@ -166,7 +190,7 @@ function Editbill() {
     setConfirmDialogOpen(false);
 
     setTimeout(() => {
-      navigate(-1); 
+      navigate(-1);
     }, 1000);
   };
 
@@ -179,14 +203,14 @@ function Editbill() {
       )
     },
     {
-    header: 'Item Name',
-    accessorKey: 'itemName',
-    cell: ({ row }) => (
-      <div className="text-center font-medium text-gray-700 dark:text-gray-200">
-        {`Item ${row.index + 1}`}
-      </div>
-    )
-  },
+      header: 'Item Name',
+      accessorKey: 'itemName',
+      cell: ({ row }) => (
+        <div className="text-center font-medium text-gray-700 dark:text-gray-200">
+          {`Item ${row.index + 1}`}
+        </div>
+      )
+    },
     {
       header: 'Description',
       accessorKey: 'description',
@@ -225,6 +249,8 @@ function Editbill() {
         </div>
       )
     },
+
+
     {
       header: 'Good Return Qty',
       accessorKey: 'goodReturnQty',
@@ -252,6 +278,21 @@ function Editbill() {
             className="w-24 p-1 border rounded text-right"
             value={row.original.goodReturnPrice}
             onChange={(e) => handleItemChange(row.original.id, 'goodReturnPrice', e.target.value)}
+          />
+        </div>
+      )
+    },
+    {
+      header: 'Good Return Free',
+      accessorKey: 'goodReturnFree',
+      cell: ({ row }) => (
+        <div className="text-center">
+          <input
+            type="number"
+            min="0"
+            className="w-16 p-1 border rounded text-center"
+            value={row.original.goodReturnFree}
+            onChange={(e) => handleItemChange(row.original.id, 'goodReturnFree', e.target.value)}
           />
         </div>
       )
@@ -288,6 +329,52 @@ function Editbill() {
       )
     },
     {
+      header: 'Market Return Free',
+      accessorKey: 'marketReturnFree',
+      cell: ({ row }) => (
+        <div className="text-center">
+          <input
+            type="number"
+            min="0"
+            className="w-16 p-1 border rounded text-center"
+            value={row.original.marketReturnFree}
+            onChange={(e) => handleItemChange(row.original.id, 'marketReturnFree', e.target.value)}
+          />
+        </div>
+      )
+    },
+    {
+      header: 'Free Issue',
+      accessorKey: 'freeIssue',
+      cell: ({ row }) => (
+        <div className="text-center">
+          <input
+            type="number"
+            min="0"
+            className="w-16 p-1 border rounded text-center"
+            value={row.original.freeIssue}
+            onChange={(e) => handleItemChange(row.original.id, 'freeIssue', e.target.value)}
+          />
+        </div>
+      )
+    },
+    {
+      header: 'Discount (%)',
+      accessorKey: 'discountPercentage',
+      cell: ({ row }) => (
+        <div className="text-center">
+          <input
+            type="number"
+            min="0"
+            max="100"
+            className="w-16 p-1 border rounded text-center"
+            value={row.original.discountPercentage}
+            onChange={(e) => handleItemChange(row.original.id, 'discountPercentage', e.target.value)}
+          />
+        </div>
+      )
+    },
+    {
       header: 'Total',
       accessorKey: 'grandTotal',
       cell: ({ row }) => (
@@ -309,7 +396,7 @@ function Editbill() {
         </div>
       )
     }
-  ], []);
+  ], [itemsData]);
 
   const table = useReactTable({
     data: itemsData,
@@ -350,6 +437,10 @@ function Editbill() {
               <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Route</label>
               <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.route}</div>
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">Territory Code</label>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{invoiceData.territoryCode}</div>
+            </div>
           </div>
         </div>
       </Card>
@@ -358,8 +449,8 @@ function Editbill() {
       <Card className="p-6 rounded-xl shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Items</h3>
-          <Button 
-            variant="solid" 
+          <Button
+            variant="solid"
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 shadow-md"
             onClick={handleAddItem}
           >
@@ -367,41 +458,63 @@ function Editbill() {
           </Button>
         </div>
 
-        <Table className="overflow-x-auto">
-          <THead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <Th key={header.id} colSpan={header.colSpan}>
-                    {!header.isPlaceholder && flexRender(header.column.columnDef.header, header.getContext())}
-                  </Th>
-                ))}
-              </Tr>
-            ))}
-          </THead>
-          <TBody>
-            {table.getRowModel().rows.map(row => (
-              <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                {row.getVisibleCells().map(cell => (
-                  <Td key={cell.id} className="py-3 px-4">{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
-                ))}
-              </Tr>
-            ))}
-          </TBody>
-        </Table>
+        <div className="overflow-x-auto">
+          <Table>
+            <THead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <Tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <Th key={header.id} colSpan={header.colSpan}>
+                      {!header.isPlaceholder && flexRender(header.column.columnDef.header, header.getContext())}
+                    </Th>
+                  ))}
+                </Tr>
+              ))}
+            </THead>
+            <TBody>
+              {table.getRowModel().rows.map(row => (
+                <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  {row.getVisibleCells().map(cell => (
+                    <Td key={cell.id} className="py-3 px-4">{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+                  ))}
+                </Tr>
+              ))}
+            </TBody>
+          </Table>
+          {/* Invoice Total Summary */}
+          <div className="flex justify-end mt-4 pr-4">
+            <div className="w-full md:w-1/2 lg:w-1/3">
+              <div className="bg-gray-100 dark:bg-gray-800/50 rounded-xl shadow-inner p-4 space-y-3">
+                <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+                  <span>Sub Total</span>
+                  <span className="font-medium text-gray-800 dark:text-gray-100">
+                    Rs. {itemsData.reduce((sum, item) => sum + item.grandTotal, 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="border-t border-gray-300 dark:border-gray-600 pt-2 mt-2 flex justify-between items-center text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  <span>Total</span>
+                  <span className="text-blue-600 dark:text-blue-400">
+                    Rs. {itemsData.reduce((sum, item) => sum + item.grandTotal, 0).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </Card>
 
       {/* Buttons */}
       <div className="flex justify-end space-x-3">
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           className="border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-2"
           onClick={handleCancel}
         >
           Cancel
         </Button>
-        <Button 
-          variant="solid" 
+        <Button
+          variant="solid"
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 shadow-md"
           onClick={handleUpdate}
         >
@@ -439,5 +552,6 @@ function Editbill() {
     </div>
   );
 }
+
 
 export default Editbill;

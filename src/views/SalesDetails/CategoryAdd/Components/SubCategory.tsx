@@ -9,6 +9,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
+import { useNavigate } from 'react-router-dom'; // <-- Add this import
 
 import {
     useReactTable,
@@ -26,7 +27,6 @@ import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
 
 type FormSchema = {
-
     SubCategoryCode: string;
     SubCategoryName: string;
     MainCategory: string;
@@ -90,13 +90,13 @@ const SubCategoryComponent = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
-    // const [error, setError] = useState<string | null>(null);
+
+    const navigate = useNavigate(); // <-- Add this line
 
     const columns = useMemo<ColumnDef<SubCategory>[]>(() => [
         { header: 'Sub Category Code', accessorKey: 'SubCategoryCode' },
         { header: 'Sub CategoryCode Name', accessorKey: 'SubCategoryName' },
         { header: 'Main Category', accessorKey: 'MainCategory' },
-    
         {
             header: 'Is Active',
             accessorKey: 'isActive',
@@ -122,9 +122,7 @@ const SubCategoryComponent = () => {
 
     const [data] = useState<SubCategory[]>([
         { SubCategoryCode: '1', SubCategoryName: 'R1A', MainCategory: 'SOYA' ,isActive: true },
-        
         { SubCategoryCode: '1', SubCategoryName: 'R1A', MainCategory: 'SOYA' , isActive: true },
-    
     ]);
 
     const totalData = data.length;
@@ -154,13 +152,9 @@ const SubCategoryComponent = () => {
         table.setPageSize(newSize);
     };
 
-    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-    //     console.log(value, e);
-    // };
-
     const handleEdit = (area: SubCategory) => {
-        // Implement edit functionality here
-        console.log('Edit:', area);
+        // Navigate to SubCategoryEdit and pass the selected subcategory as state
+        navigate('/Salesmenu/SubCategoryEdit', { state: { subCategory: area } });
     };
 
     const handleDelete = (area: SubCategory) => {
@@ -177,7 +171,6 @@ const SubCategoryComponent = () => {
             SubCategoryCode: '',
             SubCategoryName: '',
             MainCategory: '' ,   
-          
             isActive: true, // Set default value to true
         },
     });
@@ -224,7 +217,6 @@ const SubCategoryComponent = () => {
                                 }}
                             />
                         </FormItem>
-                      
                         <FormItem
                             invalid={Boolean(errors.SubCategoryName)}
                             errorMessage={errors.SubCategoryName?.message}
@@ -252,7 +244,6 @@ const SubCategoryComponent = () => {
                                 }}
                             />
                         </FormItem>
-
                         <FormItem>
                             <Controller
                                 name="isActive"
@@ -264,13 +255,11 @@ const SubCategoryComponent = () => {
                                 }
                             />
                         </FormItem>
-
                         <FormItem>
                             <Button variant="solid" block type="submit">Create</Button>
                         </FormItem>
                     </Form>
                 </Card>
-
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
                     <div>
                         <DebouncedInput

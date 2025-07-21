@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Avatar from '@/components/ui/Avatar'
+//import Avatar from '@/components/ui/Avatar'
 import Card from '@/components/ui/Card'
 import Progress from '@/components/ui/Progress'
 import RegionMap from '@/components/shared/RegionMap'
@@ -31,7 +31,7 @@ const CustomerDemographic = ({ data }: CustomerDemographicProps) => {
 
     return (
         <Card>
-            <h4>Top countries</h4>
+            <h4>Top Areas</h4>
             <div className="flex flex-col xl:flex-row items-center gap-4 mt-4">
                 <div className="px-4 flex flex-col justify-center flex-1 w-full">
                     <RegionMap
@@ -87,7 +87,7 @@ const CustomerDemographic = ({ data }: CustomerDemographicProps) => {
                             onMouseLeave={() => setHovering('')}
                         >
                             <div className="flex gap-2">
-                                <Avatar src={item.img} size={30} />
+                                {/* <Avatar src={item.img} size={30} /> */}
                             </div>
                             <div className="flex-1">
                                 <div className="heading-text font-semibold">

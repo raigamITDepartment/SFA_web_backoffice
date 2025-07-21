@@ -267,7 +267,7 @@ const CreateCampaign = ({ onCreate }: CreateCampaignProps) => {
                                     allowLeadingZeros
                                     thousandSeparator=","
                                     value={field.value}
-                                    inputPrefix={'$'}
+                                    inputprefix={'Rs.'}
                                     placeholder="0.00"
                                     onValueChange={(e) => {
                                         field.onChange(e.floatValue)

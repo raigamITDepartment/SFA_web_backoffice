@@ -46,16 +46,6 @@ const AdminModuleNavigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [
                     {
-                        key: 'BookingReverse',
-                        path: '/Admin-menu-BookingReverse',
-                        title: 'BookingReverse',
-                        translateKey: 'nav.Admin.BookingReverse',
-                        icon: '',
-                        type: NAV_ITEM_TYPE_ITEM,
-                        authority: [],
-                        subMenu: [],
-                    },
-                    {
                         key: 'AcutualReverse',
                         path: '/Admin-menu-AcutualReverse',
                         title: 'Actual Reverse',

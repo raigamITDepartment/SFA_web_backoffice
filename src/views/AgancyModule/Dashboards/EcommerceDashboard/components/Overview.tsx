@@ -134,7 +134,7 @@ const Overview = ({ data }: StatisticGroupsProps) => {
                         <NumericFormat
                             displayType="text"
                             value={data.totalProfit[selectedPeriod].value}
-                            prefix={'$'}
+                            prefix={'Rs.'}
                             thousandSeparator={true}
                         />
                     }

@@ -11,9 +11,9 @@ const AgancyModulenavigationconfig: NavigationTree[] = [
     {
         key: 'AgancyModule',
         path: '',
-        title: 'Agancy Module',
+        title: 'Agency Module',
         translateKey: 'nav.groupMenu.groupMenu',
-        icon: 'Agancy',
+        icon: 'Agency',
         type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
         subMenu: [

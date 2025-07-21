@@ -66,7 +66,7 @@ const WebAnalytic = ({ data }: WebAnalyticProps) => {
                                 <NumericFormat
                                     displayType="text"
                                     value={data.pageView.value}
-                                    prefix={'$'}
+                                    prefix={'Rs.'}
                                     thousandSeparator={true}
                                 />
                             </h3>
