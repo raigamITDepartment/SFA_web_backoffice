@@ -16,12 +16,7 @@ const UserRoute: Routes = [
         },
     },
 
-    {
-        key: 'UserModule.BookingReverse',
-        path: '/Admin-menu-BookingReverse',
-        component: lazy(() => import('@/views/Admin 2/BookingReverse')),
-        authority: [],
-    },
+    
 
 
 

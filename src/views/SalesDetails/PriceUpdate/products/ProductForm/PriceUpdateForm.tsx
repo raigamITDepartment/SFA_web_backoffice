@@ -84,23 +84,27 @@ const ProductForm = (props: ProductFormProps) => {
 
     return (
         <Form
-            className="flex flex-col w-full h-full"
-            containerClassName="flex flex-col w-full justify-between"
-            onSubmit={handleSubmit(onSubmit)}
-        >
-            <Container>
-                <div className="flex flex-col gap-4 xl:flex-row">
-                    <div className="flex flex-col gap-4 w-full xl:w-1/3">
-                        <GeneralSection/>
-                        <PricingSection control={control} errors={errors} />
-                    </div>
-                    <div className="flex flex-col gap-4 w-full xl:w-2/3 lg:min-w-[180px] 2xl:w-[150px]">
-                        <OldPrice/>
-                    </div>
-                </div>
-            </Container>
-            <BottomStickyBar>{children}</BottomStickyBar>
-        </Form>
+  className="flex flex-col w-full h-full"
+  containerClassName="flex flex-col w-full justify-between"
+  onSubmit={handleSubmit(onSubmit)}
+>
+  <Container className="w-full max-w-none p-2 sm:p-6">
+    <div className="flex flex-col gap-6 lg:flex-row w-full">
+      <div className="flex flex-col gap-4 w-full">
+        <GeneralSection/>
+        <PricingSection control={control} errors={errors} />
+      </div>
+      <div className="flex flex-col gap-4 w-full min-w-0">
+        <OldPrice />
+      </div>
+    </div>
+  </Container>
+  <BottomStickyBar className="w-full px-2 sm:px-4">
+    {children}
+  </BottomStickyBar>
+</Form>
+
+
     )
 }
 

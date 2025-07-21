@@ -85,7 +85,7 @@
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.13",
     "@types/node": "^22.5.4",
-    "@types/react": "19.0.2",
+    "@types/react": "^19.0.2",
     "@types/react-csv": "^1.1.10",
     "@types/react-dom": "^19.0.2",
     "@types/react-highlight-words": "^0.20.0",

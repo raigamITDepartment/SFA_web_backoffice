@@ -20,10 +20,13 @@ const { DatePickerRange } = DatePicker;
 type Invoice = {
   id: number;
   invoiceNo: string;
-  route: string;
-  shop: string;
-  territoryCode: string;
+  invoiceType?: string;
+  routeCode: string;
+  shopCode: string;
+  customer: string;
+  agencyCode: string;
   value: number;
+  source?: 'Web' | 'Mobile';
   status: string;
   date: string;
 };
@@ -84,11 +87,12 @@ function DebouncedInput({
 
 const ViewBills = () => {
   const [data] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-001', route: 'Route A', shop: 'Shop 1', territoryCode: 'T001', value: 1000, status: 'Actual', date: '2023-07-01' },
-    { id: 2, invoiceNo: 'INV-002', route: 'Route B', shop: 'Shop 2', territoryCode: 'T002', value: 2000, status: 'Actual', date: '2023-07-02' },
-    { id: 3, invoiceNo: 'INV-003', route: 'Route C', shop: 'Shop 3', territoryCode: 'T003', value: 1500, status: 'Actual', date: '2023-07-05' },
-    { id: 4, invoiceNo: 'INV-004', route: 'Route D', shop: 'Shop 4', territoryCode: 'T004', value: 3000, status: 'Actual', date: '2023-07-06' },
+    { id: 1, invoiceNo: 'INV-001', invoiceType: 'Normal', routeCode: 'R100', shopCode: 'S100', customer: 'Shop 1', agencyCode: 'T001', value: 1000, status: 'Actual', date: '2023-07-01', source: 'Web' },
+    { id: 2, invoiceNo: 'INV-002', invoiceType: 'Agency', routeCode: 'R100', shopCode: 'S100', customer: 'Shop 2', agencyCode: 'T002', value: 2000, status: 'Actual', date: '2023-07-02', source: 'Mobile' },
+    { id: 3, invoiceNo: 'INV-003', invoiceType: 'Company', routeCode: 'R100', shopCode: 'S100', customer: 'Shop 3', agencyCode: 'T003', value: 1500, status: 'Actual', date: '2023-07-05', source: 'Web' },
+    { id: 4, invoiceNo: 'INV-004', invoiceType: 'Normal', routeCode: 'R100', shopCode: 'S100', customer: 'Shop 4', agencyCode: 'T004', value: 3000, status: 'Actual', date: '2023-07-06', source: 'Mobile' },
   ]);
+
 
   const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -140,16 +144,29 @@ const ViewBills = () => {
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
     { header: 'Invoice No', accessorKey: 'invoiceNo' },
-    { header: 'Route', accessorKey: 'route' },
-    { header: 'Shop', accessorKey: 'shop' },
-    { header: 'Territory Code', accessorKey: 'territoryCode' },
+    { header: 'Invoice Type', accessorKey: 'invoiceType' },
+    { header: 'Agency Code', accessorKey: 'agencyCode' },
+    { header: 'Route Code', accessorKey: 'routeCode' },
+    { header: 'Shop Code', accessorKey: 'shopCode' },
+    { header: 'Customer', accessorKey: 'customer' },
+
     {
       header: 'Value',
       accessorKey: 'value',
       cell: ({ getValue }) => (
-        <div className="font-semibold text-right pr-2">Rs. {getValue<number>().toLocaleString()}</div>
-      )
+        <div className="flex items-center justify-end font-semibold text-right pr-2 space-x-1">
+          <span>Rs.</span>
+          <span>
+            {getValue<number>().toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+        </div>
+      ),
     },
+
+
     {
       header: 'Date',
       accessorKey: 'date',
@@ -158,6 +175,26 @@ const ViewBills = () => {
         return new Date(dateStr).toLocaleDateString();
       }
     },
+    {
+      header: 'Source',
+      accessorKey: 'source',
+      cell: ({ getValue }) => {
+        const source = getValue<'Web' | 'Mobile'>();
+
+        return (
+          <span
+            className={`inline-flex items-center gap-x-1 px-2 py-1 rounded-full text-xs font-medium ${source === 'Web'
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+              }`}
+          >
+            <span>{source === 'Web' ? '🌐' : '📱'}</span>
+            <span>{source}</span>
+          </span>
+        );
+      },
+    },
+
     {
       header: 'Status',
       accessorKey: 'status',
@@ -169,7 +206,7 @@ const ViewBills = () => {
       header: 'Action',
       accessorKey: 'action',
       cell: ({ row }) => (
-        <button 
+        <button
           className="text-red-600 hover:text-red-800 transition"
           onClick={() => handleReverseClick(row.original)}
         >
@@ -320,7 +357,7 @@ const ViewBills = () => {
         <h5 className="mb-4">Reverse Invoice</h5>
         <p>
           Are you sure you want to reverse invoice <b>{selectedInvoice?.invoiceNo}</b>?
-          
+
         </p>
         <div className="text-right mt-6">
           <Button
@@ -329,8 +366,8 @@ const ViewBills = () => {
           >
             Cancel
           </Button>
-          <Button 
-            variant="solid" 
+          <Button
+            variant="solid"
             color="red"
             onClick={handleDialogConfirm}
           >

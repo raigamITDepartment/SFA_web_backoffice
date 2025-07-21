@@ -28,7 +28,7 @@ interface Invoice {
   id: number;
   invoiceNo: string;
   invoiceType: 'Normal' | 'Agency';
-  type: 'Actual' | 'Booking'; // used as Status
+  type: 'Actual' | 'Booking'; // Status
   agencyCode: string;
   routeCode: string;
   shopCode: string;
@@ -42,10 +42,16 @@ interface Invoice {
   actualValue: number;
   bookingDate: string;
   actualDate: string;
+  // Agency/Cascade filter fields
+  channel: string;
+  subChannel: string;
+  region: string;
+  area: string;
+  territory: string;
+  agency: string;
 }
 
-interface DebouncedInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
+interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
   value: string | number;
   onChange: (value: string | number) => void;
   debounce?: number;
@@ -106,27 +112,56 @@ const invoiceTypeOptions = [
   { value: 'Agency', label: 'Agency' },
 ];
 
-function ViewInvoices() {
+// Agency filter options - NO 'All'
+const channelOptions = [
+  { value: 'National', label: 'National' },
+  { value: 'Bakery', label: 'Bakery' },
+];
+const subChannelOptions = [
+  { value: 'SubChannel1', label: 'Sub Channel 1' },
+  { value: 'SubChannel2', label: 'Sub Channel 2' },
+];
+const regionOptions = [
+  { value: 'Region1', label: 'Region 1' },
+  { value: 'Region2', label: 'Region 2' },
+];
+const areaOptions = [
+  { value: 'Area1', label: 'Area 1' },
+  { value: 'Area2', label: 'Area 2' },
+];
+const territoryOptions = [
+  { value: 'Territory1', label: 'Territory 1' },
+  { value: 'Territory2', label: 'Territory 2' },
+];
+const agencyOptions = [
+  { value: 'Agency1', label: 'Agency 1' },
+  { value: 'Agency2', label: 'Agency 2' },
+];
+
+function SalesViewInvoices() {
   const distributorName = 'Example Distributor';
   const territory = 'Central';
   const agencyName = 'Example Agency';
   const navigate = useNavigate();
 
-  // Data state
-  const [data, setData] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-2023-001', invoiceType: 'Normal', type: 'Actual', agencyCode: 'AG001', routeCode: 'RT001', shopCode: 'SH001', customer: 'John Traders', source: 'Mobile', bookingValue: 1500, marketReturnValue: 100, goodReturnValue: 50, freeIssue: 0, discountPercentage: 5, actualValue: 1350, bookingDate: '2023-07-01', actualDate: '2023-07-02' },
-    { id: 2, invoiceNo: 'INV-2023-002', invoiceType: 'Agency', type: 'Booking', agencyCode: 'AG002', routeCode: 'RT002', shopCode: 'SH002', customer: 'Green Mart', source: 'Web', bookingValue: 2300, marketReturnValue: 200, goodReturnValue: 100, freeIssue: 50, discountPercentage: 10, actualValue: 1950, bookingDate: '2023-07-01', actualDate: '2023-07-03' },
-    { id: 3, invoiceNo: 'INV-2023-003', invoiceType: 'Agency', type: 'Actual', agencyCode: 'AG003', routeCode: 'RT003', shopCode: 'SH003', customer: 'Fresh Foods', source: 'Mobile', bookingValue: 1800, marketReturnValue: 150, goodReturnValue: 75, freeIssue: 25, discountPercentage: 8, actualValue: 1600, bookingDate: '2023-07-02', actualDate: '2023-07-04' },
-    { id: 4, invoiceNo: 'INV-2023-004', invoiceType: 'Normal', type: 'Actual', agencyCode: 'AG001', routeCode: 'RT004', shopCode: 'SH004', customer: 'Mega Store', source: 'Web', bookingValue: 4200, marketReturnValue: 300, goodReturnValue: 120, freeIssue: 100, discountPercentage: 7, actualValue: 3680, bookingDate: '2023-07-03', actualDate: '2023-07-05' },
-    { id: 5, invoiceNo: 'INV-2023-005', invoiceType: 'Agency', type: 'Booking', agencyCode: 'AG002', routeCode: 'RT005', shopCode: 'SH005', customer: 'Quick Buy', source: 'Mobile', bookingValue: 3100, marketReturnValue: 180, goodReturnValue: 90, freeIssue: 60, discountPercentage: 6, actualValue: 2770, bookingDate: '2023-07-04', actualDate: '2023-07-06' },
-    { id: 6, invoiceNo: 'INV-2023-006', invoiceType: 'Agency', type: 'Actual', agencyCode: 'AG003', routeCode: 'RT006', shopCode: 'SH006', customer: 'City Grocers', source: 'Web', bookingValue: 1980, marketReturnValue: 120, goodReturnValue: 60, freeIssue: 30, discountPercentage: 8, actualValue: 1770, bookingDate: '2023-07-05', actualDate: '2023-07-07' },
-    { id: 7, invoiceNo: 'INV-2023-007', invoiceType: 'Normal', type: 'Booking', agencyCode: 'AG001', routeCode: 'RT007', shopCode: 'SH007', customer: 'Corner Market', source: 'Mobile', bookingValue: 2750, marketReturnValue: 150, goodReturnValue: 75, freeIssue: 40, discountPercentage: 5, actualValue: 2485, bookingDate: '2023-07-06', actualDate: '2023-07-08' },
-    { id: 8, invoiceNo: 'INV-2023-008', invoiceType: 'Normal', type: 'Actual', agencyCode: 'AG002', routeCode: 'RT008', shopCode: 'SH008', customer: 'Daily Needs', source: 'Web', bookingValue: 3600, marketReturnValue: 250, goodReturnValue: 125, freeIssue: 80, discountPercentage: 10, actualValue: 3145, bookingDate: '2023-07-06', actualDate: '2023-07-09' },
-    { id: 9, invoiceNo: 'INV-2023-009', invoiceType: 'Agency', type: 'Booking', agencyCode: 'AG003', routeCode: 'RT009', shopCode: 'SH009', customer: 'Urban Mart', source: 'Mobile', bookingValue: 2200, marketReturnValue: 140, goodReturnValue: 70, freeIssue: 35, discountPercentage: 7, actualValue: 1955, bookingDate: '2023-07-07', actualDate: '2023-07-10' },
-    { id: 10, invoiceNo: 'INV-2023-010', invoiceType: 'Normal', type: 'Actual', agencyCode: 'AG001', routeCode: 'RT010', shopCode: 'SH010', customer: 'Family Store', source: 'Web', bookingValue: 2900, marketReturnValue: 190, goodReturnValue: 95, freeIssue: 55, discountPercentage: 8, actualValue: 2560, bookingDate: '2023-07-08', actualDate: '2023-07-11' },
+  // Agency filter states - use null ("not selected")
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [selectedSubChannel, setSelectedSubChannel] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedTerritory, setSelectedTerritory] = useState<string | null>(null);
+  const [selectedAgency, setSelectedAgency] = useState<string | null>(null);
+
+  // Dummy data for testing
+  const [data] = useState<Invoice[]>([
+    { id: 1, invoiceNo: 'INV-2023-001', invoiceType: 'Normal', type: 'Actual', agencyCode: 'AG001', routeCode: 'RT001', shopCode: 'SH001', customer: 'John Traders', source: 'Mobile', bookingValue: 1500, marketReturnValue: 100, goodReturnValue: 50, freeIssue: 0, discountPercentage: 5, actualValue: 1350, bookingDate: '2023-07-01', actualDate: '2023-07-02', channel: 'National', subChannel: 'SubChannel1', region: 'Region1', area: 'Area1', territory: 'Territory1', agency: 'Agency1' },
+    { id: 2, invoiceNo: 'INV-2023-002', invoiceType: 'Agency', type: 'Booking', agencyCode: 'AG002', routeCode: 'RT002', shopCode: 'SH002', customer: 'Green Mart', source: 'Web', bookingValue: 2300, marketReturnValue: 200, goodReturnValue: 100, freeIssue: 50, discountPercentage: 10, actualValue: 1950, bookingDate: '2023-07-01', actualDate: '2023-07-03', channel: 'National', subChannel: 'SubChannel2', region: 'Region2', area: 'Area2', territory: 'Territory2', agency: 'Agency2' },
+    { id: 3, invoiceNo: 'INV-2023-003', invoiceType: 'Agency', type: 'Actual', agencyCode: 'AG003', routeCode: 'RT003', shopCode: 'SH003', customer: 'Fresh Foods', source: 'Mobile', bookingValue: 1800, marketReturnValue: 150, goodReturnValue: 75, freeIssue: 25, discountPercentage: 8, actualValue: 1600, bookingDate: '2023-07-02', actualDate: '2023-07-04', channel: 'Bakery', subChannel: 'SubChannel1', region: 'Region1', area: 'Area1', territory: 'Territory1', agency: 'Agency1' },
+    { id: 4, invoiceNo: 'INV-2023-004', invoiceType: 'Normal', type: 'Actual', agencyCode: 'AG001', routeCode: 'RT004', shopCode: 'SH004', customer: 'Mega Store', source: 'Web', bookingValue: 4200, marketReturnValue: 300, goodReturnValue: 120, freeIssue: 100, discountPercentage: 7, actualValue: 3680, bookingDate: '2023-07-03', actualDate: '2023-07-05', channel: 'Bakery', subChannel: 'SubChannel2', region: 'Region2', area: 'Area2', territory: 'Territory2', agency: 'Agency2' },
+    { id: 5, invoiceNo: 'INV-2023-005', invoiceType: 'Agency', type: 'Booking', agencyCode: 'AG002', routeCode: 'RT005', shopCode: 'SH005', customer: 'Quick Buy', source: 'Mobile', bookingValue: 3100, marketReturnValue: 180, goodReturnValue: 90, freeIssue: 60, discountPercentage: 6, actualValue: 2770, bookingDate: '2023-07-04', actualDate: '2023-07-06', channel: 'National', subChannel: 'SubChannel1', region: 'Region1', area: 'Area1', territory: 'Territory1', agency: 'Agency1' },
   ]);
 
-  // Filter states
+  // Invoice filter states
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [invoiceTypeFilter, setInvoiceTypeFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
@@ -141,15 +176,43 @@ function ViewInvoices() {
       const itemDate = new Date(item.bookingDate);
       const [from, to] = dateRange;
       const matchesDate = (!from || itemDate >= from) && (!to || itemDate <= to);
-      return matchesStatus && matchesInvoiceType && matchesDate;
+
+      // Agency filters (null means not selected, so do not filter)
+      const matchesChannel = selectedChannel === null || item.channel === selectedChannel;
+      const matchesSubChannel = selectedSubChannel === null || item.subChannel === selectedSubChannel;
+      const matchesRegion = selectedRegion === null || item.region === selectedRegion;
+      const matchesArea = selectedArea === null || item.area === selectedArea;
+      const matchesTerritory = selectedTerritory === null || item.territory === selectedTerritory;
+      const matchesAgency = selectedAgency === null || item.agency === selectedAgency;
+
+      return (
+        matchesStatus &&
+        matchesInvoiceType &&
+        matchesDate &&
+        matchesChannel &&
+        matchesSubChannel &&
+        matchesRegion &&
+        matchesArea &&
+        matchesTerritory &&
+        matchesAgency
+      );
     });
-  }, [data, statusFilter, invoiceTypeFilter, dateRange]);
+  }, [
+    data,
+    statusFilter,
+    invoiceTypeFilter,
+    dateRange,
+    selectedChannel,
+    selectedSubChannel,
+    selectedRegion,
+    selectedArea,
+    selectedTerritory,
+    selectedAgency,
+  ]);
 
   const handleView = (invoice: Invoice) => {
-    navigate(`/invoice-details/${invoice.id}`);
+    navigate(`/Salesmenu/SalesInvoiceDetails/${invoice.id}`);
   };
-
- 
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('en-IN', {
@@ -162,107 +225,21 @@ function ViewInvoices() {
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
     { header: 'Invoice No', accessorKey: 'invoiceNo' },
-    {
-      header: 'Invoice Type',
-      accessorKey: 'invoiceType',
-      cell: ({ getValue }) => {
-        const type = getValue<'Normal' | 'Agency'>();
-        const colorMap = {
-          Normal: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-          Agency: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-        };
-        return (
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorMap[type]}`}>
-            {type}
-          </span>
-        );
-      },
-    },
-    {
-      header: 'Status',
-      accessorKey: 'type',
-      cell: ({ getValue }) => {
-        const status = getValue<'Actual' | 'Booking'>();
-        const colorMap = {
-          Actual: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-          Booking: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-        };
-        return (
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorMap[status]}`}>
-            {status}
-          </span>
-        );
-      },
-    },
+    { header: 'Invoice Type', accessorKey: 'invoiceType' },
+    { header: 'Status', accessorKey: 'type' },
     { header: 'Agency Code', accessorKey: 'agencyCode' },
     { header: 'Route Code', accessorKey: 'routeCode' },
     { header: 'Shop Code', accessorKey: 'shopCode' },
     { header: 'Customer', accessorKey: 'customer' },
-    {
-      header: 'Source',
-      accessorKey: 'source',
-      cell: ({ getValue }) => {
-        const source = getValue<'Web' | 'Mobile'>();
-        return (
-          <span
-            className={`inline-flex items-center gap-x-1 px-2 py-1 rounded-full text-xs font-medium ${source === 'Web'
-              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-              }`}
-          >
-            <span>{source === 'Web' ? '🌐' : '📱'}</span>
-            <span>{source}</span>
-          </span>
-        );
-      },
-    },
-    {
-      header: 'Booking Value',
-      accessorKey: 'bookingValue',
-      cell: ({ getValue }) => <div className="text-right">{formatCurrency(getValue<number>())}</div>,
-    },
-    {
-      header: 'Market Return Value',
-      accessorKey: 'marketReturnValue',
-      cell: ({ getValue }) => <div className="text-right">{formatCurrency(getValue<number>())}</div>,
-    },
-    {
-      header: 'Good Return Value',
-      accessorKey: 'goodReturnValue',
-      cell: ({ getValue }) => <div className="text-right">{formatCurrency(getValue<number>())}</div>,
-    },
-    {
-      header: 'Free Issue',
-      accessorKey: 'freeIssue',
-      cell: ({ getValue }) => <div className="text-right">{formatCurrency(getValue<number>())}</div>,
-    },
-    {
-      header: 'Discount %',
-      accessorKey: 'discountPercentage',
-      cell: ({ getValue }) => <div className="text-right">{getValue<number>()}%</div>,
-    },
-    {
-      header: 'Actual Value',
-      accessorKey: 'actualValue',
-      cell: ({ getValue }) => (
-        <div className="text-right font-medium">{formatCurrency(getValue<number>())}</div>
-      ),
-    },
-    {
-      header: 'Booking Date',
-      accessorKey: 'bookingDate',
-      cell: ({ getValue }) => dayjs(getValue<string>()).format('DD/MM/YYYY'),
-      sortingFn: 'datetime',
-    },
-    {
-      header: 'Actual Date',
-      accessorKey: 'actualDate',
-      cell: ({ getValue }) => {
-        const date = getValue<string>();
-        return date ? dayjs(date).format('DD/MM/YYYY') : 'N/A';
-      },
-      sortingFn: 'datetime',
-    },
+    { header: 'Source', accessorKey: 'source' },
+    { header: 'Booking Value', accessorKey: 'bookingValue' },
+    { header: 'Market Return Value', accessorKey: 'marketReturnValue' },
+    { header: 'Good Return Value', accessorKey: 'goodReturnValue' },
+    { header: 'Free Issue', accessorKey: 'freeIssue' },
+    { header: 'Discount %', accessorKey: 'discountPercentage' },
+    { header: 'Actual Value', accessorKey: 'actualValue' },
+    { header: 'Booking Date', accessorKey: 'bookingDate' },
+    { header: 'Actual Date', accessorKey: 'actualDate' },
     {
       header: 'Action',
       accessorKey: 'action',
@@ -294,7 +271,155 @@ function ViewInvoices() {
 
   return (
     <div className="p-6 w-full mx-auto space-y-6">
-      {/* 1st Card - Distributor Info */}
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">View Invoices</h2>
+      {/* Agency Filter Card */}
+      <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
+  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    Agency Filter
+  </h3>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+    <div className="min-h-[60px] flex flex-col justify-start">
+      <label
+        htmlFor="filter-channel"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Channel
+      </label>
+      <Select
+        id="filter-channel"
+        size="md"
+        options={channelOptions}
+        value={channelOptions.find((opt) => opt.value === selectedChannel) || null}
+        onChange={(opt) => setSelectedChannel(opt?.value ?? null)}
+        placeholder="Select Channel"
+        isClearable
+      />
+    </div>
+
+    <div className="min-h-[60px] flex flex-col justify-start">
+      <label
+        htmlFor="filter-subchannel"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Sub Channel
+      </label>
+      <Select
+        id="filter-subchannel"
+        size="md"
+        options={subChannelOptions}
+        value={subChannelOptions.find((opt) => opt.value === selectedSubChannel) || null}
+        onChange={(opt) => setSelectedSubChannel(opt?.value ?? null)}
+        placeholder="Select Sub Channel"
+        isClearable
+      />
+    </div>
+
+    <div className="min-h-[60px] flex flex-col justify-start">
+      <label
+        htmlFor="filter-region"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Region
+      </label>
+      <Select
+        id="filter-region"
+        size="md"
+        options={regionOptions}
+        value={regionOptions.find((opt) => opt.value === selectedRegion) || null}
+        onChange={(opt) => setSelectedRegion(opt?.value ?? null)}
+        placeholder="Select Region"
+        isClearable
+      />
+    </div>
+
+    <div className="min-h-[60px] flex flex-col justify-start">
+      <label
+        htmlFor="filter-area"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Area
+      </label>
+      <Select
+        id="filter-area"
+        size="md"
+        options={areaOptions}
+        value={areaOptions.find((opt) => opt.value === selectedArea) || null}
+        onChange={(opt) => setSelectedArea(opt?.value ?? null)}
+        placeholder="Select Area"
+        isClearable
+      />
+    </div>
+
+    <div className="min-h-[60px] flex flex-col justify-start">
+      <label
+        htmlFor="filter-territory"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Territory
+      </label>
+      <Select
+        id="filter-territory"
+        size="md"
+        options={territoryOptions}
+        value={territoryOptions.find((opt) => opt.value === selectedTerritory) || null}
+        onChange={(opt) => setSelectedTerritory(opt?.value ?? null)}
+        placeholder="Select Territory"
+        isClearable
+      />
+    </div>
+
+    <div className="min-h-[60px] flex flex-col justify-start">
+      <label
+        htmlFor="filter-agency"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Agency
+      </label>
+      <Select
+        id="filter-agency"
+        size="md"
+        options={agencyOptions}
+        value={agencyOptions.find((opt) => opt.value === selectedAgency) || null}
+        onChange={(opt) => setSelectedAgency(opt?.value ?? null)}
+        placeholder="Select Agency"
+        isClearable
+      />
+    </div>
+  </div>
+
+  <div className="pt-6 flex flex-col sm:flex-row justify-end items-center gap-3">
+    <Button
+      
+      className="px-6"
+      onClick={() => {
+        setSelectedChannel(null);
+        setSelectedSubChannel(null);
+        setSelectedRegion(null);
+        setSelectedArea(null);
+        setSelectedTerritory(null);
+        setSelectedAgency(null);
+      }}
+    >
+      Reset
+    </Button>
+    <Button
+      variant="solid"
+      className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+      onClick={() => {
+        // Add submit logic here if filtering is not reactive
+      }}
+    >
+      Submit
+    </Button>
+  </div>
+</Card>
+
+
+
+
+
+
+      {/* Distributor Info Card */}
       <Card className="rounded-xl shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border border-blue-100 dark:border-gray-700 transition-all">
         <div className="p-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -304,7 +429,7 @@ function ViewInvoices() {
               </svg>
             </div>
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{agencyName}</h2>
+              <h5 className="text-2xl font-bold text-gray-900 dark:text-white">{agencyName}</h5>
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white dark:bg-gray-800/50 p-4 rounded-lg border border-blue-100 dark:border-gray-700 shadow-sm">
                   <div className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">Distributor</div>
@@ -320,8 +445,10 @@ function ViewInvoices() {
         </div>
       </Card>
 
+
+      {/* Filters Card */}
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filters</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filters</h3>
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Status Filter */}
@@ -367,12 +494,10 @@ function ViewInvoices() {
               />
             </div>
           </div>
-         
         </div>
       </Card>
 
-
-      {/* 3rd Card - Summary Counts */}
+      {/* Summary Counts Card */}
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           <div className="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg border border-blue-100 dark:border-gray-600">
@@ -402,7 +527,7 @@ function ViewInvoices() {
         </div>
       </Card>
 
-      {/* 4th Card - Table */}
+      {/* Main Table Card */}
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
@@ -493,4 +618,4 @@ function ViewInvoices() {
   );
 }
 
-export default ViewInvoices;
+export default SalesViewInvoices;

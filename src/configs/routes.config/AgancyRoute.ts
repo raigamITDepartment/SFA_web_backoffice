@@ -69,7 +69,7 @@ const AgancyRoute: Routes = [
         },
     },
 
-      {
+    {
         key: 'invoiceFinish',
         path: '/AgancyModule-Invoice-invoiceFinish',
         component: lazy(
@@ -90,7 +90,7 @@ const AgancyRoute: Routes = [
 
     {
         key: 'CreateInvoiceScreen',
-        path:'/AgancyModule-Invoice-CreateInvoiceScreen',
+        path: '/AgancyModule-Invoice-CreateInvoiceScreen',
         component: lazy(
             () =>
                 import('@/views/AgancyModule/Invoice/ManualBill/CreateInvoiceScreen'),
@@ -102,7 +102,7 @@ const AgancyRoute: Routes = [
         },
     },
 
-   {
+    {
         key: 'ItemDetails',
         path: '/AgancyModule-Invoice-ItemDetails',
         component: lazy(
@@ -129,6 +129,16 @@ const AgancyRoute: Routes = [
         },
     },
 
+    {
+        key: 'invoiceDetails',
+        path: '/invoice-details/:invoiceId',
+        component: lazy(() => import('@/views/AgancyModule/Invoice/ViewInvoices/InvoiceDetails')),
+        authority: [],
+        meta: {
+            allowedRoles: ['System Admin'],
+            allowedSubRoles: ['Admin'],
+        },
+    },
     {
         key: 'LoadingListView',
         path: '/LoadingList-LoadingListView',

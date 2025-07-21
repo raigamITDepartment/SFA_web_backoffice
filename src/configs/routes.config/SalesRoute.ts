@@ -137,6 +137,18 @@ const SalesRoute: Routes = [
         component: lazy(() => import('@/views/SalesDetails/ReverseRequests/ReverseRequests')),
         authority: [],
     },
+    {
+        key: 'SalesMenu.SalesViewInvoices',
+        path: '/Salesmenu/SalesViewInvoices',
+        component: lazy(() => import('@/views/SalesDetails/SalesViewInvoices/SalesViewInvoices')),
+        authority: [],
+    },
+    {
+        key: 'SalesMenu.SalesInvoiceDetails',
+        path: '/Salesmenu/SalesInvoiceDetails/:id',
+        component: lazy(() => import('@/views/SalesDetails/SalesViewInvoices/SalesInvoiceDetails')),
+        authority: [],
+    },
 
 
 ]

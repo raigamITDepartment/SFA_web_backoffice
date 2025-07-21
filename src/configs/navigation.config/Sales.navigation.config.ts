@@ -143,6 +143,16 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
+            {
+                key: 'SalesViewInvoices',
+                path: '/Salesmenu/SalesViewInvoices',
+                title: 'View Invoices',
+                translateKey: 'nav.SalesMenu.SalesViewInvoices',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
         ],
     },
 ]
