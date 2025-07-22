@@ -242,6 +242,7 @@ function SalesInvoiceDetails() {
           {Object.entries(invoice).map(([key, value]) => (
             <div key={key} className="flex flex-col">
               <p className="text-sm text-gray-500">{key.replace(/([A-Z])/g, ' $1')}</p>
+              <div className='bg-gray-200 dark:bg-gray-100 p-2 rounded-lg mt-1'>
               <p className="text-base font-medium text-gray-900 dark:text-gray-100">
                 {typeof value === 'number' && key.toLowerCase().includes('value')
                   ? formatCurrency(value)
@@ -249,6 +250,7 @@ function SalesInvoiceDetails() {
                   ? new Date(value).toLocaleDateString('en-GB')
                   : value ?? 'N/A'}
               </p>
+              </div>
             </div>
           ))}
         </div>

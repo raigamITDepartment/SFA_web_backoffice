@@ -110,6 +110,7 @@ const invoiceTypeOptions = [
   { value: '', label: 'All' },
   { value: 'Normal', label: 'Normal' },
   { value: 'Agency', label: 'Agency' },
+  { value: 'Company', label: 'Company' },
 ];
 
 // Agency filter options - NO 'All'

@@ -100,6 +100,9 @@ const ViewBills = () => {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [remark, setRemark] = useState('');
+  const [remarkError, setRemarkError] = useState('');
+
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -115,7 +118,13 @@ const ViewBills = () => {
   };
 
   const handleDialogConfirm = async () => {
+    if (!remark.trim()) {
+      setRemarkError('Remark is required.');
+      return;
+    }
+
     setDialogIsOpen(false);
+    setRemarkError('');
 
     toast.push(
       <Alert
@@ -124,6 +133,8 @@ const ViewBills = () => {
         className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
       >
         Invoice {selectedInvoice?.invoiceNo} submitted for reverse!
+        <br />
+        <span className="text-xs text-gray-500">Remark: {remark}</span>
       </Alert>,
       {
         offsetX: 5,
@@ -134,8 +145,10 @@ const ViewBills = () => {
       }
     );
 
-    console.log('Invoice reversed:', selectedInvoice);
+    console.log('Invoice reversed:', selectedInvoice, 'Remark:', remark);
+    setRemark('');
   };
+
 
   const handleDialogClose = () => {
     setDialogIsOpen(false);
@@ -359,6 +372,23 @@ const ViewBills = () => {
           Are you sure you want to reverse invoice <b>{selectedInvoice?.invoiceNo}</b>?
 
         </p>
+
+        <div className="mb-4">
+        
+          <Input
+            value={remark}
+            onChange={(e) => {
+              setRemark(e.target.value);
+              if (remarkError) setRemarkError('');
+            }}
+            placeholder="Enter your remark..."
+            className="w-full"
+          />
+          {remarkError && (
+            <p className="text-sm text-red-600 mt-1">{remarkError}</p>
+          )}
+        </div>
+
         <div className="text-right mt-6">
           <Button
             className="mr-2"

@@ -153,6 +153,16 @@ const Salesnavigationconfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
+            {
+                key: 'ManualBillQuota',
+                path: '/Salesmenu/ManualBillQuota',
+                title: 'Manual Bill Quota',
+                translateKey: 'nav.SalesMenu.ManualBillQuota',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
         ],
     },
 ]

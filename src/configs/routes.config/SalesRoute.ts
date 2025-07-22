@@ -149,6 +149,12 @@ const SalesRoute: Routes = [
         component: lazy(() => import('@/views/SalesDetails/SalesViewInvoices/SalesInvoiceDetails')),
         authority: [],
     },
+    {
+        key: 'SalesMenu.ManualBillQuota',
+        path: '/Salesmenu/ManualBillQuota',
+        component: lazy(() => import('@/views/SalesDetails/ManualBillQuota/ManualBillQuota')),
+        authority: [],
+    },
 
 
 ]
