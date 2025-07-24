@@ -156,7 +156,7 @@ export const productsData = [
     },
     {
         id: '17',
-        name: 'Ringed Earring',
+        name: 'PVD Salt- 200g',
         productCode: '098314NT',
         img: '/img/products/product-6.jpg',
         imgList: [
@@ -184,7 +184,7 @@ export const productsData = [
     },
     {
         id: '18',
-        name: 'Maneki Neko Poster',
+        name: 'CURRY CHICKEN SOYA',
         productCode: '098336NT',
         img: '/img/products/product-7.jpg',
         imgList: [
@@ -240,7 +240,7 @@ export const productsData = [
     },
     {
         id: '20',
-        name: 'Spiky Ring',
+        name: 'RAIGAM X ORANGE 4KG',
         productCode: '098392NT',
         img: '/img/products/product-9.jpg',
         imgList: [
@@ -268,7 +268,7 @@ export const productsData = [
     },
     {
         id: '21',
-        name: 'Pastel Petals Poster',
+        name: 'GANGO ORANGE 100G',
         productCode: '098355NT',
         img: '/img/products/product-10.jpg',
         imgList: [
@@ -324,7 +324,7 @@ export const productsData = [
     },
     {
         id: '23',
-        name: 'Il Limone',
+        name: 'MALDIVE FISH SOYA 105G',
         productCode: '098377NT',
         img: '/img/products/product-12.jpg',
         imgList: [

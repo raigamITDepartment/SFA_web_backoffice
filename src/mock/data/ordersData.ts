@@ -192,7 +192,7 @@ export const orderDetailsData = {
         },
         {
             id: '18',
-            name: 'Maneki Neko Poster',
+            name: 'CURRY CHICKEN SOYA',
             productCode: '098336NT',
             img: '/img/products/product-7.jpg',
             price: 389,

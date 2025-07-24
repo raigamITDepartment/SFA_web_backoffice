@@ -924,27 +924,27 @@ export const mediaData = {
         {
             id: '7020d33d-e2d3-416a-969b-dd7e68f0e2cf',
             name: 'Snövalla',
-            url: '/img/products/product-2.jpg',
+            //url: '/img/products/product-2.jpg',
         },
         {
             id: 'c20f164c-4848-4162-aa6f-0889e15a4f12',
-            name: 'Spiky Ring',
-            url: '/img/products/product-9.jpg',
+            name: 'RAIGAM X ORANGE 4KG',
+            //url: '/img/products/product-9.jpg',
         },
         {
             id: 'abf6c2be-3b6d-4444-9498-95a82798fcf5',
-            name: 'Il Limone',
-            url: '/img/products/product-12.jpg',
+            name: 'MALDIVE FISH SOYA 105G',
+            //url: '/img/products/product-12.jpg',
         },
         {
             id: '1c2502f2-326e-4bdb-b167-5e642921d2f3',
-            name: 'Maneki Neko Poster',
-            url: '/img/products/product-7.jpg',
+            name: 'CURRY CHICKEN SOYA',
+            //url: '/img/products/product-7.jpg',
         },
         {
             id: '5540ca41-b188-442b-8d2f-b4ee183b9f77',
             name: 'Gränvika',
-            url: '/img/products/product-11.jpg',
+            //url: '/img/products/product-11.jpg',
         },
     ],
     files: [
