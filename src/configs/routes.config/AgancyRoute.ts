@@ -171,6 +171,21 @@ const AgancyRoute: Routes = [
         ),
         authority: [],
     },
+    {
+    key: 'ViewStock',
+    path: '/Stock-ViewStock',
+    component: lazy(() => import('@/views/AgancyModule/Stock/ViewStock')),
+    authority: [],
+    
+    },
+    {
+    key: 'StockAdd',
+    path: '/Stock-StockAdd',
+    component: lazy(() => import('@/views/AgancyModule/Stock/StockAdd')),
+    authority: [],
+    
+    },
+
 ]
 
 export default AgancyRoute

@@ -7,10 +7,10 @@ import { ItemType } from './types';
 import { FiChevronDown, FiChevronUp, FiSearch, FiFileText, FiTruck, FiTag, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 interface LocationState {
-    customerId: string;
-    customerName: string;
-    invoiceType: string;
-    invoiceMode: string;
+  customerId: string;
+  customerName: string;
+  invoiceType: string;
+  invoiceMode: string;
 }
 
 
@@ -47,14 +47,14 @@ const categorizeItem = (name: string): string => {
 
 
 export default function CreateInvoiceScreen() {
-  
+
   const navigate = useNavigate();
   const location: Location<LocationState> = useLocation();
-  const { 
-   // customerId, 
-    customerName = 'No Customer', 
-    invoiceType = 'N/A', 
-    invoiceMode = 'N/A' 
+  const {
+    // customerId, 
+    customerName = 'No Customer',
+    invoiceType = 'N/A',
+    invoiceMode = 'N/A'
   } = location.state || {};
 
   const [billDiscount, setBillDiscount] = useState<string>('0');
@@ -93,7 +93,7 @@ export default function CreateInvoiceScreen() {
           lineTotal: '0.00',
           unitPrice: '100', // Assuming a default unit price
         }));
-      
+
       const allItems = [...items, ...newItems];
       setSavedItems(allItems);
 
@@ -175,6 +175,16 @@ export default function CreateInvoiceScreen() {
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
+
+        {/* Remaining Quota Card */}
+        <div className="w-full flex justify-center mb-6">
+          <div className="bg-white shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-xl px-6 py-4 text-center">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-100">
+              Remaining Manual Bill Quota - <span className="text-blue-600 dark:text-blue-400">100</span>
+            </h2>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -183,8 +193,8 @@ export default function CreateInvoiceScreen() {
               <p className="text-gray-500 mt-1">For customer: <span className="font-semibold text-blue-600">{customerName}</span></p>
             </div>
             <div className="flex gap-4 text-sm">
-              <div className="flex items-center gap-2 text-gray-600"><FiTag className="text-blue-500"/> Type: <span className="font-medium">{invoiceType}</span></div>
-              <div className="flex items-center gap-2 text-gray-600"><FiTruck className="text-blue-500"/> Mode: <span className="font-medium">{invoiceMode}</span></div>
+              <div className="flex items-center gap-2 text-gray-600"><FiTag className="text-blue-500" /> Type: <span className="font-medium">{invoiceType}</span></div>
+              <div className="flex items-center gap-2 text-gray-600"><FiTruck className="text-blue-500" /> Mode: <span className="font-medium">{invoiceMode}</span></div>
             </div>
           </div>
         </div>
