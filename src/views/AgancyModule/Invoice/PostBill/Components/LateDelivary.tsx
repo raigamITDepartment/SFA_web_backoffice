@@ -25,10 +25,13 @@ const { DatePickerRange } = DatePicker;
 interface Invoice {
   id: number;
   invoiceNo: string;
-  route: string;
-  shop: string;
-  territoryCode: string;
+  invoiceType?: string;
+  routeCode: string;
+  shopCode: string;
+  customer: string;
+  agencyCode: string;
   value: number;
+  source?: 'Web' | 'Mobile';
   status: string;
   date: string;
 }
@@ -89,12 +92,86 @@ const statusOptions = [
 
 function LateDelivary() {
   const [data, setData] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', territoryCode: 'T001', value: 1500, status: 'Late Delivery', date: '2023-07-01' },
-    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', territoryCode: 'T002', value: 2300, status: 'Late Delivery', date: '2023-07-03' },
-    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', territoryCode: 'T003', value: 1750, status: 'Late Delivery', date: '2023-07-05' },
-    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', territoryCode: 'T001', value: 4200, status: 'Late Delivery', date: '2023-07-01' },
-    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', territoryCode: 'T002', value: 3100, status: 'Late Delivery', date: '2023-07-04' },
-  ]);
+  {
+    id: 1,
+    invoiceNo: 'INV-2023-001',
+    invoiceType: 'Normal',
+    routeCode: 'R001',
+    shopCode: 'S001',
+    customer: 'John Traders',
+    agencyCode: 'AG001',
+    value: 1500,
+    source: 'Mobile',
+    status: 'Late Delivery',
+    date: '2023-07-01',
+  },
+  {
+    id: 2,
+    invoiceNo: 'INV-2023-002',
+    invoiceType: 'Company',
+    routeCode: 'R002',
+    shopCode: 'S002',
+    customer: 'Green Mart',
+    agencyCode: 'AG002',
+    value: 2300,
+    source: 'Web',
+    status: 'Late Delivery',
+    date: '2023-07-03',
+  },
+  {
+    id: 3,
+    invoiceNo: 'INV-2023-003',
+    invoiceType: 'Agency',
+    routeCode: 'R003',
+    shopCode: 'S003',
+    customer: 'Fresh Foods',
+    agencyCode: 'AG003',
+    value: 1750,
+    source: 'Mobile',
+    status: 'Late Delivery',
+    date: '2023-07-05',
+  },
+  {
+    id: 4,
+    invoiceNo: 'INV-2023-004',
+    invoiceType: 'Normal',
+    routeCode: 'R001',
+    shopCode: 'S004',
+    customer: 'Mega Store',
+    agencyCode: 'AG001',
+    value: 4200,
+    source: 'Web',
+    status: 'Late Delivery',
+    date: '2023-07-01',
+  },
+  {
+    id: 5,
+    invoiceNo: 'INV-2023-005',
+    invoiceType: 'Company',
+    routeCode: 'R004',
+    shopCode: 'S005',
+    customer: 'Quick Buy',
+    agencyCode: 'AG002',
+    value: 3100,
+    source: 'Mobile',
+    status: 'Late Delivery',
+    date: '2023-07-04',
+  },
+  {
+    id: 6,
+    invoiceNo: 'INV-2023-006',
+    invoiceType: 'Agency',
+    routeCode: 'R005',
+    shopCode: 'S006',
+    customer: 'Daily Needs',
+    agencyCode: 'AG003',
+    value: 2800,
+    source: 'Web',
+    status: 'Late Delivery',
+    date: '2023-07-06',
+  },
+]);
+
   
   const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -144,26 +221,56 @@ function LateDelivary() {
   };
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
-    { header: 'Invoice No:', accessorKey: 'invoiceNo' },
-    { header: 'Route', accessorKey: 'route' }, 
-    { 
-      header: 'Territory Code', 
-      accessorKey: 'territoryCode',
-    },
-    { header: 'Shop', accessorKey: 'shop' },
-    { 
-      header: 'Value', 
+    { header: 'Invoice No', accessorKey: 'invoiceNo' },
+    { header: 'Invoice Type', accessorKey: 'invoiceType' },
+    { header: 'Agency Code', accessorKey: 'agencyCode' },
+    { header: 'Route Code', accessorKey: 'routeCode' },
+    { header: 'Shop Code', accessorKey: 'shopCode' },
+    { header: 'Customer', accessorKey: 'customer' },
+
+    {
+      header: 'Value',
       accessorKey: 'value',
       cell: ({ getValue }) => (
-        <div className="font-medium text-right pr-2">Rs. {getValue<number>().toLocaleString()}</div>
-      )
+        <div className="flex items-center justify-end font-semibold text-right pr-2 space-x-1">
+          <span>Rs.</span>
+          <span>
+            {getValue<number>().toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+        </div>
+      ),
     },
+
+
     {
       header: 'Date',
       accessorKey: 'date',
-      cell: ({ getValue }) => (
-        <div>{getValue<string>()}</div>
-      )
+      cell: ({ getValue }) => {
+        const dateStr = getValue<string>();
+        return new Date(dateStr).toLocaleDateString();
+      }
+    },
+    {
+      header: 'Source',
+      accessorKey: 'source',
+      cell: ({ getValue }) => {
+        const source = getValue<'Web' | 'Mobile'>();
+
+        return (
+          <span
+            className={`inline-flex items-center gap-x-1 px-2 py-1 rounded-full text-xs font-medium ${source === 'Web'
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+              }`}
+          >
+            <span>{source === 'Web' ? '🌐' : '📱'}</span>
+            <span>{source}</span>
+          </span>
+        );
+      },
     },
     { 
       header: 'Status', 

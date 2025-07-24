@@ -25,12 +25,16 @@ const { DatePickerRange } = DatePicker;
 interface Invoice {
   id: number;
   invoiceNo: string;
-  route: string;
-  shop: string;
-  territoryCode: string;
+  invoiceType?: string;
+  routeCode: string;
+  shopCode: string;
+  customer: string;
+  agencyCode: string;
   value: number;
+  source?: 'Web' | 'Mobile';
   status: string;
   date: string;
+  remark?: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -89,13 +93,78 @@ const statusOptions = [
 
 function CancelBill() {
   const [data, setData] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', territoryCode: 'T001', value: 1500, status: 'Cancel', date: '2023-07-01' },
-    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', territoryCode: 'T002', value: 2300, status: 'Cancel', date: '2023-07-02' },
-    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', territoryCode: 'T003', value: 1750, status: 'Cancel', date: '2023-07-03' },
-    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', territoryCode: 'T001', value: 4200, status: 'Cancel', date: '2023-07-04' },
-    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', territoryCode: 'T002', value: 3100, status: 'Cancel', date: '2023-07-05' },
+    {
+      id: 1,
+      invoiceNo: 'INV-2023-001',
+      invoiceType: 'Normal',
+      routeCode: 'R001',
+      shopCode: 'S001',
+      customer: 'John Traders',
+      agencyCode: 'AG001',
+      value: 1500,
+      status: 'Canceled',
+      source: 'Mobile',
+      date: '2023-07-01',
+      remark: 'Duplicate entry',
+    },
+    {
+      id: 2,
+      invoiceNo: 'INV-2023-002',
+      invoiceType: 'Company',
+      routeCode: 'R002',
+      shopCode: 'S002',
+      customer: 'Green Mart',
+      agencyCode: 'AG002',
+      value: 2300,
+      status: 'Canceled',
+      source: 'Web',
+      date: '2023-07-02',
+      remark: 'Incorrect billing amount',
+    },
+    {
+      id: 3,
+      invoiceNo: 'INV-2023-003',
+      invoiceType: 'Agency',
+      routeCode: 'R003',
+      shopCode: 'S003',
+      customer: 'Fresh Foods',
+      agencyCode: 'AG003',
+      value: 1750,
+      status: 'Canceled',
+      source: 'Mobile',
+      date: '2023-07-03',
+      remark: 'Customer request',
+    },
+    {
+      id: 4,
+      invoiceNo: 'INV-2023-004',
+      invoiceType: 'Normal',
+      routeCode: 'R001',
+      shopCode: 'S004',
+      customer: 'Mega Store',
+      agencyCode: 'AG001',
+      value: 4200,
+      status: 'Canceled',
+      source: 'Web',
+      date: '2023-07-04',
+      remark: 'Payment not received',
+    },
+    {
+      id: 5,
+      invoiceNo: 'INV-2023-005',
+      invoiceType: 'Company',
+      routeCode: 'R004',
+      shopCode: 'S005',
+      customer: 'Quick Buy',
+      agencyCode: 'AG002',
+      value: 3100,
+      status: 'Canceled',
+      source: 'Mobile',
+      date: '2023-07-05',
+      remark: 'Pricing error',
+    },
   ]);
-  
+
   const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
@@ -111,15 +180,11 @@ function CancelBill() {
   }, [data, dateRange]);
 
   const handleStatusChange = (invoiceId: number, newStatus: string) => {
-    setData(prevData => 
-      prevData.map(invoice => 
+    setData(prevData =>
+      prevData.map(invoice =>
         invoice.id === invoiceId ? { ...invoice, status: newStatus } : invoice
       )
     );
-  };
-
-  const handleSubmit = () => {
-    setDialogIsOpen(true);
   };
 
   const handleDialogConfirm = () => {
@@ -144,38 +209,56 @@ function CancelBill() {
   };
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
-    { header: 'Invoice No:', accessorKey: 'invoiceNo' },
-    { header: 'Route', accessorKey: 'route' },
-    { 
-      header: 'Territory Code', 
-      accessorKey: 'territoryCode',
-    },
-    { header: 'Shop', accessorKey: 'shop' },
-    { 
-      header: 'Value', 
+    { header: 'Invoice No', accessorKey: 'invoiceNo' },
+    { header: 'Invoice Type', accessorKey: 'invoiceType' },
+    { header: 'Agency Code', accessorKey: 'agencyCode' },
+    { header: 'Route Code', accessorKey: 'routeCode' },
+    { header: 'Shop Code', accessorKey: 'shopCode' },
+    { header: 'Customer', accessorKey: 'customer' },
+    {
+      header: 'Value',
       accessorKey: 'value',
       cell: ({ getValue }) => (
-        <div className="font-medium text-right pr-2">Rs. {getValue<number>().toLocaleString()}</div>
-      )
+        <div className="flex items-center justify-end font-semibold text-right pr-2 space-x-1">
+          <span>Rs.</span>
+          <span>
+            {getValue<number>().toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+        </div>
+      ),
     },
     {
       header: 'Date',
       accessorKey: 'date',
-      cell: ({ getValue }) => <div>{getValue<string>()}</div>,
+      cell: ({ getValue }) => {
+        const dateStr = getValue<string>();
+        return new Date(dateStr).toLocaleDateString();
+      },
     },
-    { 
-      header: 'Status', 
-      accessorKey: 'status',
-      cell: ({ row }) => (
-        <Select
-          size="sm"
-          options={statusOptions}
-          value={statusOptions.find(option => option.value === row.original.status)}
-          onChange={(option) => handleStatusChange(row.original.id, option?.value || 'Cancel')}
-          className="min-w-[150px]"
-        />
-      )
-    }
+    {
+      header: 'Source',
+      accessorKey: 'source',
+      cell: ({ getValue }) => {
+        const source = getValue<'Web' | 'Mobile'>();
+        return (
+          <span
+            className={`inline-flex items-center gap-x-1 px-2 py-1 rounded-full text-xs font-medium ${
+              source === 'Web'
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+            }`}
+          >
+            <span>{source === 'Web' ? '🌐' : '📱'}</span>
+            <span>{source}</span>
+          </span>
+        );
+      },
+    },
+    { header: 'Status', accessorKey: 'status' },
+    { header: 'Remark', accessorKey: 'remark' },
   ], []);
 
   const table = useReactTable({
@@ -223,22 +306,16 @@ function CancelBill() {
 
         <Table>
           <THead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map(header => (
                   <Th key={header.id}>
                     <div
-                      className={
-                        header.column.getCanSort()
-                          ? 'cursor-pointer select-none flex items-center gap-1'
-                          : ''
-                      }
+                      className={header.column.getCanSort() ? 'cursor-pointer select-none flex items-center gap-1' : ''}
                       onClick={header.column.getToggleSortingHandler()}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
-                      {header.column.getCanSort() && (
-                        <Sorter sort={header.column.getIsSorted()} />
-                      )}
+                      {header.column.getCanSort() && <Sorter sort={header.column.getIsSorted()} />}
                     </div>
                   </Th>
                 ))}
@@ -246,9 +323,9 @@ function CancelBill() {
             ))}
           </THead>
           <TBody>
-            {table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.map(row => (
               <Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
+                {row.getVisibleCells().map(cell => (
                   <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
                 ))}
               </Tr>
@@ -261,7 +338,7 @@ function CancelBill() {
             pageSize={table.getState().pagination.pageSize}
             currentPage={table.getState().pagination.pageIndex + 1}
             total={filteredData.length}
-            onChange={(page) => table.setPageIndex(page - 1)}
+            onChange={page => table.setPageIndex(page - 1)}
           />
           <div className="min-w-[130px]">
             <Select
@@ -269,7 +346,7 @@ function CancelBill() {
               isSearchable={false}
               value={pageSizeOptions.find(option => option.value === pageSize)}
               options={pageSizeOptions}
-              onChange={(option) => {
+              onChange={option => {
                 const size = option?.value ?? 10;
                 setPageSize(size);
                 table.setPageSize(size);
@@ -277,44 +354,7 @@ function CancelBill() {
             />
           </div>
         </div>
-
-        <div className="flex justify-end mt-8">
-          <Button
-            variant="solid"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 shadow-md"
-            onClick={handleSubmit}
-          >
-            Submit
-          </Button>
-        </div>
       </Card>
-
-      {/* Confirmation Dialog */}
-      <Dialog
-        isOpen={dialogIsOpen}
-        onClose={handleDialogClose}
-        onRequestClose={handleDialogClose}
-      >
-        <h5 className="mb-4">Confirm Submission</h5>
-        <p>
-          Are you sure you want to submit all canceled invoice changes?
-        </p>
-        <div className="text-right mt-6">
-          <Button
-            className="mr-2"
-            onClick={handleDialogClose}
-          >
-            Cancel
-          </Button>
-          <Button 
-            variant="solid" 
-            color="blue"
-            onClick={handleDialogConfirm}
-          >
-            Confirm Submit
-          </Button>
-        </div>
-      </Dialog>
     </div>
   );
 }
