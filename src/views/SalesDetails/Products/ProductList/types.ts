@@ -9,6 +9,19 @@ export type Product = {
     status: number
     sales: number
     salesPercentage: number
+
+    SAP: string
+    LN: string
+    Product: string
+    Range: string
+    UMO: string
+    Size: string
+    Volume: string
+    unitValue: string
+    CategoryType: string
+    Subcategory: string
+    Subsubcategory: string
+    Flavor: string
 }
 
 export type Filter = {

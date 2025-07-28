@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
@@ -14,7 +14,11 @@ import {
 } from '@tanstack/react-table'
 
 import { rankItem } from '@tanstack/match-sorter-utils'
-import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
+import type {
+    ColumnDef,
+    FilterFn,
+    ColumnFiltersState,
+} from '@tanstack/react-table'
 
 import Card from '@/components/ui/Card'
 import Table from '@/components/ui/Table'
@@ -29,7 +33,17 @@ import { Form, FormItem } from '@/components/ui/Form'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
 
-import { fetchRoutes, deleteRoute } from '@/services/DemarcationService'
+import {
+    deleteRoute,
+    getAllSubChannelsByChannelId,
+    fetchRoutesByTerritoryId,
+} from '@/services/DemarcationService'
+
+import {
+    fetchChannels,
+    getTerritoriesByAreaId,
+    fetchAreas,
+} from '@/services/singupDropdownService'
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
@@ -55,65 +69,156 @@ interface DemarcationRoute {
 }
 
 const filterSchema = z.object({
-    channel: z.string().optional(),
-    subChannel: z.string().optional(),
-    region: z.string().optional(),
-    area: z.string().optional(),
-    territory: z.string().optional(),
-    route: z.string().optional(),
+    channelId: z.number().optional().nullable(),
+    subChannelId: z.number().optional().nullable(),
+    region: z.number().optional().nullable(),
+    area: z.number().optional().nullable(),
+    territory: z.number().optional().nullable(),
+    route: z.number().optional().nullable(),
 })
 
 type FormSchema = z.infer<typeof filterSchema>
 
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value)
-    addMeta({ itemRank })
-    return itemRank.passed
-}
-
 const Route = () => {
     const navigate = useNavigate()
+    const token = sessionStorage.getItem('accessToken')
 
     const [routeData, setRouteData] = useState<DemarcationRoute[]>([])
     const [filteredData, setFilteredData] = useState<DemarcationRoute[]>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [dialogIsOpen, setDialogIsOpen] = useState(false)
-    const [selectedRoute, setSelectedRoute] = useState<DemarcationRoute | null>(null)
+
+
+    const [channelOptions, setChannelOptions] = useState<any[]>([])
+    const [subChannel, setSubChannel] = useState<any[]>([])
+    const [area, setArea] = useState<any[]>([])
+    const [territory, setTerritory] = useState<any[]>([])
 
     const {
         control,
         handleSubmit,
-        reset,
         formState: { errors },
     } = useForm<FormSchema>({
         resolver: zodResolver(filterSchema),
         defaultValues: {
-            channel: '',
-            subChannel: '',
-            region: '',
-            area: '',
-            territory: '',
-            route: '',
+            channelId: null,
+            subChannelId: null,
+            region: null,
+            area: null,
+            territory: null,
+            route: null,
         },
     })
 
+    // ✅ watch selected values
+    const selectedChannelId = useWatch({ control, name: 'channelId' })
+    const selectedAreaId = useWatch({ control, name: 'area' })
+
+    // ✅ fetch sub-channels when channel changes
     useEffect(() => {
-        const loadData = async () => {
+        const loadSubChannels = async () => {
+            if (!selectedChannelId) return setSubChannel([])
             try {
-                const res = await fetchRoutes()
-                setRouteData(res)
-                setFilteredData(res)
-            } catch (error) {
+                const res = await getAllSubChannelsByChannelId(selectedChannelId)
+                setSubChannel(res)
+            } catch {
                 toast.push(
                     <Alert type="danger" showIcon>
-                        Failed to load routes
+                        Failed to load sub channels.
+                    </Alert>
+                )
+                setSubChannel([])
+            }
+        }
+        loadSubChannels()
+    }, [selectedChannelId])
+
+    // ✅ fetch areas
+    useEffect(() => {
+        const loadAreas = async () => {
+            if (!token) {
+                return
+            }
+            try {
+                const res = await fetchAreas(token)
+                setArea(res)
+            } catch {
+                toast.push(
+                    <Alert type="danger" showIcon>
+                        Failed to load areas.
                     </Alert>
                 )
             }
         }
-        loadData()
+        loadAreas()
+    }, [token])
+    console.log("log areaaaa",area)
+
+    // ✅ fetch territories when area changes
+    useEffect(() => {
+        const loadTerritories = async () => {
+            if (!selectedAreaId) return setTerritory([])
+            try {
+                const res = await getTerritoriesByAreaId(selectedAreaId)
+                setTerritory(res)
+            } catch {
+                toast.push(
+                    <Alert type="danger" showIcon>
+                        Failed to load territories.
+                    </Alert>
+                )
+                setTerritory([])
+            }
+        }
+        loadTerritories()
+    }, [selectedAreaId])
+
+    const onSubmit = async (data: FormSchema) => {
+        const { territory: territoryId } = data
+        if (!territoryId) {
+            setRouteData([])
+            setFilteredData([])
+            return
+        }
+        console.log("log territoryId",territoryId)
+        try {
+            const res = await fetchRoutesByTerritoryId(territoryId)
+            setRouteData(res)
+            setFilteredData(res)
+            if (res.length === 0) {
+                toast.push(
+                    <Alert type="info" showIcon>
+                        No routes found for the selected territory.
+                    </Alert>
+                )
+            }
+        } catch {
+            toast.push(
+                <Alert type="danger" showIcon>
+                    Failed to load routes.
+                </Alert>
+            )
+            setRouteData([])
+            setFilteredData([])
+        }
+    }
+
+    // ✅ fetch channels once
+    useEffect(() => {
+        const loadChannels = async () => {
+            try {
+                const res = await fetchChannels()
+                setChannelOptions(res)
+            } catch {
+                toast.push(
+                    <Alert type="danger" showIcon>
+                        Failed to load channels
+                    </Alert>,
+                )
+            }
+        }
+        loadChannels()
     }, [])
 
     const columns = useMemo<ColumnDef<DemarcationRoute>[]>(() => [
@@ -124,55 +229,24 @@ const Route = () => {
             header: 'Is Active',
             accessorKey: 'isActive',
             cell: ({ row }) => (
-                <Tag
-                    className={
-                        row.original.isActive
-                            ? 'bg-emerald-100 text-emerald-600'
-                            : 'bg-red-100 text-red-600'
-                    }
-                >
+                <Tag className={row.original.isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}>
                     {row.original.isActive ? 'Active' : 'Inactive'}
                 </Tag>
             ),
         },
-        {
-            header: 'Actions',
-            id: 'actions',
-            cell: ({ row }) => {
-                const route = row.original
-                return (
-                    <div className="flex space-x-2">
-                        {route.isActive && (
-                            <FaRegEdit
-                                className="text-blue-500 cursor-pointer"
-                                onClick={() => handleEditClick(route)}
-                            />
-                        )}
-                        {route.isActive ? (
-                            <MdBlock
-                                className="text-red-500 cursor-pointer"
-                                onClick={() => handleDeleteClick(route)}
-                            />
-                        ) : (
-                            <MdCheckCircleOutline
-                                className="text-green-500 cursor-pointer"
-                                onClick={() => handleDeleteClick(route)}
-                            />
-                        )}
-                    </div>
-                )
-            },
-        },
+        
     ], [])
 
     const table = useReactTable({
         data: filteredData,
         columns,
-        filterFns: { fuzzy: fuzzyFilter },
         state: { globalFilter, columnFilters },
         onColumnFiltersChange: setColumnFilters,
         onGlobalFilterChange: setGlobalFilter,
-        globalFilterFn: fuzzyFilter,
+        globalFilterFn: (row, columnId, filterValue) => {
+            const routeName = row.original.routeName || ''
+            return routeName.toLowerCase().includes(String(filterValue).toLowerCase())
+        },
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -180,156 +254,65 @@ const Route = () => {
         initialState: { pagination: { pageSize } },
     })
 
-    const handleFilterSubmit = (data: FormSchema) => {
-        const filtered = routeData.filter(route =>
-            (!data.channel || route.channelCode === data.channel) &&
-            (!data.subChannel || route.subChannelCode === data.subChannel) &&
-            (!data.region || route.regionCode === data.region) &&
-            (!data.area || route.areaCode === data.area) &&
-            (!data.territory || route.territoryCode === data.territory) &&
-            (!data.route || route.routeCode === data.route)
-        )
-        setFilteredData(filtered)
-        table.setPageIndex(0)
-    }
+ 
 
-    const handleEditClick = (route: DemarcationRoute) => {
-        navigate(`/Master-menu-Demarcation-/${route.id}/Route`)
-    }
-
-    const handleDeleteClick = (route: DemarcationRoute) => {
-        setSelectedRoute(route)
-        setDialogIsOpen(true)
-    }
-
-    const handleDialogConfirm = async () => {
-        if (!selectedRoute) return
-        try {
-            await deleteRoute(selectedRoute.id)
-            const updated = routeData.filter(r => r.id !== selectedRoute.id)
-            setRouteData(updated)
-            setFilteredData(updated)
-            toast.push(
-                <Alert showIcon type="success">
-                    Route {selectedRoute.isActive ? 'deactivated' : 'activated'} successfully
-                </Alert>
-            )
-        } catch {
-            toast.push(
-                <Alert type="danger" showIcon>
-                    Operation failed
-                </Alert>
-            )
-        } finally {
-            setDialogIsOpen(false)
-            setSelectedRoute(null)
-        }
-    }
 
     return (
         <div className="space-y-6">
-            {/* Filter Form */}
             <Card>
-                <h5 className="mb-4">Route</h5>
-                <Form onSubmit={handleSubmit(handleFilterSubmit)}>
+                <h5 className="mb-4">Filter Routes</h5>
+                <Form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <FormItem
-                            label="Channel"
-                            invalid={!!errors.channel}
-                            errorMessage={errors.channel?.message}
-                        >
+                        <FormItem label="Channel">
                             <Controller
-                                name="channel"
+                                name="channelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Channel"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={[
-                                            { label: 'Channel 1', value: 'channel 1' }as any,
-                                            { label: 'Channel 2', value: 'channel 2' },
-                                        ]}
+                                        options={channelOptions}
+                                        value={channelOptions.find(opt => opt.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                             />
                         </FormItem>
-
-                        <FormItem
-                            label="Sub Channel"
-                            invalid={!!errors.subChannel}
-                            errorMessage={errors.subChannel?.message}
-                        >
+                        <FormItem label="Sub Channel">
                             <Controller
-                                name="subChannel"
+                                name="subChannelId"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         size="sm"
                                         placeholder="Select Sub Channel"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={[
-                                            { label: 'SubChannel 1', value: 'subChannel 1' }as any,
-                                            { label: 'SubChannel 2', value: 'subChannel 2' },
-                                        ]}
+                                        options={subChannel}
+                                        value={subChannel.find(opt => opt.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                             />
                         </FormItem>
-
-                        <FormItem
-                            label="Region"
-                            invalid={!!errors.region}
-                            errorMessage={errors.region?.message}
-                        >
-                            <Controller
-                                name="region"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Region"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={[
-                                            { label: 'Region 1', value: 'region 1' } as any,
-                                            { label: 'Region 2', value: 'region 2' },
-                                        ]}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-
-                        <FormItem
-                            label="Area"
-                            invalid={!!errors.area}
+                         <FormItem
+                            label="Areas"
+                            invalid={Boolean(errors.area)}
                             errorMessage={errors.area?.message}
                         >
                             <Controller
                                 name="area"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Area"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={[
-                                            { label: 'Area 1', value: 'area 1' }as any,
-                                            { label: 'Area 2', value: 'area 2' },
-                                        ]}
-                                    />
+                                     <Select
+                                            size="sm"
+                                            placeholder="Select Area"
+                                            options={area}
+                                            value={area.find(option => option.value === field.value) || null}
+                                            onChange={(option) => field.onChange(option?.value ?? null)}
+                                        />
                                 )}
                             />
                         </FormItem>
-
-                        <FormItem
-                            label="Territory"
-                            invalid={!!errors.territory}
-                            errorMessage={errors.territory?.message}
-                        >
+                        <FormItem label="Territory">
                             <Controller
                                 name="territory"
                                 control={control}
@@ -337,84 +320,56 @@ const Route = () => {
                                     <Select
                                         size="sm"
                                         placeholder="Select Territory"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={[
-                                            { label: 'Territory 1', value: 'territory 1' }as any,
-                                            { label: 'Territory 2', value: 'territory 2' },
-                                        ]}
-                                    />
-                                )}
-                            />
-                        </FormItem>
-
-                        <FormItem
-                            label="Route"
-                            invalid={!!errors.route}
-                            errorMessage={errors.route?.message}
-                        >
-                            <Controller
-                                name="route"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        size="sm"
-                                        placeholder="Select Route"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={[
-                                            { label: 'Route 1', value: 'route 1' }as any,
-                                            { label: 'Route 2', value: 'route 2' },
-                                        ]}
+                                        options={territory}
+                                        value={territory.find(opt => opt.value === field.value) || null}
+                                        onChange={(option) => field.onChange(option?.value ?? null)}
                                     />
                                 )}
                             />
                         </FormItem>
                     </div>
-
-                    <div className="mt-6">
-                        <Button type="submit" variant="solid">Submit</Button>
+                    <div className="mt-4 flex justify-end">
+                        <Button variant="solid" type="submit">
+                            Submit
+                        </Button>
                     </div>
                 </Form>
             </Card>
 
-            {/* Table */}
             <Card>
-                <div className="flex justify-between mb-4">
-                    <div></div>
-                    <input
-                        className="border px-2 py-1 rounded"
-                        placeholder="Search..."
-                        value={globalFilter}
-                        onChange={e => setGlobalFilter(e.target.value)}
-                    />
+                <div className="flex items-center justify-between mb-4">
+                    <h5 className="mb-0">Routes</h5>
+                    <div className="flex items-center gap-4">
+                        <span className="font-semibold">
+                            Total Routes: {table.getFilteredRowModel().rows.length}
+                        </span>
+                        <input
+                            className="border px-2 py-1 rounded"
+                            placeholder="Search by Route Name..."
+                            value={globalFilter}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 <Table>
                     <THead>
-                        {table.getHeaderGroups().map(headerGroup => (
+                        {table.getHeaderGroups().map((headerGroup) => (
                             <Tr key={headerGroup.id}>
-                                {headerGroup.headers.map(header => (
+                                {headerGroup.headers.map((header) => (
                                     <Th key={header.id}>
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                onClick={header.column.getToggleSortingHandler()}
-                                                className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
-                                            >
-                                                {flexRender(header.column.columnDef.header, header.getContext())}
-                                                <Sorter sort={header.column.getIsSorted()} />
-                                            </div>
-                                        )}
+                                        {flexRender(header.column.columnDef.header, header.getContext())}
+                                        <Sorter sort={header.column.getIsSorted()} />
                                     </Th>
                                 ))}
                             </Tr>
                         ))}
                     </THead>
                     <TBody>
-                        {table.getRowModel().rows.map(row => (
+                        {table.getRowModel().rows.map((row) => (
                             <Tr key={row.id}>
-                                {row.getVisibleCells().map(cell => (
-                                    <Td key={cell.id} className="py-1 text-sm">
+                                {row.getVisibleCells().map((cell) => (
+                                    <Td key={cell.id}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </Td>
                                 ))}
@@ -426,33 +381,24 @@ const Route = () => {
                 <div className="flex justify-between items-center mt-4">
                     <Pagination
                         currentPage={table.getState().pagination.pageIndex + 1}
-                        pageSize={pageSize}
-                        total={filteredData.length}
-                        onChange={page => table.setPageIndex(page - 1)}
+                        pageSize={table.getState().pagination.pageSize}
+                        total={table.getFilteredRowModel().rows.length}
+                        onChange={(page) => table.setPageIndex(page - 1)}
                     />
                     <Select
                         size="sm"
-                        value={pageSizeOptions.find(opt => opt.value === pageSize)}
-                        onChange={opt => {
-                            setPageSize(opt?.value ?? 10)
-                            table.setPageSize(opt?.value ?? 10)
+                        value={pageSizeOptions.find((opt) => opt.value === pageSize)}
+                        onChange={(opt) => {
+                            const newSize = opt?.value ?? 10
+                            setPageSize(newSize)
+                            table.setPageSize(newSize)
                         }}
                         options={pageSizeOptions}
                     />
                 </div>
             </Card>
 
-            {/* Dialog */}
-            <Dialog isOpen={dialogIsOpen} onClose={() => setDialogIsOpen(false)}>
-                <h5 className="mb-4">{selectedRoute?.isActive ? 'Deactivate' : 'Activate'} Route</h5>
-                <p>
-                    Are you sure you want to {selectedRoute?.isActive ? 'deactivate' : 'activate'} <b>{selectedRoute?.routeName}</b>?
-                </p>
-                <div className="text-right mt-6">
-                    <Button className="mr-2" onClick={() => setDialogIsOpen(false)}>Cancel</Button>
-                    <Button variant="solid" onClick={handleDialogConfirm}>Confirm</Button>
-                </div>
-            </Dialog>
+          
         </div>
     )
 }

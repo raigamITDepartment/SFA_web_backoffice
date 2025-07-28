@@ -26,14 +26,14 @@ const OutletRoute: Routes = [
         authority: [],
     },
 
-    {
-        key: 'groupMenu.collapse.item2',
-        path: '/group-collapse-menu-item-view-2',
-        component: lazy(
-            () => import('@/views/MasterSettings/GroupCollapseMenuItemView2'),
-        ),
-        authority: [],
-    },
+    // {
+    //     key: 'groupMenu.collapse.item2',
+    //     path: '/group-collapse-menu-item-view-2',
+    //     component: lazy(
+    //         () => import('@/views/MasterSettings/GroupCollapseMenuItemView2'),
+    //     ),
+    //     authority: [],
+    // },
     // {
     //     key: 'OutletModule.editOutlet',
     //     path: '/Outlet-Module-editOutlet',

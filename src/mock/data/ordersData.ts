@@ -186,7 +186,7 @@ export const orderDetailsData = {
             name: 'Snövalla',
             productCode: '098359NT',
             img: '/img/products/product-2.jpg',
-            price: 252,
+            price: 257,
             quantity: 2,
             total: 504,
         },

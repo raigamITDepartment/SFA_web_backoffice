@@ -12,7 +12,7 @@
     "lint": "npx eslint",
     "lint:fix": "npm run lint -- --fix",
     "format": "npm run prettier:fix && npm run lint:fix",
-    "start": "serve -s build -l 8080"
+    "start": "serve -s build -l 3000"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.2",
