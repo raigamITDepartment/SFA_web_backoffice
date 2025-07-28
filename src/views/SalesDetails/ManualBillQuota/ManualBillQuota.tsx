@@ -35,8 +35,8 @@ const schema = z.object({
 })
 
 const channelOptions = [
-    { label: 'Modern Trade', value: 'modern' },
-    { label: 'General Trade', value: 'general' },
+    { label: 'Channel 1', value: 'channel1' },
+    { label: 'Channel 2', value: 'channel2' },
 ]
 const subChannelOptions = [
     { label: 'Sub 1', value: 'sub1' },
@@ -215,57 +215,67 @@ const ManualBillQuota: React.FC = () => {
                     </div>
                 </Card>
 
-               <Card className="w-full p-0 overflow-hidden">
-    {/* Agency Header Block */}
-    <div className="bg-sky-50 dark:bg-gray-800/50 flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-        {/* Example icon/avatar: can be replaced with your logo or initials */}
-        <div className="bg-sky-200 text-sky-800 dark:bg-gray-600 dark:text-gray-100 rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold">
-            {agencyName.split(' ').map(w => w[0]).join('').slice(0,2)} 
-            {/* Just initials, e.g. AD for "ABC DISTRIBUTORS" */}
-        </div>
-        <div>
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider uppercase">
-                Agency
-            </div>
-            <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {agencyName}
-            </div>
-        </div>
-    </div>
-    {/* Card Body */}
-    <div className="px-6 py-6 flex flex-col gap-4">
-        <FormItem invalid={!!errors.quota} errorMessage={errors.quota?.message}>
-            <label htmlFor="quota" className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Quota
-            </label>
-            <Controller
-                name="quota"
-                control={control}
-                render={({ field }) => (
-                    <Input
-                        id="quota"
-                        placeholder="Enter quota"
-                        type="number"
-                        className={`w-full ${errors.quota ? 'border-red-500' : ''}`}
-                        {...field}
-                        value={field.value}
-                        onChange={e => field.onChange(e.target.value)}
-                    />
-                )}
-            />
-        </FormItem>
+                <Card className="w-full overflow-hidden rounded-2xl shadow-md bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700">
+                    {/* Agency Header Block */}
+                    <div className="flex items-center gap-4 px-6 py-5 bg-sky-100/70 dark:bg-sky-900/30 border-b border-gray-200 dark:border-gray-700">
+                        <div>
+                            <div className="text-[11px] font-semibold text-sky-600 dark:text-sky-300 uppercase tracking-wide">
+                                Agency
+                            </div>
+                            <div className="text-xl font-bold text-gray-800 dark:text-white">
+                                {agencyName}
+                            </div>
+                        </div>
+                    </div>
 
-        <Button
-            type="submit"
-            variant="solid"
-            className="text-base  px-8 rounded-xl w-full sm:w-auto self-center"
-            disabled={isSubmitting}
-            loading={isSubmitting}
-        >
-            Submit Quota
-        </Button>
+                    {/* Card Body */}
+{/* Card Body - Quota Section */}
+<div className="px-6 py-6">
+  <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 w-full max-w-md mx-auto shadow-sm">
+    <div className="mb-4">
+      <label
+        htmlFor="quota"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        Enter Quota
+      </label>
+      <FormItem invalid={!!errors.quota} errorMessage={errors.quota?.message}>
+        <Controller
+          name="quota"
+          control={control}
+          render={({ field }) => (
+            <Input
+              id="quota"
+              placeholder="Enter quota amount"
+              type="number"
+              className={`w-full px-4 py-2 rounded-lg border text-base dark:bg-gray-800 ${
+                errors.quota
+                  ? 'border-red-500 focus:ring-red-400'
+                  : 'border-gray-300 dark:border-gray-600 focus:ring-sky-500'
+              } focus:outline-none focus:ring-2`}
+              {...field}
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+            />
+          )}
+        />
+      </FormItem>
     </div>
-</Card>
+
+    <Button
+      type="submit"
+      variant="solid"
+      className="w-full bg-sky-600 hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600 text-white font-semibold py-2.5 rounded-lg transition-all duration-200"
+      disabled={isSubmitting}
+      loading={isSubmitting}
+    >
+      Submit Quota
+    </Button>
+  </div>
+</div>
+
+                </Card>
+
 
             </div>
 
