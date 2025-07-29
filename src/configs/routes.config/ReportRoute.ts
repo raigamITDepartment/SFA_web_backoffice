@@ -22,7 +22,7 @@ import type { Routes } from '@/@types/routes'
    {
         key: 'Reports.AchItemWise',
          path:  '/Reports-menu-AchItemWise',
-        component: lazy(() => import('@/views/Report/AchievementItem')),
+        component: lazy(() => import('@/views/Report/Achievement/AchievementItem')),
         authority: [],
     },
    
