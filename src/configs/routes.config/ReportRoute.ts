@@ -27,12 +27,7 @@ import type { Routes } from '@/@types/routes'
     },
    
  
-  {
-        key: 'Reports.AchProductwise',
-      path:  '/Reports-menu-AchProductwise',
-        component: lazy(() => import('@/views/Report/AchievementProduct')),
-        authority: [],
-    },
+  
    
 
   {
