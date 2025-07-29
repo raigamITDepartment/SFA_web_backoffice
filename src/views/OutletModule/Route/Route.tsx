@@ -153,7 +153,7 @@ const Route = () => {
         }
         loadAreas()
     }, [token])
-    console.log("log areaaaa",area)
+  
 
     // ✅ fetch territories when area changes
     useEffect(() => {
@@ -263,7 +263,7 @@ const Route = () => {
                 <h5 className="mb-4">Filter Routes</h5>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <FormItem label="Channel">
+                        {/* <FormItem label="Channel">
                             <Controller
                                 name="channelId"
                                 control={control}
@@ -292,7 +292,7 @@ const Route = () => {
                                     />
                                 )}
                             />
-                        </FormItem>
+                        </FormItem> */}
                          <FormItem
                             label="Areas"
                             invalid={Boolean(errors.area)}

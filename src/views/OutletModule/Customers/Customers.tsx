@@ -1,10 +1,9 @@
 import AdaptiveCard from '@/components/shared/AdaptiveCard'
 import Container from '@/components/shared/Container'
 import CustomerListTable from './components/CustomerListTable'
-import CustomerListActionTools from './components/CustomerListActionTools'
-import CustomersListTableTools from './components/CustomersListTableTools'
+
 import CustomerListSelected from './components/CustomerListSelected'
-import OutletFilter from './components/OutletFilter'
+
 
 const CustomerList = () => {
     return (
@@ -17,7 +16,7 @@ const CustomerList = () => {
                             {/* <CustomerListActionTools /> */}
                         </div>
                         {/* <CustomersListTableTools /> */}
-                        <OutletFilter onSubmit={() => {}} />
+                    
                         <CustomerListTable />
                     </div>
                 </AdaptiveCard> 
