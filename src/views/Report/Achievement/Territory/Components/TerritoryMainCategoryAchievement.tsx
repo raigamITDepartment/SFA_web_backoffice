@@ -20,13 +20,13 @@ import {
 const { DatePickerRange } = DatePicker
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-function MainCategoryAchievement() {
+function TerritoryMainCategoryAchievement() {
   const [dateRange, setDateRange] = useState(null)
   const [globalFilter, setGlobalFilter] = useState('')
 
   const mainCategoryOptions = [
-    { label: 'Beverages', value: 'beverages' },
-    { label: 'Snacks', value: 'snacks' },
+    { label: 'Soya', value: 'beverages' },
+    { label: 'Deveni 1', value: 'snacks' },
   ]
 
   const areaOptions = [
@@ -113,6 +113,9 @@ function MainCategoryAchievement() {
     <div className="space-y-6">
       {/* Filter Card */}
       <Card className="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+        <h3>Main Category Achievement Report</h3>
+        <h5 className='mb-6'>(Territory-wise)</h5>
+        
         <div className="flex items-center mb-6 gap-2 text-gray-700 dark:text-gray-200">
           <FiFilter className="text-xl" />
           <h2 className="text-lg font-semibold">Filter Criteria</h2>
@@ -220,4 +223,4 @@ function MainCategoryAchievement() {
   )
 }
 
-export default MainCategoryAchievement
+export default TerritoryMainCategoryAchievement

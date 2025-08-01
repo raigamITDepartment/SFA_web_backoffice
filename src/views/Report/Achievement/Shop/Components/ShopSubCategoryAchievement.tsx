@@ -20,68 +20,80 @@ import {
 const { DatePickerRange } = DatePicker
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-const SUB_SUB_CATEGORY_OPTIONS = [
-    { label: 'Cola Drinks', value: 'cola' },
-    { label: 'Lemon-Lime Drinks', value: 'lemon-lime' },
-    { label: 'Potato Chips', value: 'potato-chips' },
-    { label: 'Tortilla Chips', value: 'tortilla-chips' },
-]
-
-const SUB_CATEGORY_OPTIONS = [
-    { label: 'Carbonated Drinks', value: 'carbonated' },
-    { label: 'Chips', value: 'chips' },
-]
-
-const TERRITORY_OPTIONS = [
-    { label: 'Colombo', value: 'colombo' },
-    { label: 'Kandy', value: 'kandy' },
-    { label: 'Galle', value: 'galle' },
-    { label: 'Matara', value: 'matara' },
-]
-
-const PAGE_SIZE_OPTIONS = [
-    { value: 5, label: '5 / page' },
-    { value: 10, label: '10 / page' },
-    { value: 20, label: '20 / page' },
-]
-
-const TABLE_DATA = [
-    { name: 'Cola Drinks', qty: 850, value: 380000 },
-    { name: 'Lemon-Lime Drinks', qty: 350, value: 170000 },
-    { name: 'Potato Chips', qty: 620, value: 290000 },
-    { name: 'Tortilla Chips', qty: 360, value: 170000 },
-    { name: 'Energy Drinks', qty: 280, value: 150000 },
-    { name: 'Flavored Chips', qty: 190, value: 90000 },
-]
-
-const COLUMNS = [
-    {
-        accessorKey: 'name',
-        header: 'Sub-Sub-Category',
-    },
-    {
-        accessorKey: 'qty',
-        header: 'Quantity Sold',
-        
-    },
-    {
-        accessorKey: 'value',
-        header: 'Revenue (Rs.)',
-        
-    },
-    
-]
-
-function SubSubCategoryAchievement() {
+function ShopSubCategoryAchievement() {
     const [dateRange, setDateRange] = useState(null)
     const [globalFilter, setGlobalFilter] = useState('')
-    const [selectedSubCategory, setSelectedSubCategory] = useState('')
-    const [selectedSubSubCategory, setSelectedSubSubCategory] = useState('')
-    const [selectedTerritory, setSelectedTerritory] = useState('')
+
+    const subCategoryOptions = [
+        { label: 'Premium Soya', value: 'carbonated' },
+        { label: 'Budget Soya', value: 'chips' },
+    ]
+
+    const areaOptions = [
+        { label: 'Western', value: 'western' },
+        { label: 'Central', value: 'central' },
+    ]
+
+    const territoryOptions = [
+        { label: 'Colombo', value: 'colombo' },
+        { label: 'Kandy', value: 'kandy' },
+        { label: 'Galle', value: 'galle' },
+        { label: 'Matara', value: 'matara' },
+    ]
+
+    const routeOptions = [
+        { label: 'Route 1', value: 'route1' },
+        { label: 'Route 2', value: 'route2' },
+    ]
+
+    const shopOptions = [
+        { label: 'Shop 1', value: 'shop1' },
+        { label: 'Shop 2', value: 'shop2' },
+    ]
+
+
+
+    const pageSizeOptions = [
+        { value: 5, label: '5 / page' },
+        { value: 10, label: '10 / page' },
+        { value: 20, label: '20 / page' },
+    ]
+
+    const data = useMemo(
+        () => [
+            { name: 'Colombo', qty: 1200, value: 550000 },
+            { name: 'Kandy', qty: 950, value: 410000 },
+            { name: 'Galle', qty: 780, value: 310000 },
+            { name: 'Matara', qty: 610, value: 280000 },
+            { name: 'Negombo', qty: 540, value: 250000 },
+            { name: 'Kurunegala', qty: 480, value: 220000 },
+            { name: 'Jaffna', qty: 420, value: 200000 },
+            { name: 'Trincomalee', qty: 380, value: 180000 },
+        ],
+        []
+    )
+
+    const columns = useMemo(
+        () => [
+            {
+                accessorKey: 'name',
+                header: 'Name',
+            },
+            {
+                accessorKey: 'qty',
+                header: 'Qty',
+            },
+            {
+                accessorKey: 'value',
+                header: 'Value (Rs.)',
+            },
+        ],
+        []
+    )
 
     const table = useReactTable({
-        data: TABLE_DATA,
-        columns: COLUMNS,
+        data,
+        columns,
         state: {
             globalFilter,
         },
@@ -98,78 +110,40 @@ function SubSubCategoryAchievement() {
 
     const handleExport = () => {
         const rows = table.getFilteredRowModel().rows.map((row) => ({
-            'Sub-Sub-Category': row.original.name,
-            'Quantity Sold': row.original.qty,
-            'Revenue (Rs.)': row.original.value,
-            
+            Name: row.original.name,
+            Qty: row.original.qty,
+            Value: row.original.value,
         }))
 
         const worksheet = XLSX.utils.json_to_sheet(rows)
         const workbook = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'SubSubCategoryReport')
-        XLSX.writeFile(workbook, 'SubSubCategoryAchievement.xlsx')
-    }
-
-    const handleApplyFilters = () => {
-        // Implement your filter logic here
-        console.log('Filters applied:', {
-            subCategory: selectedSubCategory,
-            subSubCategory: selectedSubSubCategory,
-            territory: selectedTerritory,
-            dateRange,
-        })
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'SubCategoryReport')
+        XLSX.writeFile(workbook, 'SubCategoryAchievement.xlsx')
     }
 
     return (
         <div className="space-y-6">
             {/* Filter Card */}
             <Card className="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+                <h3>Sub Category Achievement Report</h3>
+                <h5 className='mb-6'>(Shop-wise)</h5>
                 <div className="flex items-center mb-6 gap-2 text-gray-700 dark:text-gray-200">
                     <FiFilter className="text-xl" />
                     <h2 className="text-lg font-semibold">Filter Criteria</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Select 
-                        options={SUB_CATEGORY_OPTIONS} 
-                        placeholder="Select Sub Category" 
-                        value={selectedSubCategory}
-                        onChange={(value) => {
-                            setSelectedSubCategory(value)
-                            setSelectedSubSubCategory('') // Reset sub-sub-category when parent changes
-                        }}
-                    />
-                    <Select 
-                        options={SUB_SUB_CATEGORY_OPTIONS.filter(option => 
-                            selectedSubCategory === 'carbonated' 
-                                ? ['cola', 'lemon-lime', 'energy-drinks'].includes(option.value)
-                                : ['potato-chips', 'tortilla-chips', 'flavored-chips'].includes(option.value)
-                        )} 
-                        placeholder="Select Sub-Sub-Category" 
-                        value={selectedSubSubCategory}
-                        onChange={setSelectedSubSubCategory}
-                        disabled={!selectedSubCategory}
-                    />
-                    <Select 
-                        options={TERRITORY_OPTIONS} 
-                        placeholder="Select Territory" 
-                        value={selectedTerritory}
-                        onChange={setSelectedTerritory}
-                    />
-                    <DatePickerRange 
-                        placeholder="Date Range" 
-                        value={dateRange}
-                        onChange={setDateRange}
-                    />
+                    <Select options={subCategoryOptions} placeholder="Select Sub Category" />
+                    <Select options={areaOptions} placeholder="Select Area" />
+                    <Select options={territoryOptions} placeholder="Select Territory" />
+                    <Select options={routeOptions} placeholder="Select Route" />
+                    <Select options={shopOptions} placeholder="Select Shop" />
+
+                    <DatePickerRange placeholder="Date Range" />
                 </div>
 
                 <div className="mt-6 flex xl:justify-end lg:justify-end md:justify-end sm:justify-center justify-center">
-                    <Button 
-                        type="button" 
-                        variant="solid" 
-                        className="px-6 py-2 text-sm rounded-xl sm:w-full md:w-auto"
-                        onClick={handleApplyFilters}
-                    >
+                    <Button type="submit" variant="solid" className="px-6 py-2 text-sm rounded-xl sm:w-full md:w-auto">
                         Apply Filters
                     </Button>
                 </div>
@@ -177,18 +151,19 @@ function SubSubCategoryAchievement() {
 
             {/* Report Card */}
             <Card className="p-6 rounded-xl shadow-md bg-white dark:bg-gray-800">
+
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                     <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
-                        Sub-Sub-Category Performance Report
+
                     </h2>
 
                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <Button
-                            
-                            icon={<FaFileExcel className="text-green-600 text-lg" />}
+
                             className="text-sm flex items-center gap-2"
                             onClick={handleExport}
                         >
+                            <FaFileExcel className="text-green-600 text-lg" />
                             Export to Excel
                         </Button>
 
@@ -228,8 +203,8 @@ function SubSubCategoryAchievement() {
                         <TBody>
                             {table.getRowModel().rows.length === 0 ? (
                                 <Tr>
-                                    <Td colSpan={COLUMNS.length} className="text-center text-gray-400 py-4">
-                                        No data found. Please adjust your filters.
+                                    <Td colSpan={columns.length} className="text-center text-gray-400 py-4">
+                                        No data found.
                                     </Td>
                                 </Tr>
                             ) : (
@@ -258,10 +233,10 @@ function SubSubCategoryAchievement() {
                         <Select
                             size="sm"
                             isSearchable={false}
-                            value={PAGE_SIZE_OPTIONS.find(
+                            value={pageSizeOptions.find(
                                 (option) => option.value === table.getState().pagination.pageSize
                             )}
-                            options={PAGE_SIZE_OPTIONS}
+                            options={pageSizeOptions}
                             onChange={(option) => onSelectChange(option?.value)}
                         />
                     </div>
@@ -271,4 +246,4 @@ function SubSubCategoryAchievement() {
     )
 }
 
-export default SubSubCategoryAchievement
+export default ShopSubCategoryAchievement

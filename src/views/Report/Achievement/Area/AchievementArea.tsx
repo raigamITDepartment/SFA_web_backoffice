@@ -1,9 +1,9 @@
 import React from 'react'
 import Tabs from '@/components/ui/Tabs'
-import MainCategoryAchievement from './Components/MainCategoryAchievement'
-import SubCategoryAchievement from './Components/SubCategoryAchievement'
-import SubSubCategoryAchievement from './Components/SubSubCategoryAchievement'
-import ItemWiseAchievement from './Components/ItemWiseAchievement'
+import MainCategoryAchievement from './Components/AreaMainCategoryAchievement'
+import SubCategoryAchievement from './Components/AreaSubCategoryAchievement'
+import SubSubCategoryAchievement from './Components/AreaSubSubCategoryAchievement'
+import ItemWiseAchievement from './Components/AreaItemWiseAchievement'
 const { TabNav, TabList, TabContent } = Tabs
 
 

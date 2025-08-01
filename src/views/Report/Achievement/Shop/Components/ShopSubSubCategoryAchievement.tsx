@@ -20,13 +20,13 @@ import {
 const { DatePickerRange } = DatePicker
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-function SubCategoryAchievement() {
+function ShopSubSubCategoryAchievement() {
     const [dateRange, setDateRange] = useState(null)
     const [globalFilter, setGlobalFilter] = useState('')
 
-    const subCategoryOptions = [
-        { label: 'Carbonated Drinks', value: 'carbonated' },
-        { label: 'Chips', value: 'chips' },
+    const subSubCategoryOptions = [
+        { label: 'Dara Poranu Soya', value: 'cola' },
+        { label: 'Soya Tempered', value: 'salted_chips' },
     ]
 
     const areaOptions = [
@@ -41,6 +41,17 @@ function SubCategoryAchievement() {
         { label: 'Matara', value: 'matara' },
     ]
 
+    const routeOptions = [
+        { label: 'Route 1', value: 'route1' },
+        { label: 'Route 2', value: 'route2' },
+    ]
+
+    const shopOptions = [
+        { label: 'Shop 1', value: 'shop1' },
+        { label: 'Shop 2', value: 'shop2' },
+    ]
+
+  
     const pageSizeOptions = [
         { value: 5, label: '5 / page' },
         { value: 10, label: '10 / page' },
@@ -74,6 +85,7 @@ function SubCategoryAchievement() {
             {
                 accessorKey: 'value',
                 header: 'Value (Rs.)',
+                
             },
         ],
         []
@@ -105,23 +117,28 @@ function SubCategoryAchievement() {
 
         const worksheet = XLSX.utils.json_to_sheet(rows)
         const workbook = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'SubCategoryReport')
-        XLSX.writeFile(workbook, 'SubCategoryAchievement.xlsx')
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'SubSubCategoryReport')
+        XLSX.writeFile(workbook, 'SubSubCategoryAchievement.xlsx')
     }
 
     return (
         <div className="space-y-6">
             {/* Filter Card */}
             <Card className="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+                <h3>Sub-Sub Category Achievement Report</h3>
+                <h5 className='mb-6'>(Shop-wise)</h5>
                 <div className="flex items-center mb-6 gap-2 text-gray-700 dark:text-gray-200">
                     <FiFilter className="text-xl" />
                     <h2 className="text-lg font-semibold">Filter Criteria</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Select options={subCategoryOptions} placeholder="Select Sub Category" />
+                    <Select options={subSubCategoryOptions} placeholder="Select Sub-Sub Category" />
                     <Select options={areaOptions} placeholder="Select Area" />
                     <Select options={territoryOptions} placeholder="Select Territory" />
+                    <Select options={routeOptions} placeholder="Select Route" />
+                    <Select options={shopOptions} placeholder="Select Shop" />
+                    
                     <DatePickerRange placeholder="Date Range" />
                 </div>
 
@@ -136,12 +153,11 @@ function SubCategoryAchievement() {
             <Card className="p-6 rounded-xl shadow-md bg-white dark:bg-gray-800">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                     <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
-                       
+                        {/* Title if needed */}
                     </h2>
 
                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <Button
-
                             className="text-sm flex items-center gap-2"
                             onClick={handleExport}
                         >
@@ -228,4 +244,4 @@ function SubCategoryAchievement() {
     )
 }
 
-export default SubCategoryAchievement
+export default ShopSubSubCategoryAchievement

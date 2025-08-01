@@ -20,9 +20,29 @@ import type { Routes } from '@/@types/routes'
    
 
    {
-        key: 'Reports.AchItemWise',
-         path:  '/Reports-menu-AchItemWise',
-        component: lazy(() => import('@/views/Report/Achievement/AchievementItem')),
+        key: 'Reports.Achievement',
+         path:  '/Reports-menu-Achievement',
+        component: lazy(() => import('@/views/Report/Achievement/Acievement')),
+        authority: [],
+    },
+
+    {
+        key: 'Reports.AchievementTerritory',
+         path:  '/Reports-menu-AchievementTerritory',
+        component: lazy(() => import('@/views/Report/Achievement/Territory/AchievementTerritory')),
+        authority: [],
+    },
+
+    {
+        key: 'Reports.AchievementArea',
+         path:  '/Reports-menu-AchievementArea',
+        component: lazy(() => import('@/views/Report/Achievement/Area/AchievementArea')),
+        authority: [],
+    },
+    {
+        key: 'Reports.AchievementShop',
+         path:  '/Reports-menu-AchievementShop',
+        component: lazy(() => import('@/views/Report/Achievement/Shop/AchievementShop')),
         authority: [],
     },
    
