@@ -121,7 +121,7 @@ const SubChannelEdit = (props: UpdateSubChannelFormSchema) => {
 
         try {
             const payload = {
-                id: id,
+                id: Number(id),
                 channelId: values.channelId,
                 userId: userIdNumber,
                 subChannelName: values.subChannelName,
@@ -256,6 +256,9 @@ const SubChannelEdit = (props: UpdateSubChannelFormSchema) => {
                                 }}
                             />
                         </FormItem>
+
+
+                        
 
                         <FormItem>
                             <Controller

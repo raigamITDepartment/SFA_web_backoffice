@@ -9,22 +9,32 @@ import {
   getCoreRowModel, 
   getFilteredRowModel, 
   getPaginationRowModel, 
+  getSortedRowModel,
   flexRender 
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
-import type { ColumnDef, FilterFn } from '@tanstack/react-table';
+import type { ColumnDef, FilterFn, ColumnSort } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
-import { Button,toast,Alert } from '@/components/ui'; 
+import { Button, toast, Alert, Tag } from '@/components/ui';
+import DatePicker from '@/components/ui/DatePicker';
+import Dialog from '@/components/ui/Dialog';
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
+const { DatePickerRange } = DatePicker;
 
 interface Invoice {
   id: number;
   invoiceNo: string;
-  route: string;
-  shop: string;
+  invoiceType?: string;
+  routeCode: string;
+  shopCode: string;
+  customer: string;
+  agencyCode: string;
   value: number;
+  source?: 'Web' | 'Mobile';
   status: string;
+  date: string;
+  remark?: string;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -83,26 +93,102 @@ const statusOptions = [
 
 function CancelBill() {
   const [data, setData] = useState<Invoice[]>([
-    { id: 1, invoiceNo: 'INV-2023-001', route: 'Route A', shop: 'Shop 1', value: 1500, status: 'Cancel' },
-    { id: 2, invoiceNo: 'INV-2023-002', route: 'Route B', shop: 'Shop 2', value: 2300, status: 'Cancel' },
-    { id: 3, invoiceNo: 'INV-2023-003', route: 'Route C', shop: 'Shop 3', value: 1750, status: 'Cancel' },
-    { id: 4, invoiceNo: 'INV-2023-004', route: 'Route A', shop: 'Shop 4', value: 4200, status: 'Cancel' },
-    { id: 5, invoiceNo: 'INV-2023-005', route: 'Route D', shop: 'Shop 5', value: 3100, status: 'Cancel' },
+    {
+      id: 1,
+      invoiceNo: 'INV-2023-001',
+      invoiceType: 'Normal',
+      routeCode: 'R001',
+      shopCode: 'S001',
+      customer: 'John Traders',
+      agencyCode: 'AG001',
+      value: 1500,
+      status: 'Canceled',
+      source: 'Mobile',
+      date: '2023-07-01',
+      remark: 'Duplicate entry',
+    },
+    {
+      id: 2,
+      invoiceNo: 'INV-2023-002',
+      invoiceType: 'Company',
+      routeCode: 'R002',
+      shopCode: 'S002',
+      customer: 'Green Mart',
+      agencyCode: 'AG002',
+      value: 2300,
+      status: 'Canceled',
+      source: 'Web',
+      date: '2023-07-02',
+      remark: 'Incorrect billing amount',
+    },
+    {
+      id: 3,
+      invoiceNo: 'INV-2023-003',
+      invoiceType: 'Agency',
+      routeCode: 'R003',
+      shopCode: 'S003',
+      customer: 'Fresh Foods',
+      agencyCode: 'AG003',
+      value: 1750,
+      status: 'Canceled',
+      source: 'Mobile',
+      date: '2023-07-03',
+      remark: 'Customer request',
+    },
+    {
+      id: 4,
+      invoiceNo: 'INV-2023-004',
+      invoiceType: 'Normal',
+      routeCode: 'R001',
+      shopCode: 'S004',
+      customer: 'Mega Store',
+      agencyCode: 'AG001',
+      value: 4200,
+      status: 'Canceled',
+      source: 'Web',
+      date: '2023-07-04',
+      remark: 'Payment not received',
+    },
+    {
+      id: 5,
+      invoiceNo: 'INV-2023-005',
+      invoiceType: 'Company',
+      routeCode: 'R004',
+      shopCode: 'S005',
+      customer: 'Quick Buy',
+      agencyCode: 'AG002',
+      value: 3100,
+      status: 'Canceled',
+      source: 'Mobile',
+      date: '2023-07-05',
+      remark: 'Pricing error',
+    },
   ]);
-  
+
+  const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+
+  const filteredData = useMemo(() => {
+    return data.filter((item) => {
+      const itemDate = new Date(item.date);
+      const [from, to] = dateRange;
+      return (!from || itemDate >= from) && (!to || itemDate <= to);
+    });
+  }, [data, dateRange]);
 
   const handleStatusChange = (invoiceId: number, newStatus: string) => {
-    setData(prevData => 
-      prevData.map(invoice => 
+    setData(prevData =>
+      prevData.map(invoice =>
         invoice.id === invoiceId ? { ...invoice, status: newStatus } : invoice
       )
     );
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting late delivery data:', data);
+  const handleDialogConfirm = () => {
+    setDialogIsOpen(false);
     toast.push(
       <Alert showIcon type="success" className="dark:bg-gray-700 w-64 sm:w-80 md:w-96">
         Submitted Successfully
@@ -115,120 +201,144 @@ function CancelBill() {
         placement: 'top-end',
       }
     );
+    console.log('Submitting canceled invoices data:', data);
   };
 
-  
+  const handleDialogClose = () => {
+    setDialogIsOpen(false);
+  };
 
   const columns = useMemo<ColumnDef<Invoice>[]>(() => [
-    { header: 'Invoice No:', accessorKey: 'invoiceNo' },
-    { header: 'Route', accessorKey: 'route' },
-    { header: 'Shop', accessorKey: 'shop' },
-    { 
-      header: 'Value', 
+    { header: 'Invoice No', accessorKey: 'invoiceNo' },
+    { header: 'Invoice Type', accessorKey: 'invoiceType' },
+    { header: 'Agency Code', accessorKey: 'agencyCode' },
+    { header: 'Route Code', accessorKey: 'routeCode' },
+    { header: 'Shop Code', accessorKey: 'shopCode' },
+    { header: 'Customer', accessorKey: 'customer' },
+    {
+      header: 'Value',
       accessorKey: 'value',
       cell: ({ getValue }) => (
-        <div className="font-medium">Rs. {getValue<number>().toLocaleString()}</div>
-      )
+        <div className="flex items-center justify-end font-semibold text-right pr-2 space-x-1">
+          <span>Rs.</span>
+          <span>
+            {getValue<number>().toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+        </div>
+      ),
     },
-    { 
-      header: 'Status', 
-      accessorKey: 'status',
-      cell: ({ row }) => (
-        <Select
-          size="sm"
-          options={statusOptions}
-          value={statusOptions.find(option => option.value === row.original.status)}
-          onChange={(option) => handleStatusChange(row.original.id, option?.value || 'Late Delivery')}
-          className="min-w-[150px]"
-        />
-      )
-    }
+    {
+      header: 'Date',
+      accessorKey: 'date',
+      cell: ({ getValue }) => {
+        const dateStr = getValue<string>();
+        return new Date(dateStr).toLocaleDateString();
+      },
+    },
+    {
+      header: 'Source',
+      accessorKey: 'source',
+      cell: ({ getValue }) => {
+        const source = getValue<'Web' | 'Mobile'>();
+        return (
+          <span
+            className={`inline-flex items-center gap-x-1 px-2 py-1 rounded-full text-xs font-medium ${
+              source === 'Web'
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+            }`}
+          >
+            <span>{source === 'Web' ? '🌐' : '📱'}</span>
+            <span>{source}</span>
+          </span>
+        );
+      },
+    },
+    { header: 'Status', accessorKey: 'status' },
+    { header: 'Remark', accessorKey: 'remark' },
   ], []);
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
-    state: { globalFilter },
+    state: { globalFilter, sorting },
+    onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     initialState: { pagination: { pageSize } },
   });
 
-  const onPaginationChange = (page: number) => {
-    table.setPageIndex(page - 1);
-  };
-
-  const onSelectChange = (value = 0) => {
-    const newSize = Number(value);
-    setPageSize(newSize);
-    table.setPageSize(newSize);
-  };
-
-  const totalData = data.length;
-
   return (
-    <div className="p-6 w-full mx-auto">
+    <div className="p-6 w-full mx-auto space-y-6">
       <Card className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800">
-        <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Canceled Invoices</h3>
-          <div className="w-full sm:w-64">
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center">
+            <span className="mr-2">Search:</span>
             <DebouncedInput
               value={globalFilter ?? ''}
-              placeholder="Search invoices..."
               onChange={(value) => setGlobalFilter(String(value))}
+              placeholder="Search all columns..."
+              className="w-64"
+            />
+          </div>
+          <div className="w-64">
+            <DatePickerRange
+              value={dateRange}
+              onChange={(newRange) => setDateRange(newRange)}
+              placeholder="Select date range"
+              clearable={true}
+              size="sm"
             />
           </div>
         </div>
-        
-        <div className="overflow-x-auto">
-          <Table>
-            <THead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <Tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <Th key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className={header.column.getCanSort() 
-                            ? 'cursor-pointer select-none flex items-center gap-1' 
-                            : 'flex items-center'}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {header.column.getCanSort() && (
-                            <Sorter sort={header.column.getIsSorted()} />
-                          )}
-                        </div>
-                      )}
-                    </Th>
-                  ))}
-                </Tr>
-              ))}
-            </THead>
-            <TBody>
-              {table.getRowModel().rows.map((row) => (
-                <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  {row.getVisibleCells().map((cell) => (
-                    <Td key={cell.id} className='py-3 px-4'>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </Td>
-                  ))}
-                </Tr>
-              ))}
-            </TBody>
-          </Table>
-        </div>
+
+        <Table>
+          <THead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <Tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <Th key={header.id}>
+                    <div
+                      className={header.column.getCanSort() ? 'cursor-pointer select-none flex items-center gap-1' : ''}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.column.getCanSort() && <Sorter sort={header.column.getIsSorted()} />}
+                    </div>
+                  </Th>
+                ))}
+              </Tr>
+            ))}
+          </THead>
+          <TBody>
+            {table.getRowModel().rows.map(row => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+                ))}
+              </Tr>
+            ))}
+          </TBody>
+        </Table>
 
         <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
           <Pagination
             pageSize={table.getState().pagination.pageSize}
             currentPage={table.getState().pagination.pageIndex + 1}
-            total={totalData}
-            onChange={onPaginationChange}
+            total={filteredData.length}
+            onChange={page => table.setPageIndex(page - 1)}
           />
           <div className="min-w-[130px]">
             <Select
@@ -236,20 +346,13 @@ function CancelBill() {
               isSearchable={false}
               value={pageSizeOptions.find(option => option.value === pageSize)}
               options={pageSizeOptions}
-              onChange={(option) => onSelectChange(option?.value)}
+              onChange={option => {
+                const size = option?.value ?? 10;
+                setPageSize(size);
+                table.setPageSize(size);
+              }}
             />
           </div>
-        </div>
-
-        <div className="flex justify-end mt-8 space-x-4">
-          
-          <Button 
-            variant="solid" 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 shadow-md"
-            onClick={handleSubmit}
-          >
-            Submit
-          </Button>
         </div>
       </Card>
     </div>

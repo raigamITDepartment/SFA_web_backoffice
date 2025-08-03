@@ -7,9 +7,9 @@ import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import Tag from '@/components/ui/Tag';
-// import InputGroup from '@/components/ui/InputGroup';
 import { useForm, Controller } from 'react-hook-form';
 import { FormItem, Form } from '@/components/ui/Form';
+import { useNavigate } from 'react-router-dom'; // <-- Add this import
 
 import {
     useReactTable,
@@ -25,6 +25,8 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchCategories } from '@/services/CategoryServices'
+import { Channel } from 'node:diagnostics_channel';
 
 type FormSchema = {
     SubsubCategoryName: string;
@@ -40,6 +42,15 @@ const pageSizeOptions = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ];
+
+interface Category {
+    id: number;
+    categoryId: number;
+    categoryCode: string;
+    categoryName: string;
+    isActive?: boolean;
+}
+
 
 interface SubsubCategory {
     SubsubCategoryCode: string;
@@ -83,12 +94,31 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-const SubsubCategory = () => {
+const Category = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [error, setError] = useState<string | null>(null);
     const [channelName, setChannelName] = useState<string>('');
+    const navigate = useNavigate(); // <-- Add this line
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const columns = useMemo<ColumnDef<SubsubCategory>[]>(() => [
         { header: 'SubsubCategory Code', accessorKey: 'SubsubCategoryCode' },
         { header: 'SubsubCategory Name', accessorKey: 'SubsubCategoryName' },
@@ -115,15 +145,12 @@ const SubsubCategory = () => {
         },
     ], []);
 
-    const [data, setData] = useState<SubsubCategory[]>([
-        { SubsubCategoryCode: '1', SubsubCategoryName: 'Soya', isActive: true },
-        { SubsubCategoryCode: '2', SubsubCategoryName: 'Dewani 1', isActive: false },
-        { SubsubCategoryCode: '3', SubsubCategoryName: 'Aryaa', isActive: true },
-    ]);
+ 
 
-    const totalData = data.length;
+    const data = selectedCategory;
 
     const table = useReactTable({
+     
         data,
         columns,
         filterFns: { fuzzy: fuzzyFilter },
@@ -152,14 +179,14 @@ const SubsubCategory = () => {
         console.log(value, e);
     };
 
-    const handleEdit = (SubsubCategory: SubsubCategory) => {
-        // Implement edit functionality here
-        console.log('Edit:', SubsubCategory);
+    const handleEdit = (subsubCategory: SubsubCategory) => {
+        // Navigate to SubSubCategoryEdit and pass the selected subsubCategory as state
+        navigate('/Salesmenu/SubSubCategoryEdit', { state: { subsubCategory } });
     };
 
-    const handleDelete = (SubsubCategory: SubsubCategory) => {
+    const handleDelete = (subsubCategory: SubsubCategory) => {
         // Implement delete functionality here
-        console.log('Delete:', SubsubCategory);
+        console.log('Delete:', subsubCategory);
     };
 
     const handleCreate = () => {
@@ -173,7 +200,6 @@ const SubsubCategory = () => {
         control,
     } = useForm<FormSchema>({
         defaultValues: {
-         
             SubsubCategoryName: '',
             isActive: true, // Set default value to true
         },
@@ -190,7 +216,6 @@ const SubsubCategory = () => {
                 <Card bordered={false} className='lg:w-1/3 xl:w-1/3 h-1/2'>
                     <h5 className='mb-2'>Sub -Sub Category Creation</h5>
                     <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
-                        
                         <FormItem
                             invalid={Boolean(errors.SubsubCategoryName)}
                             errorMessage={errors.SubsubCategoryName?.message}
@@ -209,7 +234,6 @@ const SubsubCategory = () => {
                                 )}
                             />
                         </FormItem>
-
                         <FormItem>
                             <Controller
                                 name="isActive"
@@ -221,13 +245,11 @@ const SubsubCategory = () => {
                                 }
                             />
                         </FormItem>
-
                         <FormItem>
                             <Button variant="solid" block type="submit">Create</Button>
                         </FormItem>
                     </Form>
                 </Card>
-
                 <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
                     <div>
                         <DebouncedInput
@@ -292,4 +314,4 @@ const SubsubCategory = () => {
     );
 };
 
-export default SubsubCategory;
+export default Category;

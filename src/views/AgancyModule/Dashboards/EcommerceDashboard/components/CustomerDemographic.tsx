@@ -10,28 +10,28 @@ type CustomerDemographicProps = {
     data: CustomerDemographicData[]
 }
 
-const mapMeta: Record<string, { img: string }> = {
-    us: { img: '/img/countries/US.png' },
-    br: { img: '/img/countries/BR.png' },
-    in: { img: '/img/countries/IN.png' },
-    uk: { img: '/img/countries/UK.png' },
-    tr: { img: '/img/countries/TR.png' },
-    id: { img: '/img/countries/ID.png' },
-}
+// const mapMeta: Record<string, { img: string }> = {
+//     us: { img: '/img/countries/US.png' },
+//     br: { img: '/img/countries/BR.png' },
+//     in: { img: '/img/countries/IN.png' },
+//     uk: { img: '/img/countries/UK.png' },
+//     tr: { img: '/img/countries/TR.png' },
+//     id: { img: '/img/countries/ID.png' },
+// }
 
-const getMapMeta = (data: CustomerDemographicData[] = []) => {
-    return data.map((item) => ({
-        ...item,
-        ...(mapMeta[item.id as string] || {}),
-    }))
-}
+// const getMapMeta = (data: CustomerDemographicData[] = []) => {
+//     return data.map((item) => ({
+//         ...item,
+//         ...(mapMeta[item.id as string] || {}),
+//     }))
+// }
 
 const CustomerDemographic = ({ data }: CustomerDemographicProps) => {
     const [hovering, setHovering] = useState('')
 
     return (
         <Card>
-            <h4>Top countries</h4>
+            <h4>Top Areas</h4>
             <div className="flex flex-col xl:flex-row items-center gap-4 mt-4">
                 <div className="px-4 flex flex-col justify-center flex-1 w-full">
                     <RegionMap
@@ -75,7 +75,7 @@ const CustomerDemographic = ({ data }: CustomerDemographicProps) => {
                     />
                 </div>
                 <div className="flex flex-col justify-center px-4 2xl:min-w-[340px] xl:w-[300px] w-full">
-                    {getMapMeta(data).map((item) => (
+                    {/* {getMapMeta(data).map((item) => (
                         <div
                             key={item.name}
                             className={classNames(
@@ -85,7 +85,7 @@ const CustomerDemographic = ({ data }: CustomerDemographicProps) => {
                             )}
                             onMouseEnter={() => setHovering(item.id)}
                             onMouseLeave={() => setHovering('')}
-                        >
+                        > */}
                             <div className="flex gap-2">
                                 <Avatar src={item.img} size={30} />
                             </div>

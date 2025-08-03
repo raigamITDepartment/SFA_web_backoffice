@@ -11,9 +11,9 @@ const AgancyModulenavigationconfig: NavigationTree[] = [
     {
         key: 'AgancyModule',
         path: '',
-        title: 'Agancy Module',
+        title: 'Agency Module',
         translateKey: 'nav.groupMenu.groupMenu',
-        icon: 'Agancy',
+        icon: 'Agency',
         type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
         subMenu: [
@@ -171,6 +171,39 @@ const AgancyModulenavigationconfig: NavigationTree[] = [
         
                 ],
             },
+
+            {
+    key: 'Stock',
+    path: '/Stock',
+    title: 'Stock',
+    translateKey: 'nav.singleMenuItem',
+    icon: '',
+    type: NAV_ITEM_TYPE_COLLAPSE,
+    authority: [],
+    subMenu: [
+        {
+            key: 'ViewStock',
+            path: '/Stock-ViewStock',
+            title: 'View Stock',
+            translateKey: 'AgancyModule-Stock-ViewStock',
+            icon: '',
+            type: NAV_ITEM_TYPE_ITEM,
+            authority: [],
+            subMenu: [],
+        },
+        {
+            key: 'StockAdd',
+            path: '/Stock-StockAdd',
+            title: 'Add Stock',
+            translateKey: 'AgancyModule-Stock-StockAdd',
+            icon: '',
+            type: NAV_ITEM_TYPE_ITEM,
+            authority: [],
+            subMenu: [],
+        }
+    ]
+}
+
 
           
           

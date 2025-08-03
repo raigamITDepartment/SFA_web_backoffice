@@ -26,22 +26,31 @@ const OutletRoute: Routes = [
         authority: [],
     },
 
-    {
-        key: 'groupMenu.collapse.item2',
-        path: '/group-collapse-menu-item-view-2',
+    // {
+    //     key: 'groupMenu.collapse.item2',
+    //     path: '/group-collapse-menu-item-view-2',
+    //     component: lazy(
+    //         () => import('@/views/MasterSettings/GroupCollapseMenuItemView2'),
+    //     ),
+    //     authority: [],
+    // },
+    // {
+    //     key: 'OutletModule.editOutlet',
+    //     path: '/Outlet-Module-editOutlet',
+    //     component: lazy(
+    //         () => import('@/views/OutletModule/CreateCustomer/CustomerEdit'),
+    //     ),
+    //     authority: [],
+    // },
+        {
+        key: 'outlets.edit',
+        path: '/outlets/edit/:outletId',
         component: lazy(
-            () => import('@/views/MasterSettings/GroupCollapseMenuItemView2'),
+            () => import('@/views/OutletModule/Customers/Edit/OutletEdit')
         ),
         authority: [],
     },
-    {
-        key: 'OutletModule.editOutlet',
-        path: '/Outlet-Module-editOutlet',
-        component: lazy(
-            () => import('@/views/OutletModule/CreateCustomer/CustomerEdit'),
-        ),
-        authority: [],
-    },
+
 
 ]
 

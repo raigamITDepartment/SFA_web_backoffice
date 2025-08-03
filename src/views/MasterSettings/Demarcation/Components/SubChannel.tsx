@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import  { useMemo, useState, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Table from '@/components/ui/Table'
@@ -330,7 +330,7 @@ const SubChannel = (props: AddSubChannelFormSchema) => {
                         type="success"
                         className="dark:bg-gray-700 w-72 sm:w-80 md:w-96 flex flex-col items-center"
                     >
-                        <div className="mt-2 text-green-700 font-semibold text-lg  text-center">
+                        <div className="mt-2 text-green-700 font-semibold text-md  text-center">
                             New Sub Channel created successfully!
                         </div>
                     </Alert>,

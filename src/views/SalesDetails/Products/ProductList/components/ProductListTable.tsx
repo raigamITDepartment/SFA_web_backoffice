@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import Avatar from '@/components/ui/Avatar'
-import Progress from '@/components/ui/Progress'
+
 import Tooltip from '@/components/ui/Tooltip'
 import DataTable from '@/components/shared/DataTable'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useProductList from '../hooks/useProductList'
-import classNames from '@/utils/classNames'
+
 import cloneDeep from 'lodash/cloneDeep'
 import { useNavigate } from 'react-router-dom'
 import { TbPencil, TbTrash } from 'react-icons/tb'
@@ -23,10 +23,6 @@ const ProductColumn = ({ row }: { row: Product }) => {
                 size={60}
                 {...(row.img ? { src: row.img } : { icon: <FiPackage /> })}
             />
-            <div>
-                <div className="font-bold heading-text mb-1">{row.name}</div>
-                <span>ID: {row.productCode}</span>
-            </div>
         </div>
     )
 }
@@ -42,7 +38,7 @@ const ActionColumn = ({
         <div className="flex items-center justify-end gap-3">
             <Tooltip title="Edit">
                 <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
+                    className="text-xl cursor-pointer select-none font-semibold"
                     role="button"
                     onClick={onEdit}
                 >
@@ -51,7 +47,7 @@ const ActionColumn = ({
             </Tooltip>
             <Tooltip title="Delete">
                 <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
+                    className="text-xl cursor-pointer select-none font-semibold"
                     role="button"
                     onClick={onDelete}
                 >
@@ -112,36 +108,107 @@ const ProductListTable = () => {
     const columns: ColumnDef<Product>[] = useMemo(
         () => [
             {
-                header: 'Product',
-                accessorKey: 'name',
+                header: 'Image',
+                accessorKey: 'Image',
                 cell: (props) => {
                     const row = props.row.original
                     return <ProductColumn row={row} />
                 },
             },
-       
             {
-                header: 'Category',
-                accessorKey: 'stock',
+                header: 'SAP Code',
+                accessorKey: 'SAP',
                 cell: (props) => {
                     const row = props.row.original
-                    return (
-                        <span className="font-bold heading-text">
-                            {row.stock}
-                        </span>
-                    )
+                    return <span className="font-bold heading-text">{row.SAP}</span>
                 },
             },
             {
-                header: 'Sub Category',
-                accessorKey: 'stock',
+                header: 'LN',
+                accessorKey: 'LN',
                 cell: (props) => {
                     const row = props.row.original
-                    return (
-                        <span className="font-bold heading-text">
-                            {row.stock}
-                        </span>
-                    )
+                    return <span className="font-bold heading-text">{row.LN}</span>
+                },
+            },
+            {
+                header: 'Product Name',
+                accessorKey: 'name',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Product}</span>
+                },
+            },
+            {
+                header: 'Range',
+                accessorKey: 'Range',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Range}</span>
+                },
+            },
+            {
+                header: 'UMO',
+                accessorKey: 'Umo',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.UMO}</span>
+                },
+            },
+            {
+                header: 'Size',
+                accessorKey: 'size',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Size}</span>
+                },
+            },
+            {
+                header: 'Volume',
+                accessorKey: 'volume',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Volume}</span>
+                },
+            },
+            {
+                header: 'Unit Value',
+                accessorKey: 'unitValue',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.unitValue}</span>
+                },
+            },
+            {
+                header: 'Category Type',
+                accessorKey: 'CategoryType',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.CategoryType}</span>
+                },
+            },
+            {
+                header: 'Sub-Category',
+                accessorKey: 'Subcategory',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Subcategory}</span>
+                },
+            },
+            {
+                header: 'Sub-sub-category',
+                accessorKey: 'Subsubcategory',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Subsubcategory}</span>
+                },
+            },
+            {
+                header: 'Flavor',
+                accessorKey: 'Flavor',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="font-bold heading-text">{row.Flavor}</span>
                 },
             },
             {
@@ -164,75 +231,6 @@ const ProductListTable = () => {
                 },
             },
             {
-                header: 'Uom',
-                accessorKey: 'stock',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <span className="font-bold heading-text">
-                            {row.stock}
-                        </span>
-                    )
-                },
-            },
-            {
-                header: 'Volume',
-                accessorKey: 'stock',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <span className="font-bold heading-text">
-                            {row.stock}
-                        </span>
-                    )
-                },
-            },
-
-            {
-                header: 'Unit Value',
-                accessorKey: 'stock',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <span className="font-bold heading-text">
-                            {row.stock}
-                        </span>
-                    )
-                },
-            },
-
-
-            // {
-            //     header: 'Sales',
-            //     accessorKey: 'status',
-            //     cell: (props) => {
-            //         const { salesPercentage, sales } = props.row.original
-            //         return (
-            //             <div className="flex flex-col gap-1">
-            //                 <span className="flex gap-1">
-            //                     <span className="font-semibold">
-            //                         <NumericFormat
-            //                             displayType="text"
-            //                             value={sales}
-            //                             thousandSeparator={true}
-            //                         />
-            //                     </span>
-            //                     <span>Sales</span>
-            //                 </span>
-            //                 <Progress
-            //                     percent={salesPercentage}
-            //                     showInfo={false}
-            //                     customColorClass={classNames(
-            //                         'bg-error',
-            //                         salesPercentage > 40 && 'bg-warning',
-            //                         salesPercentage > 70 && 'bg-success',
-            //                     )}
-            //                 />
-            //             </div>
-            //         )
-            //     },
-            // },
-            {
                 header: '',
                 id: 'action',
                 cell: (props) => (
@@ -243,7 +241,6 @@ const ProductListTable = () => {
                 ),
             },
         ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
     )
 
@@ -320,9 +317,7 @@ const ProductListTable = () => {
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    {' '}
-                    Are you sure you want to remove this product? This action
-                    can&apos;t be undo.{' '}
+                    Are you sure you want to remove this product? This action cant be undone.
                 </p>
             </ConfirmDialog>
         </>

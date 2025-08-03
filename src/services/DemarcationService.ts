@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { AuthService_URL } from '../configs/Config';
 import { channel } from 'diagnostics_channel';
+import { co } from '@fullcalendar/core/internal-common';
 
 
 //channel APIs
@@ -712,6 +713,46 @@ export const fetchRoutes = async () => {
         throw new Error(error.response?.data?.message || 'Failed to load routes.');
     }
 };
+
+
+//routes APIs  T id 
+export const fetchRoutesByTerritoryId = async (territoryId: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/route/byTerritoryId/${territoryId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching routes:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load routes.');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export interface AddRoutePayload {
     userId: number;
     territoryId: number | null;
@@ -843,10 +884,34 @@ export const updateRoute = async (payload: UpdateRoutePayload, token: string) =>
     }
 };
 
+//Shop APIs 
+export const fetchShopsbyRouteId = async (route: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/outlet/getAllOutletsByRouteId/${route}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        console.log("Fetched shops:", response.data.payload);
+        return response.data.payload;
+
+    } catch (error: any) {
+        console.error('Error fetching routes:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load routes.');
+    }
+};
 
 
-
-//agencies APIs
+//agencies APIs 
 export const fetchAgencies = async () => {
     try {
         const token = sessionStorage.getItem('accessToken');

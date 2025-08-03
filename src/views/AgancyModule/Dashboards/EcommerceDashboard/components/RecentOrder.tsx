@@ -100,7 +100,7 @@ const columns = [
                     className="heading-text font-bold"
                     displayType="text"
                     value={(Math.round(totalAmount * 100) / 100).toFixed(2)}
-                    prefix={'$'}
+                    prefix={'Rs.'}
                     thousandSeparator={true}
                 />
             )

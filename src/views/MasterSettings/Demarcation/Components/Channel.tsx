@@ -325,7 +325,7 @@ const Channel = (props: AddChannelFormSchema) => {
                         type="success"
                         className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
                     >
-                        <div className="mt-2 text-green-700 font-semibold text-lg text-center">
+                        <div className="mt-2 text-green-700 font-semibold text-md text-center">
                             New Channel created successfully!
                         </div>
                     </Alert>,

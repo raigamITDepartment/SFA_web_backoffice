@@ -1,14 +1,15 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
-import Table from '@/components/ui/Table';
-import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
-import { FaRegEdit } from "react-icons/fa";
-import { MdDeleteOutline } from "react-icons/md";
-import Tag from '@/components/ui/Tag';
-import { useForm, Controller } from 'react-hook-form';
-import { FormItem, Form } from '@/components/ui/Form';
+import React, { useMemo, useState, useEffect } from 'react'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import Table from '@/components/ui/Table'
+import Card from '@/components/ui/Card'
+import Pagination from '@/components/ui/Pagination'
+import { FaRegEdit } from 'react-icons/fa'
+import Dialog from '@/components/ui/Dialog'
+import { MdBlock, MdCheckCircleOutline } from 'react-icons/md'
+import Tag from '@/components/ui/Tag'
+import { useForm, Controller } from 'react-hook-form'
+import { FormItem, Form } from '@/components/ui/Form'
 import {
     useReactTable,
     getCoreRowModel,
@@ -16,23 +17,36 @@ import {
     getSortedRowModel,
     getPaginationRowModel,
     flexRender,
-} from '@tanstack/react-table';
-import { rankItem } from '@tanstack/match-sorter-utils';
-import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
-import type { InputHTMLAttributes } from 'react';
-import { Button } from '@/components/ui';
-import Checkbox from '@/components/ui/Checkbox';
-import type { ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+} from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
+import type {
+    ColumnDef,
+    FilterFn,
+    ColumnFiltersState,
+} from '@tanstack/react-table'
+import type { InputHTMLAttributes } from 'react'
+import { Button, toast, Alert } from '@/components/ui'
+import Checkbox from '@/components/ui/Checkbox'
 
-type FormSchema = {
-    MainCategoryCode: string;
-    MainCategoryName: string;
-    isActive: boolean;
-    CategoryType?: string;
-};
+import { useNavigate } from 'react-router-dom'
+import {
+    fetchCategories,
+    fetchMainCategoriesAll,
+    addNewMainCategory,deleteMainCategory
+} from '@/services/CategoryServices'
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table;
+type MainCategoryFormSchema = {
+    userId: number
+    catTypeId: number | null
+    itemMainCat: string
+    isActive: boolean
+}
+
+interface MainCategoryProps {
+    setMessage?: (message: string) => void
+}
+
+const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 const pageSizeOptions = [
     { value: 10, label: '10 / page' },
@@ -40,108 +54,188 @@ const pageSizeOptions = [
     { value: 30, label: '30 / page' },
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
-];
+]
 
-interface MainCategory {
-    MainCategoryCode: string;
-    MainCategoryName: string;
-    isActive?: boolean;
-    CategoryType?: string;
+interface MainCategoryData {
+    id: string
+    MainCategoryCode: string
+    MainCategoryName: string
+    isActive?: boolean
+    CategoryType?: string
+    catTypeId?: number
 }
 
-interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
-    value: string | number;
-    onChange: (value: string | number) => void;
-    debounce?: number;
+interface DebouncedInputProps
+    extends Omit<
+        InputHTMLAttributes<HTMLInputElement>,
+        'onChange' | 'size' | 'prefix'
+    > {
+    value: string | number
+    onChange: (value: string | number) => void
+    debounce?: number
 }
 
-function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...props }: DebouncedInputProps) {
-    const [value, setValue] = useState(initialValue);
+function DebouncedInput({
+    value: initialValue,
+    onChange,
+    debounce = 500,
+    ...props
+}: DebouncedInputProps) {
+    const [value, setValue] = useState(initialValue)
 
     useEffect(() => {
-        setValue(initialValue);
-    }, [initialValue]);
+        setValue(initialValue)
+    }, [initialValue])
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            onChange(value);
-        }, debounce);
-        return () => clearTimeout(timeout);
-    }, [value, onChange, debounce]);
+            onChange(value)
+        }, debounce)
+        return () => clearTimeout(timeout)
+    }, [value, onChange, debounce])
 
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
                 <span className="mr-2">Search:</span>
-                <Input size='sm' {...props} value={value} onChange={(e) => setValue(e.target.value)} />
+                <Input
+                    size="sm"
+                    {...props}
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                />
             </div>
         </div>
-    );
+    )
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value);
-    addMeta({ itemRank });
-    return itemRank.passed;
-};
+    const itemRank = rankItem(row.getValue(columnId), value)
+    addMeta({ itemRank })
+    return itemRank.passed
+}
 
-const MainCategory = () => {
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [globalFilter, setGlobalFilter] = useState('');
-    const [pageSize, setPageSize] = useState(10);
-    const [error, setError] = useState<string | null>(null);
-    const [channelName, setChannelName] = useState<string>('');
-    const navigate = useNavigate();
+const MainCategory = (props: MainCategoryProps) => {
+    const { setMessage } = props
+    //const token = sessionStorage.getItem('accessToken')
+    const userId = sessionStorage.getItem('userId')
+    const userIdNumber = Number(userId)
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [globalFilter, setGlobalFilter] = useState('')
+    const [pageSize, setPageSize] = useState(10)
+   // const [error, setError] = useState<string | null>(null)
+   
+    const navigate = useNavigate()
+    const [categoryType, setCategoryType] = useState<any>([])
+    const [selectedMainCategory, setSelectedMainCategory] = useState<
+        MainCategoryData[]
+    >([])
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    
+    const [MainSelectCategory, setMainSelectCategory] = useState<MainCategoryData | null>(null)
+     const [dialogIsOpen, setDialogIsOpen] = useState(false)
 
-    const columns = useMemo<ColumnDef<MainCategory>[]>(() => [
-        { header: 'Main Category Code', accessorKey: 'MainCategoryCode' },
-        { header: 'Main Category Name', accessorKey: 'MainCategoryName' },
-        {
-            header: 'Category Type',
-            accessorKey: 'CategoryType',
-            cell: ({ row }) => (
-                <span>{row.original.CategoryType || '-'}</span>
-            ),
-        },
-        {
-            header: 'Is Active',
-            accessorKey: 'isActive',
-            cell: ({ row }) => (
-                <div className="mr-2 rtl:ml-2">
-                    <Tag className={row.original.isActive ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded" : "text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0"}>
-                        {row.original.isActive ? "Active" : "Inactive"}
-                    </Tag>
-                </div>
-            ),
-        },
-        {
-            header: 'Action',
-            accessorKey: 'action',
-            cell: ({ row }) => (
-                <div className="flex ">
-                    <FaRegEdit
-                        onClick={() => handleEdit(row.original)}
-                        className="cursor-pointer mr-4 text-primary-deep text-lg"
-                    />
-                    <MdDeleteOutline
-                        onClick={() => handleDelete(row.original)}
-                        className="cursor-pointer text-red-600 text-xl"
-                    />
-                </div>
-            ),
-        },
-    ], []);
+    useEffect(() => {
+        const loadCategoryTypes = async () => {
+            try {
+                const categoryData = await fetchCategories()
+                const categoryOptions = categoryData.map((category: any) => ({
+                    label: category.categoryType,
+                    value: category.id,
+                }))
+                setCategoryType(categoryOptions)
+            } catch (error) {
+                setMessage?.('Failed to load category types.')
+            }
+        }
+        loadCategoryTypes()
+    }, [setMessage])
 
-    const [data] = useState<MainCategory[]>([
-        { MainCategoryCode: '1', MainCategoryName: 'Soya', isActive: true, CategoryType: 'Type 1' },
-        { MainCategoryCode: '2', MainCategoryName: 'Dewani 1', isActive: false, CategoryType: 'Type 2' },
-        { MainCategoryCode: '3', MainCategoryName: 'Aryaa', isActive: true, CategoryType: 'Type 1' },
-    ]);
+    const loadMainCategory = async () => {
+        try {
+            const response = await fetchMainCategoriesAll() // Original API response
+            const mapped: MainCategoryData[] = response.map((item: any) => ({
+                id: String(item.id),
+                MainCategoryCode: String(item.mainCatSeq),
+                MainCategoryName: item.itemMainCat,
+                CategoryType: item.categoryType,
+                isActive: item.isActive,
+                catTypeId: item.catTypeId,
+            }))
+            setSelectedMainCategory(mapped)
+        } catch (err) {
+            console.error('Failed to load categories:', err)
+        }
+    }
 
-    const totalData = data.length;
+    useEffect(() => {
+        loadMainCategory()
+    }, [])
+
+    const columns = useMemo<ColumnDef<MainCategoryData>[]>(
+        () => [
+            { header: 'Main Category Code', accessorKey: 'MainCategoryCode' },
+            { header: 'Main Category Name', accessorKey: 'MainCategoryName' },
+            {
+                header: 'Category Type',
+                accessorKey: 'CategoryType',
+                cell: ({ row }) => (
+                    <span>{row.original.CategoryType || '-'}</span>
+                ),
+            },
+            {
+                header: 'Is Active',
+                accessorKey: 'isActive',
+                cell: ({ row }) => (
+                    <div className="mr-2 rtl:ml-2">
+                        <Tag
+                            className={
+                                row.original.isActive
+                                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded'
+                                    : 'text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 border-0'
+                            }
+                        >
+                            {row.original.isActive ? 'Active' : 'Inactive'}
+                        </Tag>
+                    </div>
+                ),
+            },
+            {
+                header: 'Action',
+                accessorKey: 'action',
+                cell: ({ row }) => {
+                    const MainCatCode = row.original
+                    return (
+                        <div className="flex ">
+                            <FaRegEdit
+                                onClick={() => handleEdit(MainCatCode)}
+                                className="cursor-pointer mr-4 text-primary-deep text-lg"
+                            />
+                            {MainCatCode.isActive ? (
+                                <MdBlock
+                                    className="text-red-500 text-lg cursor-pointer"
+                                    title="Deactivate main category"
+                                    onClick={() => handleDeleteClick(MainCatCode)}
+                                />
+                            ) : (
+                                <MdCheckCircleOutline
+                                    className="text-green-500 text-lg cursor-pointer"
+                                    title="Activate Main Category"
+                                    onClick={() => handleDeleteClick(MainCatCode)}
+                                />
+                            )}
+                        </div>
+                    )
+                },
+            },
+        ],
+        [],
+    )
+
+    const totalData = selectedMainCategory.length
 
     const table = useReactTable({
-        data,
+        data: selectedMainCategory,
         columns,
         filterFns: { fuzzy: fuzzyFilter },
         state: { columnFilters, globalFilter },
@@ -153,98 +247,230 @@ const MainCategory = () => {
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         initialState: { pagination: { pageSize: pageSize } },
-    });
+    })
 
     const onPaginationChange = (page: number) => {
-        table.setPageIndex(page - 1);
-    };
+        table.setPageIndex(page - 1)
+    }
 
     const onSelectChange = (value = 0) => {
-        const newSize = Number(value);
-        setPageSize(newSize);
-        table.setPageSize(newSize);
-    };
+        const newSize = Number(value)
+        setPageSize(newSize)
+        table.setPageSize(newSize)
+    }
 
-    const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e);
-    };
+    // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
+    //     console.log(value, e);
+    // };
+  const handleDialogConfirm = async () => {
+    setDialogIsOpen(false)
+    if (MainSelectCategory) {
+        const isDeactivating = MainSelectCategory?.isActive
+        const actionText = isDeactivating ? 'Deactivated' : 'Activated'
 
-    const handleEdit = (MainCategory: MainCategory) => {
-        // Navigate to MainCategoryEdit page
-        navigate('/Salesmenu/MainCategoryEdit');
-    };
+        try {
+            await deleteMainCategory(MainSelectCategory.id)
+            await loadMainCategory() // This will refresh the table with the latest data
 
-    const handleDelete = (MainCategory: MainCategory) => {
-        // Implement delete functionality here
-        console.log('Delete:', MainCategory);
-    };
+            toast.push(
+                <Alert showIcon type="success">
+                    Main Category {actionText} successfully!
+                </Alert>,
+            )
+        } catch (error) {
+            console.error(`Failed to ${actionText.toLowerCase()} main category:`, error)
+            toast.push(
+                <Alert showIcon type="danger">
+                    {`Failed to ${actionText.toLowerCase()} main category.`}
+                </Alert>,
+            )
+        } finally {
+            setMainSelectCategory(null)
+        }
+    }
+}
+const handleEdit = (MainCategory: MainCategoryData) => {
+        // Pass the id to MainCategoryEdit page
+        navigate('/Salesmenu/MainCategoryEdit', {
+            state: {
+                id: MainCategory.id,
+                MainCategoryName: MainCategory.MainCategoryName,
+                CategoryType: MainCategory.CategoryType,
+                catTypeId: MainCategory.catTypeId,
+                isActive: MainCategory.isActive,
+                mainCatSeq: MainCategory.MainCategoryCode, // Assuming MainCategoryCode is used for
+            },
+        })
+    }
 
-    const handleCreate = () => {
-        setError(null);
-        console.log('Create category:', { MainCategoryName: channelName });
-    };
+    // const handleDelete = (MainCategory: MainCategoryData) => {
+    //     // Implement delete functionality here
+    //     console.log('Delete:', MainCategory)
+    // }
+
+    const handleDeleteClick = (MainCatCode: MainCategoryData) => {
+        setMainSelectCategory(MainCatCode)
+        setDialogIsOpen(true)
+    }
+
+
+       const handleDialogClose = () => {
+        setDialogIsOpen(false)
+        setMainSelectCategory(null)
+    }
+    // const handleCreate = () => {
+    //     setError(null);
+    //     console.log('Create category:', { MainCategoryName: channelName });
+    // };
 
     const {
         handleSubmit,
+        reset,
         formState: { errors },
         control,
-    } = useForm<FormSchema>({
+    } = useForm<MainCategoryFormSchema>({
         defaultValues: {
-            MainCategoryName: '',
+            userId: userIdNumber,
+            catTypeId: null,
+            itemMainCat: '',
             isActive: true,
-            CategoryType: '',
         },
-    });
+    })
 
-    const onSubmit = async (values: FormSchema) => {
-        await new Promise((r) => setTimeout(r, 500));
-        alert(JSON.stringify(values, null, 2));
-    };
+    const onSubmit = async (values: MainCategoryFormSchema) => {
+        const currentUserId = sessionStorage.getItem('userId')
+        if (!currentUserId) {
+            toast.push(
+                <Alert type="danger" showIcon>
+                    User session has expired. Please log in again.
+                </Alert>,
+            )
+            return
+        }
+
+        if (isSubmitting) return // Prevent double submit
+        setIsSubmitting(true)
+        try {
+            const payload = {
+                userId: Number(currentUserId),
+                catTypeId: values.catTypeId,
+                itemMainCat: values.itemMainCat,
+                isActive: values.isActive,
+            }
+            const result = await addNewMainCategory(payload)
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+            } else {
+                toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <div className="mt-2 text-green-700 font-semibold text-md text-center">
+                            New Category Type created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 30,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    },
+                )
+                reset()
+                await loadMainCategory()
+            }
+        } catch (err: any) {
+            let backendMessage =
+                'An error occurred during creating new Category Type. Please try again.'
+
+            const response = err?.response
+            const data = response?.data
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message
+            }
+
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                    className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                    {backendMessage}
+                </Alert>,
+                {
+                    offsetX: 5,
+                    offsetY: 100,
+                    transitionType: 'fade',
+                    block: false,
+                    placement: 'top-end',
+                },
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
 
     return (
         <div>
-            <div className='flex flex-col lg:flex-row xl:flex-row gap-4'>
-                <div className='flex-row lg:w-1/3 xl:w-1/3 h-1/2'>
-                    <Card bordered={false} className='mb-4'>
-                        <h5 className='mb-2'>Category Creation</h5>
+            <div className="flex flex-col lg:flex-row xl:flex-row gap-4">
+                <div className="flex-row lg:w-1/3 xl:w-1/3 h-1/2">
+                    <Card bordered={false} className="mb-4">
+                        <h5 className="mb-2">Main Category Creation</h5>
                         <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
                             <FormItem
-                                invalid={Boolean(errors.MainCategoryName)}
-                                errorMessage={errors.MainCategoryName?.message}
+                                invalid={Boolean(errors.catTypeId)}
+                                errorMessage={errors.catTypeId?.message}
                             >
                                 <Controller
-                                    name="MainCategoryName"
+                                    name="catTypeId"
+                                    control={control}
+                                    rules={{ required: 'Required' }}
+                                    render={({ field }) => (
+                                        <Select
+                                            size="sm"
+                                            placeholder="Select Category Type"
+                                            options={categoryType}
+                                            value={
+                                                categoryType.find(
+                                                    (option) =>
+                                                        option.value ===
+                                                        field.value,
+                                                ) || null
+                                            }
+                                            onChange={(option) =>
+                                                field.onChange(
+                                                    option?.value ?? null,
+                                                )
+                                            }
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                            <FormItem
+                                invalid={Boolean(errors.itemMainCat)}
+                                errorMessage={errors.itemMainCat?.message}
+                            >
+                                <Controller
+                                    name="itemMainCat"
                                     control={control}
                                     rules={{ required: 'Required' }}
                                     render={({ field }) => (
                                         <Input
                                             type="text"
                                             autoComplete="off"
-                                            placeholder="Category Name"
+                                            placeholder="Main Category Name"
                                             {...field}
-                                        />
-                                    )}
-                                />
-                            </FormItem>
-
-                            <FormItem
-                                invalid={Boolean(errors.CategoryType)}
-                                errorMessage={errors.CategoryType?.message}
-                            >
-                                <Controller
-                                    name="CategoryType"
-                                    control={control}
-                                    rules={{ required: 'Required' }}
-                                    render={({ field }) => (
-                                        <Select
-                                            size="md"
-                                            placeholder="Category Type"
-                                            options={[
-                                                { label: 'Type 1', value: 'Type 1' } as any,
-                                                { label: 'Type 2', value: 'Type 2' },
-                                            ]}
-                                            value={field.value}
-                                            onChange={field.onChange}
                                         />
                                     )}
                                 />
@@ -254,22 +480,30 @@ const MainCategory = () => {
                                 <Controller
                                     name="isActive"
                                     control={control}
-                                    render={({ field }) =>
-                                        <Checkbox {...field} checked={field.value}>
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            {...field}
+                                            checked={field.value}
+                                        >
                                             IsActive
                                         </Checkbox>
-                                    }
+                                    )}
                                 />
                             </FormItem>
 
                             <FormItem>
-                                <Button variant="solid" block type="submit">Create</Button>
+                                <Button variant="solid" block type="submit">
+                                    Create
+                                </Button>
                             </FormItem>
                         </Form>
                     </Card>
                 </div>
 
-                <Card bordered={false} className='lg:w-2/3 xl:w-2/3 overflow-auto'>
+                <Card
+                    bordered={false}
+                    className="lg:w-2/3 xl:w-2/3 overflow-auto"
+                >
                     <div>
                         <DebouncedInput
                             value={globalFilter ?? ''}
@@ -282,14 +516,28 @@ const MainCategory = () => {
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <Tr key={headerGroup.id}>
                                         {headerGroup.headers.map((header) => (
-                                            <Th key={header.id} colSpan={header.colSpan}>
+                                            <Th
+                                                key={header.id}
+                                                colSpan={header.colSpan}
+                                            >
                                                 {header.isPlaceholder ? null : (
                                                     <div
-                                                        className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
+                                                        className={
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : ''
+                                                        }
                                                         onClick={header.column.getToggleSortingHandler()}
                                                     >
-                                                        {flexRender(header.column.columnDef.header, header.getContext())}
-                                                        <Sorter sort={header.column.getIsSorted()} />
+                                                        {flexRender(
+                                                            header.column
+                                                                .columnDef
+                                                                .header,
+                                                            header.getContext(),
+                                                        )}
+                                                        <Sorter
+                                                            sort={header.column.getIsSorted()}
+                                                        />
                                                     </div>
                                                 )}
                                             </Th>
@@ -301,8 +549,14 @@ const MainCategory = () => {
                                 {table.getRowModel().rows.map((row) => (
                                     <Tr key={row.id}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <Td key={cell.id} className='py-1 text-xs'>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            <Td
+                                                key={cell.id}
+                                                className="py-1 text-xs"
+                                            >
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext(),
+                                                )}
                                             </Td>
                                         ))}
                                     </Tr>
@@ -312,7 +566,9 @@ const MainCategory = () => {
                         <div className="flex items-center justify-between mt-4">
                             <Pagination
                                 pageSize={table.getState().pagination.pageSize}
-                                currentPage={table.getState().pagination.pageIndex + 1}
+                                currentPage={
+                                    table.getState().pagination.pageIndex + 1
+                                }
                                 total={totalData}
                                 onChange={onPaginationChange}
                             />
@@ -320,17 +576,53 @@ const MainCategory = () => {
                                 <Select
                                     size="sm"
                                     isSearchable={false}
-                                    value={pageSizeOptions.find(option => option.value === pageSize)}
+                                    value={pageSizeOptions.find(
+                                        (option) => option.value === pageSize,
+                                    )}
                                     options={pageSizeOptions}
-                                    onChange={(option) => onSelectChange(option?.value)}
+                                    onChange={(option) =>
+                                        onSelectChange(option?.value)
+                                    }
                                 />
                             </div>
                         </div>
                     </div>
                 </Card>
             </div>
+            <Dialog
+                isOpen={dialogIsOpen}
+                onClose={handleDialogClose}
+                onRequestClose={handleDialogClose}
+            >
+                <h5 className="mb-4">{MainSelectCategory?.isActive ? 'Deactivate' : 'Activate'} Main Category?</h5>
+                            <p>
+                                Are you sure you want to {MainSelectCategory?.isActive ? 'Deactivate' : 'Activate'} <b>{MainSelectCategory?.MainCategoryName}</b>?
+                            </p>
+                            <div className="text-right mt-6">
+                                <Button
+                                    className="mr-2"
+                                    clickFeedback={false}
+                                    customColorClass={({ active, unclickable }) =>
+                                        [
+                                            'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+            
+                                            unclickable && 'opacity-50 cursor-not-allowed',
+                                            !active && !unclickable,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(' ')
+                                    }
+                                    onClick={handleDialogClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button variant="solid" onClick={handleDialogConfirm}>
+                                    Confirm
+                                </Button>
+                            </div>
+                        </Dialog>
         </div>
-    );
-};
+    )
+}
 
-export default MainCategory;
+export default MainCategory
