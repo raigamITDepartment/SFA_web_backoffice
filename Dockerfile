@@ -1,27 +1,18 @@
-# Use Node.js 18 LTS as the base image
-FROM node:18
-WORKDIR /app
+# Step 1: Build the React app
+FROM node:18 as build
 
-# Set the working directory
 WORKDIR /app
-
-# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
-
-# Copy application code
 COPY . .
-
-# Build the application
 RUN npm run build
 
+# Step 2: Serve the build with Nginx
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
 
-RUN npm install -g serve
-# Install serve globally
+# Optional: replace default nginx config if needed
+# COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose the default port for React
-ENV PORT=8080
-EXPOSE 8080
-
-# Start the application
-CMD ["npx", "serve", "-s", "build", "-l", "8080"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

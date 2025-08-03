@@ -25,6 +25,8 @@ import type { InputHTMLAttributes } from 'react';
 import { Button } from '@/components/ui';
 import Checkbox from '@/components/ui/Checkbox';
 import type { ChangeEvent } from 'react';
+import { fetchCategories } from '@/services/CategoryServices'
+import { Channel } from 'node:diagnostics_channel';
 
 type FormSchema = {
     SubsubCategoryName: string;
@@ -40,6 +42,15 @@ const pageSizeOptions = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ];
+
+interface Category {
+    id: number;
+    categoryId: number;
+    categoryCode: string;
+    categoryName: string;
+    isActive?: boolean;
+}
+
 
 interface SubsubCategory {
     SubsubCategoryCode: string;
@@ -91,6 +102,23 @@ const Category = () => {
     const [channelName, setChannelName] = useState<string>('');
     const navigate = useNavigate(); // <-- Add this line
 
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const columns = useMemo<ColumnDef<SubsubCategory>[]>(() => [
         { header: 'SubsubCategory Code', accessorKey: 'SubsubCategoryCode' },
         { header: 'SubsubCategory Name', accessorKey: 'SubsubCategoryName' },
@@ -117,15 +145,12 @@ const Category = () => {
         },
     ], []);
 
-    const [data, setData] = useState<SubsubCategory[]>([
-        { SubsubCategoryCode: '1', SubsubCategoryName: 'Soya', isActive: true },
-        { SubsubCategoryCode: '2', SubsubCategoryName: 'Dewani 1', isActive: false },
-        { SubsubCategoryCode: '3', SubsubCategoryName: 'Aryaa', isActive: true },
-    ]);
+ 
 
-    const totalData = data.length;
+    const data = selectedCategory;
 
     const table = useReactTable({
+     
         data,
         columns,
         filterFns: { fuzzy: fuzzyFilter },

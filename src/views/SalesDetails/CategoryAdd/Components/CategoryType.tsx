@@ -5,7 +5,7 @@ import Card from '@/components/ui/Card';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import { FaRegEdit } from 'react-icons/fa';
-import { Button } from '@/components/ui';
+
 import { Form, FormItem } from '@/components/ui/Form';
 import {
   useReactTable,
@@ -19,17 +19,22 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table';
 import type { InputHTMLAttributes } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchCategories, addNewCategory } from '@/services/CategoryServices';
+import { Button, toast, Alert } from '@/components/ui';
+import Checkbox from '@/components/ui/Checkbox';
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
-type CategoryTypeFormSchema = {
-  CategoryTypeName: string;
+type AddCategoryTypeFormSchema = {
+  userId: number;
+  categoryType: string;
+   isActive: boolean;
 };
 
 interface CategoryTypeData {
   id: string;
-  CategoryTypeName: string;
-  Sequence: number;
+  categoryTypeName: string;
+  sequence: number;
 }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -52,6 +57,9 @@ function DebouncedInput({ value: initialValue, onChange, debounce = 500, ...prop
     return () => clearTimeout(timeout);
   }, [value, onChange, debounce]);
 
+
+
+
   return (
     <div className="flex justify-end">
       <div className="flex items-center mb-4">
@@ -68,26 +76,47 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-const CategoryType = () => {
-  const [data] = useState<CategoryTypeData[]>([
-    { id: '1', CategoryTypeName: 'Type A', Sequence: 1 },
-    { id: '2', CategoryTypeName: 'Type B', Sequence: 2 },
-    { id: '3', CategoryTypeName: 'Type C', Sequence: 3 },
-  ]);
+const CategoryType = (props : AddCategoryTypeFormSchema) => {
 
+      const { disableSubmit = false, className, setMessage } = props
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState<CategoryTypeData[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const userId = sessionStorage.getItem('userId');
+    const userIdNumber = Number(userId);
+
+
+
+ const loadCategory = async () => {
+  try {
+    const response = await fetchCategories(); // Original API response
+    const mapped = response.map((item: any) => ({
+      id: item.id,
+      categoryTypeName: item.categoryType, // Map to expected key
+      sequence: item.catTypeSeq,           // Map to expected key
+    }));
+    setSelectedCategory(mapped);
+  } catch (err) {
+    console.error('Failed to load categories:', err);
+  }
+};
+
+    useEffect(() => {
+        loadCategory();
+    }, []);
+
 
   const columns = useMemo<ColumnDef<CategoryTypeData>[]>(() => [
     {
       header: 'Category Type Name',
-      accessorKey: 'CategoryTypeName',
+      accessorKey: 'categoryTypeName',
     },
     {
       header: 'Sequence',
-      accessorKey: 'Sequence',
+      accessorKey: 'sequence',
     },
     {
       header: 'Action',
@@ -104,7 +133,7 @@ const CategoryType = () => {
   ], []);
 
   const table = useReactTable({
-    data,
+    data: selectedCategory,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     state: { columnFilters, globalFilter },
@@ -120,25 +149,96 @@ const CategoryType = () => {
 
   const {
     control,
+    reset,
     handleSubmit,
     formState: { errors },
-  } = useForm<CategoryTypeFormSchema>({
+  } = useForm<AddCategoryTypeFormSchema>({
     defaultValues: {
-      CategoryTypeName: '',
+      userId: userIdNumber,
+      categoryType: '',
+ 
+      isActive: true,
     },
   });
 
-  const onSubmit = async (values: CategoryTypeFormSchema) => {
-    await new Promise((r) => setTimeout(r, 500));
-    alert(JSON.stringify(values, null, 2));
-  };
+  const onSubmit = async (values: AddCategoryTypeFormSchema) => {
+
+        if (isSubmitting) return // Prevent double submit
+        setIsSubmitting(true)
+        try {
+            const result = await addNewCategory(values);
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+            } else {
+                toast.push(
+                    <Alert
+                        showIcon
+                        type="success"
+                        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+                    >
+                        <div className="mt-2 text-green-700 font-semibold text-md text-center">
+                            New Category Type created successfully!
+                        </div>
+                    </Alert>,
+                    {
+                        offsetX: 5,
+                        offsetY: 30,
+                        transitionType: 'fade',
+                        block: false,
+                        placement: 'top-end',
+                    },
+                )
+                reset();
+                await loadCategory();
+            }
+                }catch (err: any) {
+
+                    let backendMessage = 'An error occurred during creating new Category Type. Please try again.';
+
+                    const response = err?.response;
+                    const data = response?.data;
+        
+                    if (data) {
+                        if (typeof data.payload === 'string') {
+                            backendMessage = data.payload;
+                        } else if (typeof data.message === 'string') {
+                            backendMessage = data.message;
+                        }
+                    } else if (typeof err.message === 'string') {
+                        backendMessage = err.message;
+                    }
+        
+                    toast.push(
+                        <Alert
+                            showIcon
+                            type="danger"
+                            className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                        >
+                            {backendMessage}
+                        </Alert>,
+                        {
+                            offsetX: 5,
+                            offsetY: 100,
+                            transitionType: 'fade',
+                            block: false,
+                            placement: 'top-end',
+                        },
+                    );
+                } finally {
+            setIsSubmitting(false)
+        }
+    };
+
+
+  
 
   const handleEdit = (category: CategoryTypeData) => {
   navigate('/Salesmenu/CategoryTypeEdit', {
     state: {
       id: category.id,
-      CategoryTypeName: category.CategoryTypeName,
-      Sequence: category.Sequence,
+      CategoryTypeName: category.categoryTypeName,
+      Sequence: category.sequence,
     },
   });
 };
@@ -146,11 +246,11 @@ const CategoryType = () => {
     table.setPageIndex(page - 1);
   };
 
-  const onSelectChange = (value = 10) => {
-    const newSize = Number(value);
-    setPageSize(newSize);
-    table.setPageSize(newSize);
-  };
+  // const onSelectChange = (value = 10) => {
+  //   const newSize = Number(value);
+  //   setPageSize(newSize);
+  //   table.setPageSize(newSize);
+  // };
 
   return (
     <div className="flex flex-col lg:flex-row xl:flex-row gap-4">
@@ -159,11 +259,11 @@ const CategoryType = () => {
           <h5 className="mb-2">Category Type Creation</h5>
           <Form size="sm" onSubmit={handleSubmit(onSubmit)}>
             <FormItem
-              invalid={Boolean(errors.CategoryTypeName)}
-              errorMessage={errors.CategoryTypeName?.message}
+              invalid={Boolean(errors.categoryType)}
+              errorMessage={errors.categoryType?.message}
             >
               <Controller
-                name="CategoryTypeName"
+                name="categoryType"
                 control={control}
                 rules={{ required: 'Required' }}
                 render={({ field }) => (
@@ -177,6 +277,19 @@ const CategoryType = () => {
               />
             </FormItem>
 
+       
+
+            <FormItem>
+              <Controller
+                name="isActive"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox {...field} checked={field.value}>
+                    IsActive
+                  </Checkbox>
+                )}
+              />
+            </FormItem>
             <FormItem>
               <Button variant="solid" block type="submit">
                 Create
@@ -230,7 +343,7 @@ const CategoryType = () => {
           <Pagination
             pageSize={table.getState().pagination.pageSize}
             currentPage={table.getState().pagination.pageIndex + 1}
-            total={data.length}
+            total={selectedCategory.length}
             onChange={onPaginationChange}
           />
         </div>
