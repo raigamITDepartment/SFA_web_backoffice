@@ -1,2 +1,4 @@
-// export const AuthService_URL = 'https://api-gateway-441978242392.us-central1.run.app';
-export const AuthService_URL = 'http://localhost:8080';
+ export const AuthService_URL = 'https://raigam-sfa-api-gateway.purplesand-bdf733b9.southeastasia.azurecontainerapps.io/';
+
+
+//export const AuthService_URL = 'http://localhost:8080';
