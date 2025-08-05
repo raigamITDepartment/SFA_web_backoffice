@@ -43,26 +43,16 @@ const Reportnavigationconfig: NavigationTree[] = [
 
              {
                 key: 'AchItemWise)',
-                path:  '/Reports-menu-AchItemWise',
-                title: 'Achievement(Item Wise)',
-                translateKey: 'nav.Reports.AchItemWise',
+                path:  '/Reports-menu-Achievement',
+                title: 'Achievement',
+                translateKey: 'nav.Reports.Achievement',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
                 subMenu: [],
              },
 
-             {
-                key: 'AchProductwise',
-                path:  '/Reports-menu-AchProductwise',
-                title: 'Achievement(Product Wise)',
-                translateKey: 'nav.Reports.AchProductwise',
-                icon: '',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-             }
-             ,
+             
 
              {
                 key: 'BAReport',

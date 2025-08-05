@@ -4,13 +4,21 @@ import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import Button from '@/components/ui/Button';
+import { FiCalendar, FiUsers } from 'react-icons/fi';
+import { toast, Alert } from '@/components/ui';
+
+type PriceOption = {
+  value: number;
+  label: string;
+};
 
 type Product = {
   id: number;
   code: string;
   name: string;
   category: string;
-  unitPrice: number;
+  priceOptions: PriceOption[];
+  selectedPrice: number;
   sellableQty: number;
   damageQty: number;
 };
@@ -31,7 +39,11 @@ const StockAdd = () => {
       code: 'SM-001',
       name: 'Wild‑Meat Flavoured Soya Meat (Budget pack)',
       category: 'Soya Meat',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -40,7 +52,11 @@ const StockAdd = () => {
       code: 'SM-002',
       name: 'Devilled Prawn Flavoured Soya Meat (Budget pack)',
       category: 'Soya Meat',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -49,7 +65,11 @@ const StockAdd = () => {
       code: 'SM-003',
       name: 'Chicken Smart Pack Soya Meat',
       category: 'Soya Meat',
-      unitPrice: 150,
+      priceOptions: [
+        { value: 150, label: 'Rs. 150.00' },
+        { value: 140, label: 'Rs. 140.00' },
+      ],
+      selectedPrice: 150,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -58,7 +78,11 @@ const StockAdd = () => {
       code: 'SM-004',
       name: 'Prawn Smart Pack Soya Meat',
       category: 'Soya Meat',
-      unitPrice: 150,
+      priceOptions: [
+        { value: 150, label: 'Rs. 150.00' },
+        { value: 140, label: 'Rs. 140.00' },
+      ],
+      selectedPrice: 150,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -67,7 +91,11 @@ const StockAdd = () => {
       code: 'SM-005',
       name: 'Chicken Flavoured Soya Meat (Budget pack)',
       category: 'Soya Meat',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -76,7 +104,11 @@ const StockAdd = () => {
       code: 'SM-006',
       name: 'Curry Flavoured Soya Meat (Budget pack)',
       category: 'Soya Meat',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -85,7 +117,11 @@ const StockAdd = () => {
       code: 'SM-007',
       name: 'Cuttlefish Flavoured Soya Meat (Budget pack)',
       category: 'Soya Meat',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -94,7 +130,11 @@ const StockAdd = () => {
       code: 'SM-008',
       name: 'Prawn Flavoured Soya Meat (Budget pack)',
       category: 'Soya Meat',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -103,7 +143,11 @@ const StockAdd = () => {
       code: 'SM-009',
       name: 'Chicken Chinese‑Style Soya Devilled',
       category: 'Soya Meat',
-      unitPrice: 180,
+      priceOptions: [
+        { value: 180, label: 'Rs. 180.00' },
+        { value: 170, label: 'Rs. 170.00' },
+      ],
+      selectedPrice: 180,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -114,7 +158,10 @@ const StockAdd = () => {
       code: 'SL-001',
       name: 'Raigam Iodised Table Salt',
       category: 'Salt',
-      unitPrice: 60,
+      priceOptions: [
+        { value: 60, label: 'Rs. 60.00' },
+      ],
+      selectedPrice: 60,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -123,7 +170,10 @@ const StockAdd = () => {
       code: 'SL-002',
       name: 'Raigam Iodised Crystal Salt',
       category: 'Salt',
-      unitPrice: 65,
+      priceOptions: [
+        { value: 65, label: 'Rs. 65.00' },
+      ],
+      selectedPrice: 65,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -132,7 +182,10 @@ const StockAdd = () => {
       code: 'SL-003',
       name: 'Raigam ESI Pure Cooking Salt',
       category: 'Salt',
-      unitPrice: 70,
+      priceOptions: [
+        { value: 70, label: 'Rs. 70.00' },
+      ],
+      selectedPrice: 70,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -143,7 +196,10 @@ const StockAdd = () => {
       code: 'DB-001',
       name: 'White Rice Noodles (350g)',
       category: 'Deveni Batha',
-      unitPrice: 180,
+      priceOptions: [
+        { value: 180, label: 'Rs. 180.00' },
+      ],
+      selectedPrice: 180,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -152,7 +208,10 @@ const StockAdd = () => {
       code: 'DB-002',
       name: 'Red Rice Noodles (350g)',
       category: 'Deveni Batha',
-      unitPrice: 190,
+      priceOptions: [
+        { value: 190, label: 'Rs. 190.00' },
+      ],
+      selectedPrice: 190,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -161,7 +220,10 @@ const StockAdd = () => {
       code: 'DB-003',
       name: 'Kuruluthuda Noodles (350g)',
       category: 'Deveni Batha',
-      unitPrice: 200,
+      priceOptions: [
+        { value: 200, label: 'Rs. 200.00' },
+      ],
+      selectedPrice: 200,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -170,7 +232,10 @@ const StockAdd = () => {
       code: 'DB-004',
       name: 'Pachchaperumal Noodles (350g)',
       category: 'Deveni Batha',
-      unitPrice: 200,
+      priceOptions: [
+        { value: 200, label: 'Rs. 200.00' },
+      ],
+      selectedPrice: 200,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -179,7 +244,10 @@ const StockAdd = () => {
       code: 'DB-005',
       name: 'Bundi Full - Chicken (100g)',
       category: 'Deveni Batha',
-      unitPrice: 100,
+      priceOptions: [
+        { value: 100, label: 'Rs. 100.00' },
+      ],
+      selectedPrice: 100,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -188,7 +256,10 @@ const StockAdd = () => {
       code: 'DB-006',
       name: 'Bundi Full - Hot Masala Chicken (100g)',
       category: 'Deveni Batha',
-      unitPrice: 110,
+      priceOptions: [
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 110,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -197,7 +268,10 @@ const StockAdd = () => {
       code: 'DB-007',
       name: 'Bundi Full - Devilled Chicken (100g)',
       category: 'Deveni Batha',
-      unitPrice: 110,
+      priceOptions: [
+        { value: 110, label: 'Rs. 110.00' },
+      ],
+      selectedPrice: 110,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -206,7 +280,10 @@ const StockAdd = () => {
       code: 'DB-008',
       name: 'Bundi Full - Chicken Kottu (100g)',
       category: 'Deveni Batha',
-      unitPrice: 120,
+      priceOptions: [
+        { value: 120, label: 'Rs. 120.00' },
+      ],
+      selectedPrice: 120,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -215,7 +292,10 @@ const StockAdd = () => {
       code: 'DB-009',
       name: 'Bundi Full - Seafood (100g)',
       category: 'Deveni Batha',
-      unitPrice: 130,
+      priceOptions: [
+        { value: 130, label: 'Rs. 130.00' },
+      ],
+      selectedPrice: 130,
       sellableQty: 0,
       damageQty: 0,
     },
@@ -224,17 +304,28 @@ const StockAdd = () => {
       code: 'DB-010',
       name: 'Bundi Full - Curry (100g)',
       category: 'Deveni Batha',
-      unitPrice: 100,
+      priceOptions: [
+        { value: 100, label: 'Rs. 100.00' },
+      ],
+      selectedPrice: 100,
       sellableQty: 0,
       damageQty: 0,
     },
   ]);
-
-  const handleQuantityChange = (id: number, field: keyof Product, value: number) => {
-    setProducts(products.map(product => 
+  const handleQuantityChange = (id: number, field: keyof Omit<Product, 'priceOptions' | 'selectedPrice'>, value: number) => {
+    setProducts(products.map(product =>
       product.id === id ? { ...product, [field]: value } : product
     ));
   };
+
+  const handlePriceChange = (id: number, value: number) => {
+    setProducts(products.map(product =>
+      product.id === id ? { ...product, selectedPrice: value } : product
+    ));
+  };
+
+  const distributorName = 'MM Marketing';
+  const agencyNames = ['Agency 1', 'Agency 2', 'Agency 3'];
 
   const filtered = products.filter(
     (product) =>
@@ -276,28 +367,44 @@ const StockAdd = () => {
           id: product.id,
           code: product.code,
           name: product.name,
+          price: product.selectedPrice,
           sellableQty: product.sellableQty,
           damageQty: product.damageQty,
           total: calculateTotal(product)
         }))
     };
+
     console.log('Submitting stock:', stockData);
-    // Add your submission logic here
+    toast.push(
+      <Alert
+        showIcon
+        type="success"
+        className="dark:bg-gray-700 w-64 sm:w-80 md:w-96 flex flex-col items-center"
+      >
+        <div className="mt-2 text-green-700 font-semibold text-md text-center">
+          Stock submitted successfully!
+        </div>
+      </Alert>,
+      {
+        offsetX: 5,
+        offsetY: 30,
+        transitionType: 'fade',
+        block: false,
+        placement: 'top-end',
+      }
+    );
   };
 
   return (
     <div className="space-y-6">
       <Card className="p-6">
         <h2 className="text-xl font-semibold mb-4">Stock Entry</h2>
-        
-        {/* Header Card */}
-        <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-            <div className="space-y-1">
-              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Date
-              </div>
-              <div className="font-semibold">
+
+        <Card className="mb-6 overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md bg-blue-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-blue-100">
+            <div className="space-y-1 bg-blue-100">
+              <div className="text-sm text-gray-500 dark:text-gray-400">Date</div>
+              <div className="text-base font-semibold text-gray-800 dark:text-white">
                 {new Date().toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
@@ -305,16 +412,25 @@ const StockAdd = () => {
                 })}
               </div>
             </div>
-            <div className="space-y-1">
-              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Distributor Name
+
+            <div className="space-y-1 bg-blue-100">
+              <div className="text-sm text-gray-500 dark:text-gray-400">Distributor</div>
+              <div className="text-base font-semibold text-gray-800 dark:text-white">
+                {distributorName}
               </div>
-              <div className="font-semibold">
-                <select className="w-full p-2 border rounded-md bg-white dark:bg-gray-800">
-                  <option>Agency 1</option>
-                  <option>Agency 2</option>
-                  <option>Agency 3</option>
-                </select>
+
+              <div className="mt-4">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Agencies</div>
+                <div className="space-y-2 shadow-md">
+                  {agencyNames.map((agency, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
+                    >
+                      {agency}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -350,7 +466,19 @@ const StockAdd = () => {
                     <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                       <td className="font-mono">{product.code}</td>
                       <td>{product.name}</td>
-                      <td className="text-right">Rs. {product.unitPrice.toFixed(2)}</td>
+                      <td className="text-right">
+                        <select
+                          value={product.selectedPrice}
+                          onChange={(e) => handlePriceChange(product.id, parseFloat(e.target.value))}
+                          className="w-full p-1 border rounded dark:bg-gray-800 dark:border-gray-700"
+                        >
+                          {product.priceOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
                       <td className="text-right">
                         <Input
                           type="number"
