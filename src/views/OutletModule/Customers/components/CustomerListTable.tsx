@@ -97,10 +97,10 @@ function DebouncedInput({
             <div className="flex items-center mb-4">
                 <span className="mr-2">Search:</span>
                 <Input
-                    size="sm"
                     {...props}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
+                    size="sm"
                 />
             </div>
         </div>
@@ -141,7 +141,7 @@ const OutletPage = () => {
     // ----------- Load dropdowns ------------
     useEffect(() => {
         if (!token) return
-        fetchAreas(token)
+        fetchAreas()
             .then(setAreas)
             .catch(() =>
                 toast.push(<Alert type="danger">Failed to load areas.</Alert>),
@@ -169,7 +169,7 @@ const OutletPage = () => {
         if (!selectedTerritory) return
         fetchRoutesByTerritoryId(selectedTerritory)
             .then((res) => {
-                const formatted = res.map((r) => ({
+                const formatted = res.map((r: DemarcationRoute) => ({
                     label: r.routeName,
                     value: String(r.id),
                 }))
@@ -202,28 +202,39 @@ const OutletPage = () => {
         } finally {
             setLoading(false)
         }
-        console.log('Filter applied: dataaaaaaaaaaaaaaaaaaaaaa', outlets)
     }
 
     // ------------ Search Filter ------------
     useEffect(() => {
-        if (!search) return setOutlets(allOutlets)
+        if (!search) {
+            setOutlets(allOutlets)
+            setTotalOutlets(allOutlets.length)
+            return
+        }
         const lower = search.toLowerCase()
-        setOutlets(
-            allOutlets.filter((outlet) =>
-                Object.values(outlet).some((v) =>
-                    String(v).toLowerCase().includes(lower),
-                ),
+        const filtered = allOutlets.filter((outlet) =>
+            Object.values(outlet).some((v) =>
+                String(v).toLowerCase().includes(lower),
             ),
         )
+        setOutlets(filtered)
+        setTotalOutlets(filtered.length)
     }, [search, allOutlets])
+
+    // ------------ Pagination Slice ------------
+    const paginatedOutlets = useMemo(() => {
+        const pageSize = tableData.pageSize ?? 10
+        const pageIndex = tableData.pageIndex ?? 1
+        const start = (pageIndex - 1) * pageSize
+        const end = start + pageSize
+        return outlets.slice(start, end)
+    }, [outlets, tableData.pageIndex, tableData.pageSize])
 
     // ------------ Table Logic ------------
     const handleEdit = (outlet: Outlet) =>
         navigate(`/outlets/edit/${outlet.id}`, { state: { outlet } })
     const handleView = (outlet: Outlet) => navigate(`/outlets/${outlet.id}`)
 
-    
     const handleRowSelect = (checked: boolean, outlet: Outlet) =>
         setSelectedOutlets((prev) =>
             checked
@@ -235,77 +246,74 @@ const OutletPage = () => {
     const updateTableData = (update: Partial<TableQueries>) =>
         setTableData((prev) => ({ ...prev, ...update }))
 
-    const columns = useMemo<ColumnDef<Outlet>[]>(
-        () => [
-            {
-                header: 'Name',
-                accessorKey: 'outletName',
-                cell: ({ row }) => (
-                    <Link
-                        className="font-semibold text-gray-900 dark:text-gray-100"
-                        to={`/outlets/${row.original.id}`}
-                    >
-                        {row.original.outletName}
-                    </Link>
-                ),
-            },
-            { header: 'Outlet ID', accessorKey: 'outletCode' },
-            { header: 'Category', accessorKey: 'outletCategoryName' },
-            { header: 'Route', accessorKey: 'routeCode' },
-            { header: 'Range', accessorKey: 'rangeName' },
-            { header: 'Owner', accessorKey: 'ownerName' },
-            { header: 'Mobile', accessorKey: 'mobileNo' },
-            {
-                header: 'Approved',
-                accessorKey: 'isApproved',
-                cell: ({ row }) => (
-                    <Tag
-                        className={
-                            row.original.isApproved === true
-                                ? 'bg-emerald-200 text-gray-900'
-                                : 'bg-red-200 text-gray-900'
-                        }
-                    >
-                        {row.original.isApproved === true
-                            ? 'Approved'
-                            : 'Not Approved'}
-                    </Tag>
-                ),
-            },
-            {
-                header: 'Status',
-                accessorKey: 'isClose',
-                cell: ({ row }) => (
-                    <Tag
-                        className={
-                            row.original.isClose
-                                ? STATUS_COLORS.closed
-                                : STATUS_COLORS.active
-                        }
-                    >
-                        {row.original.isClose ? 'Closed' : 'Active'}
-                    </Tag>
-                ),
-            },
-            {
-                header: 'Actions',
-                id: 'actions',
-                cell: ({ row }) => (
-                    <div className="flex gap-2">
-                        <Tooltip title="Edit">
-                            <div
-                                className="cursor-pointer"
-                                onClick={() => handleEdit(row.original)}
-                            >
-                                <TbPencil />
-                            </div>
-                        </Tooltip>
-                    </div>
-                ),
-            },
-        ],
-        [],
-    )
+    const columns = useMemo<ColumnDef<Outlet>[]>(() => [
+        {
+            header: 'Name',
+            accessorKey: 'outletName',
+            cell: ({ row }) => (
+                <Link
+                    className="font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap truncate block max-w-[200px]"
+                    to={`/outlets/${row.original.id}`}
+                >
+                    {row.original.outletName}
+                </Link>
+            )
+        },
+        { header: 'Outlet ID', accessorKey: 'outletCode' },
+        { header: 'Category', accessorKey: 'outletCategoryName' },
+        { header: 'Route', accessorKey: 'routeCode' },
+        { header: 'Range', accessorKey: 'rangeName' },
+        { header: 'Owner', accessorKey: 'ownerName' },
+        { header: 'Mobile', accessorKey: 'mobileNo' },
+        {
+            header: 'Approved',
+            accessorKey: 'isApproved',
+            cell: ({ row }) => (
+                <Tag
+                    className={
+                        row.original.isApproved === true
+                            ? 'bg-emerald-200 text-gray-900'
+                            : 'bg-red-200 text-gray-900'
+                    }
+                >
+                    {row.original.isApproved === true
+                        ? 'Approved'
+                        : 'Not Approved'}
+                </Tag>
+            ),
+        },
+        {
+            header: 'Status',
+            accessorKey: 'isClose',
+            cell: ({ row }) => (
+                <Tag
+                    className={
+                        row.original.isClose
+                            ? STATUS_COLORS.closed
+                            : STATUS_COLORS.active
+                    }
+                >
+                    {row.original.isClose ? 'Closed' : 'Active'}
+                </Tag>
+            ),
+        },
+        {
+            header: 'Actions',
+            id: 'actions',
+            cell: ({ row }) => (
+                <div className="flex gap-2">
+                    <Tooltip title="Edit">
+                        <div
+                            className="cursor-pointer"
+                            onClick={() => handleEdit(row.original)}
+                        >
+                            <TbPencil />
+                        </div>
+                    </Tooltip>
+                </div>
+            ),
+        },
+    ], [])
 
     return (
         <>
@@ -405,16 +413,15 @@ const OutletPage = () => {
             {/* ---------- Search ---------- */}
             <DebouncedInput
                 value={search}
-                onChange={setSearch}
+                onChange={(value) => setSearch(String(value))}
                 placeholder="Search outlets..."
             />
 
             {/* ---------- DataTable ---------- */}
-
             <DataTable
                 selectable
                 columns={columns}
-                data={outlets}
+                data={paginatedOutlets}
                 loading={loading}
                 pagingData={{
                     total: totalOutlets,
