@@ -22,6 +22,7 @@ import type {
 import { FiFilter, FiSearch } from 'react-icons/fi'
 import Table from '@/components/ui/Table'
 import Pagination from '@/components/ui/Pagination'
+import { toast, Alert, Dialog } from '@/components/ui'
 
 const { DatePickerRange } = DatePicker
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
@@ -170,6 +171,7 @@ const TimeAttendance = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [pageSize, setPageSize] = useState(10)
   const [data, setData] = useState<TimeAttendanceRow[]>([])
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   useEffect(() => {
     setData(mockData)
@@ -185,11 +187,11 @@ const TimeAttendance = () => {
     { header: 'Check In Distance(m)', accessorKey: 'checkInDistance' },
     { header: 'First Made Call Time', accessorKey: 'firstMadeCallTime' },
     { header: 'First PC Time', accessorKey: 'firstPcTime' },
-    { header: 'Time Gap', accessorKey: 'timeGap1' },
+    { header: 'First Call Time Gap', accessorKey: 'timeGap1' },
     { header: 'Last PC Time', accessorKey: 'lastPcTime' },
     { header: 'Last Made Call Time', accessorKey: 'lastMadeCallTime' },
     { header: 'Check Out Time', accessorKey: 'checkOutTime' },
-    { header: 'Time Gap', accessorKey: 'timeGap2' },
+    { header: 'Last Call Time Gap', accessorKey: 'timeGap2' },
     { header: 'Check Out Distance(m)', accessorKey: 'checkOutDistance' },
     { header: 'Made Calls', accessorKey: 'madeCalls' },
     { header: 'PC', accessorKey: 'pc' },
@@ -198,30 +200,105 @@ const TimeAttendance = () => {
     {
       header: 'Morning Status',
       accessorKey: 'morningStatus',
-      cell: ({ row }) => (
-        <Select
-          options={morningStatusOptions}
-          value={{ label: row.original.morningStatus, value: row.original.morningStatus }}
-          placeholder="Select Status"
-        />
-      ),
+      cell: ({ row }) => {
+        const currentValue = row.original.morningStatus
+        return (
+          <div className="min-w-[180px] w-full">
+            <Select
+              options={morningStatusOptions}
+              value={morningStatusOptions.find(opt => opt.value === currentValue)}
+              onChange={(selected) => {
+                const updated = [...data]
+                updated[row.index] = {
+                  ...updated[row.index],
+                  morningStatus: selected?.value || '',
+                }
+                setData(updated)
+              }}
+              placeholder="Select Status"
+              menuPortalTarget={document.body}
+              styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+              className="z-[999]"
+            />
+          </div>
+        )
+      },
     },
     {
       header: 'Evening Status',
       accessorKey: 'eveningStatus',
-      cell: ({ row }) => (
-        <Select
-          options={eveningStatusOptions}
-          value={{ label: row.original.eveningStatus, value: row.original.eveningStatus }}
-        placwholder="Select Status"
-        />
-      ),
+      cell: ({ row }) => {
+        const currentValue = row.original.eveningStatus
+        return (
+          <div className="min-w-[180px] w-full">
+            <Select
+              options={eveningStatusOptions}
+              value={eveningStatusOptions.find(opt => opt.value === currentValue)}
+              onChange={(selected) => {
+                const updated = [...data]
+                updated[row.index] = {
+                  ...updated[row.index],
+                  eveningStatus: selected?.value || '',
+                }
+                setData(updated)
+              }}
+              placeholder="Select Status"
+              menuPortalTarget={document.body}
+              styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+              className="z-[999]"
+            />
+          </div>
+        )
+      },
     },
-    { header: 'ASE/ASM Comments', accessorKey: 'aseAsmComments' },
-    { header: 'RSM Comments', accessorKey: 'rsmComments' },
+    {
+      header: 'ASE/ASM Comments',
+      accessorKey: 'aseAsmComments',
+      cell: ({ row }) => {
+        const currentValue = row.original.aseAsmComments
+        return (
+          <Input
+            size='lg'
+            value={currentValue}
+            onChange={(e) => {
+              const updated = [...data]
+              updated[row.index] = {
+                ...updated[row.index],
+                aseAsmComments: e.target.value,
+              }
+              setData(updated)
+            }}
+            rows={2}
+            className="text-xs w-full min-w-[200px]"
+          />
+        )
+      },
+    },
+    {
+      header: 'RSM Comments',
+      accessorKey: 'rsmComments',
+      cell: ({ row }) => {
+        const currentValue = row.original.rsmComments
+        return (
+          <Input
+            value={currentValue}
+            onChange={(e) => {
+              const updated = [...data]
+              updated[row.index] = {
+                ...updated[row.index],
+                rsmComments: e.target.value,
+              }
+              setData(updated)
+            }}
+            rows={2}
+            className="text-xs w-full min-w-[200px]"
+          />
+        )
+      },
+    },
     { header: 'Trainee Rep Name', accessorKey: 'traineeRepName' },
     { header: 'Trainee Rep Status', accessorKey: 'traineeRepStatus' },
-  ], [])
+  ], [data])
 
   const table = useReactTable({
     data,
@@ -264,9 +341,14 @@ const TimeAttendance = () => {
     console.log('Filter Data:', data)
   }
 
+  const handleUpdate = () => {
+    // Perform update logic here
+    console.log('Updated data:', data)
+    // Success toast is shown in dialog Confirm button
+  }
+
   return (
     <div className="space-y-6">
-      {/* Filter Section */}
       <Card>
         <h3 className="mb-6">Time Attendance</h3>
         <div className="flex items-center mb-6 gap-2 text-gray-700 dark:text-gray-200">
@@ -309,9 +391,8 @@ const TimeAttendance = () => {
         </Form>
       </Card>
 
-      {/* Table Section */}
       <Card>
-        <div className="mb-4 flex justify-between items-center">
+        <div className="mb-6 mt-6 flex justify-end items-center">
           <div className="flex items-center gap-2">
             <FiSearch className="text-xl text-gray-500" />
             <Input
@@ -323,38 +404,45 @@ const TimeAttendance = () => {
             />
           </div>
         </div>
-        <Table>
-          <THead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        <Sorter sort={header.column.getIsSorted()} />
-                      </div>
-                    )}
-                  </Th>
-                ))}
-              </Tr>
-            ))}
-          </THead>
-          <TBody>
-            {table.getRowModel().rows.map((row) => (
-              <Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <Td key={cell.id} className="text-xs">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
-                ))}
-              </Tr>
-            ))}
-          </TBody>
-        </Table>
+
+        <div className="relative z-10 overflow-visible">
+          <Table>
+            <THead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <Th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <Sorter sort={header.column.getIsSorted()} />
+                        </div>
+                      )}
+                    </Th>
+                  ))}
+                </Tr>
+              ))}
+            </THead>
+            <TBody>
+              {table.getRowModel().rows.map((row) => (
+                <Tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <Td
+                      key={cell.id}
+                      className="text-xs whitespace-nowrap max-w-[250px] relative z-[20] overflow-visible"
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Td>
+                  ))}
+                </Tr>
+              ))}
+            </TBody>
+          </Table>
+        </div>
+
         <div className="flex justify-between items-center mt-4">
           <Pagination
             currentPage={table.getState().pagination.pageIndex + 1}
@@ -362,17 +450,62 @@ const TimeAttendance = () => {
             pageSize={table.getState().pagination.pageSize}
             onChange={onPaginationChange}
           />
-          <div className="min-w-[130px]">
-            <Select
-              size="sm"
-              isSearchable={false}
-              value={pageSizeOptions.find((opt) => opt.value === pageSize)}
-              options={pageSizeOptions}
-              onChange={(option) => onSelectChange(option?.value)}
-            />
+          <div className="flex items-center gap-4">
+            <div className="min-w-[130px]">
+              <Select
+                size="sm"
+                isSearchable={false}
+                value={pageSizeOptions.find((opt) => opt.value === pageSize)}
+                options={pageSizeOptions}
+                onChange={(option) => onSelectChange(option?.value)}
+              />
+            </div>
           </div>
         </div>
+        <div className='mt-4 flex justify-end'>
+          <Button variant="solid" onClick={() => setDialogOpen(true)}>
+            Update
+          </Button>
+        </div>
       </Card>
+      <Dialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onRequestClose={() => setDialogOpen(false)}
+      >
+        <h5 className="mb-4">Confirm Update</h5>
+        <p>Are you sure you want to update the attendance data?</p>
+        <div className="text-right mt-6">
+          <Button className="mr-2" onClick={() => setDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="solid"
+            onClick={() => {
+              setDialogOpen(false)
+              toast.push(
+                <Alert
+                  showIcon
+                  type="success"
+                  className="dark:bg-gray-700 w-64 sm:w-80 md:w-96"
+                >
+                  Attendance updated successfully!
+                </Alert>,
+                {
+                  offsetX: 5,
+                  offsetY: 100,
+                  transitionType: 'fade',
+                  block: false,
+                  placement: 'top-end',
+                }
+              )
+              handleUpdate()
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </Dialog>
     </div>
   )
 }
