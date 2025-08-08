@@ -2,7 +2,7 @@
 import Tabs from '@/components/ui/Tabs'
 import MainCategory from './Components/MainCategory'
 import SubCategory from './Components/SubCategory'
-import Category from './Components/SubSubCategory'
+import SubSubCategory from './Components/SubSubCategory'
 import CategoryType from './Components/CategoryType'
 
 
@@ -38,7 +38,7 @@ const Default = () => {
 
                     {/* Region Creation */}
                     <TabContent value="tab4">
-                            <Category/>
+                            <SubSubCategory/>
                     </TabContent>
 
                   

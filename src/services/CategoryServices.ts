@@ -307,3 +307,117 @@ export const deleteSubCategory = async (id: number | string) => {
     }
 };
 
+//....................sub sub
+
+
+export const fetchSubSubCategoriesAll = async () => {
+    try {
+        const token = sessionStorage.getItem('accessToken')
+
+        if (!token) throw new Error('No access token found.')
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/sales/itemSubCategoryTwo`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            },
+        )
+        console.log('Fetched Sub Sub categories successfully:', response.data)
+        return response.data.payload
+    } catch (error: any) {
+        console.error('Error fetching Sub Sub categories:', error)
+        throw new Error(
+            error.response?.data?.message || 'Failed to load Sub sub categories.',
+        )
+    }
+}
+
+export interface UpdateSubSubCategoryPayload {
+    id: string;
+    userId: number;
+    subCatId: number;
+    subSeq: number;
+    subCatTwoName: string;
+    isActive: boolean;
+}
+export const updateSubSubCategory = async (
+    payload: UpdateSubSubCategoryPayload,
+    token: string,
+) => {
+    try {
+        const response = await axios.put(
+            `${AuthService_URL}/api/v1/sales/itemSubCategoryTwo`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            },
+        )
+
+        return response.data
+    } catch (error: any) {
+        console.error('Error during sub sub category update:', error, payload)
+        throw new Error(
+            error.response?.data?.message || 'Sub-sub category update failed.',
+        )
+    }
+}
+
+export interface AddSubSubCategoryPayload {
+    userId: number
+    subOneId: number | null
+    subCatTwoName: string
+    isActive: boolean
+}
+export const addNewSubSubCategory = async (payload: AddSubSubCategoryPayload) => {
+    try {
+        const token = sessionStorage.getItem('accessToken')
+
+        if (!token) throw new Error('No access token found.')
+        const response = await axios.post(
+            `${AuthService_URL}/api/v1/sales/itemSubCategoryTwo`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            },
+        )
+        console.log('New sub category added successfully:', response.data)
+        return response.data
+    } catch (error: any) {
+        console.error('Error during adding sub sub category:', error, payload)
+        throw new Error(
+            error.response?.data?.message || 'Add new sub sub category failed.',
+        )
+    }
+}
+
+
+export const deleteSubSubCategory = async (id: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.delete(
+            `${AuthService_URL}/api/v1/sales/itemSubCategoryOne/deactivateItemSubCategoryOne/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.payload;
+    } catch (error: any) {
+        console.error('Error deleting sub sub category:', error);
+        throw new Error(error.response?.data?.message || 'Failed to delete sub sub category.');
+    }
+};

@@ -34,11 +34,13 @@ import {
     fetchCategories,
     fetchSubCategoriesAll,
     addNewSubCategory,
-    deleteSubCategory,fetchMainCategoriesAll
+    deleteSubCategory,
+    fetchMainCategoriesAll,
 } from '@/services/CategoryServices'
 
 type SubCategoryFormSchema = {
     userId: number
+    SubCatId: number | null
     mainCatId: number | null
     subCatOneName: string
     isActive: boolean
@@ -130,7 +132,8 @@ const SubCategory = (props: SubCategoryProps) => {
     const navigate = useNavigate()
     const [mainCategoryOptions, setMainCategoryOptions] = useState<any>([])
     const [subCategories, setSubCategories] = useState<SubCategoryData[]>([])
-    const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategoryData | null>(null)
+    const [selectedSubCategory, setSelectedSubCategory] =
+        useState<SubCategoryData | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [dialogIsOpen, setDialogIsOpen] = useState(false)
 
@@ -175,19 +178,23 @@ const SubCategory = (props: SubCategoryProps) => {
 
     const columns = useMemo<ColumnDef<SubCategoryData>[]>(
         () => [
-              {
+            {
                 header: 'Category Type',
                 accessorKey: 'CategoryType',
-                cell: ({ row }) => <span>{row.original.CategoryType || '-'}</span>,
+                cell: ({ row }) => (
+                    <span>{row.original.CategoryType || '-'}</span>
+                ),
             },
-              {
+            {
                 header: 'Main Category',
                 accessorKey: 'MainCategoryType',
-                cell: ({ row }) => <span>{row.original.MainCategoryType || '-'}</span>,
+                cell: ({ row }) => (
+                    <span>{row.original.MainCategoryType || '-'}</span>
+                ),
             },
             { header: 'Sub Category Sequence', accessorKey: 'SubCategorySeq' },
             { header: 'Sub Category Name', accessorKey: 'SubCategoryName' },
-          
+
             {
                 header: 'Is Active',
                 accessorKey: 'isActive',
@@ -260,6 +267,7 @@ const SubCategory = (props: SubCategoryProps) => {
     } = useForm<SubCategoryFormSchema>({
         defaultValues: {
             userId: userIdNumber,
+            SubCatId: null,
             mainCatId: null,
             subCatOneName: '',
             isActive: true,
@@ -272,8 +280,8 @@ const SubCategory = (props: SubCategoryProps) => {
         try {
             const payload = {
                 userId: userIdNumber,
-                mainCatId: values.mainCatId,
-                subCatOneName: values.subCatOneName,
+                subCatId: values.SubCatId, 
+                subCatTwoName: values.subCatOneName, 
                 isActive: values.isActive,
             }
             const result = await addNewSubCategory(payload)
@@ -322,20 +330,16 @@ const SubCategory = (props: SubCategoryProps) => {
     }
 
     const handleEdit = (SubCategory: SubCategoryData) => {
-        navigate('/Salesmenu/SubCategoryEdit', { 
-            
-           state: {
-          
+        navigate('/Salesmenu/SubCategoryEdit', {
+            state: {
                 MainCategoryName: SubCategory.MainCategoryType,
                 id: SubCategory.id,
                 SubcatTypeId: SubCategory.SubCategorySeq,
                 subCatOneName: SubCategory.SubCategoryName,
                 isActive: SubCategory.isActive,
-                   MainCatId: SubCategory.mainCatId,
-              // Assuming MainCategoryCode is used for
+                MainCatId: SubCategory.mainCatId,
+                // Assuming MainCategoryCode is used for
             },
-        
-        
         })
     }
 
@@ -362,7 +366,12 @@ const SubCategory = (props: SubCategoryProps) => {
             )
         } catch (err) {
             console.error(err)
-            toast.push(<Alert showIcon type="danger">{`Failed to ${actionText.toLowerCase()} sub category.`}</Alert>)
+            toast.push(
+                <Alert
+                    showIcon
+                    type="danger"
+                >{`Failed to ${actionText.toLowerCase()} sub category.`}</Alert>,
+            )
         } finally {
             setSelectedSubCategory(null)
         }
@@ -402,9 +411,17 @@ const SubCategory = (props: SubCategoryProps) => {
                                         <Select
                                             placeholder="Select Main Category"
                                             options={mainCategoryOptions}
-                                            value={mainCategoryOptions.find(opt => opt.value === field.value) || null}
+                                            value={
+                                                mainCategoryOptions.find(
+                                                    (opt) =>
+                                                        opt.value ===
+                                                        field.value,
+                                                ) || null
+                                            }
                                             onChange={(option) =>
-                                                field.onChange(option?.value ?? null)
+                                                field.onChange(
+                                                    option?.value ?? null,
+                                                )
                                             }
                                         />
                                     )}
@@ -467,10 +484,13 @@ const SubCategory = (props: SubCategoryProps) => {
                                                     className="cursor-pointer select-none"
                                                 >
                                                     {flexRender(
-                                                        header.column.columnDef.header,
+                                                        header.column.columnDef
+                                                            .header,
                                                         header.getContext(),
                                                     )}
-                                                    <Sorter sort={header.column.getIsSorted()} />
+                                                    <Sorter
+                                                        sort={header.column.getIsSorted()}
+                                                    />
                                                 </div>
                                             )}
                                         </Th>
@@ -482,8 +502,14 @@ const SubCategory = (props: SubCategoryProps) => {
                             {table.getRowModel().rows.map((row) => (
                                 <Tr key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <Td key={cell.id} className="py-1 text-xs">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        <Td
+                                            key={cell.id}
+                                            className="py-1 text-xs"
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
                                         </Td>
                                     ))}
                                 </Tr>
@@ -493,7 +519,9 @@ const SubCategory = (props: SubCategoryProps) => {
                     <div className="flex items-center justify-between mt-4">
                         <Pagination
                             pageSize={table.getState().pagination.pageSize}
-                            currentPage={table.getState().pagination.pageIndex + 1}
+                            currentPage={
+                                table.getState().pagination.pageIndex + 1
+                            }
                             total={totalData}
                             onChange={onPaginationChange}
                         />
@@ -501,16 +529,23 @@ const SubCategory = (props: SubCategoryProps) => {
                             <Select
                                 size="sm"
                                 isSearchable={false}
-                                value={pageSizeOptions.find(option => option.value === pageSize)}
+                                value={pageSizeOptions.find(
+                                    (option) => option.value === pageSize,
+                                )}
                                 options={pageSizeOptions}
-                                onChange={(option) => onSelectChange(option?.value)}
+                                onChange={(option) =>
+                                    onSelectChange(option?.value)
+                                }
                             />
                         </div>
                     </div>
                 </Card>
             </div>
             <Dialog isOpen={dialogIsOpen} onClose={handleDialogClose}>
-                <h5 className="mb-4">{selectedSubCategory?.isActive ? 'Deactivate' : 'Activate'} Sub Category?</h5>
+                <h5 className="mb-4">
+                    {selectedSubCategory?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    Sub Category?
+                </h5>
                 <p>
                     Are you sure you want to{' '}
                     {selectedSubCategory?.isActive ? 'Deactivate' : 'Activate'}{' '}
