@@ -306,3 +306,4 @@ export const deleteSubCategory = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete subcategory.');
     }
 };
+

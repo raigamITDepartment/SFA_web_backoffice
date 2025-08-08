@@ -15,7 +15,7 @@ import {
 } from '@/services/singupDropdownService'
 import {
     fetchRoutesByTerritoryId,
-    fetchShopsbyRouteId,
+    fetchShopsbyRouteId,fetchShopsbyTerritoryId
 } from '@/services/DemarcationService'
 
 import type { ColumnDef, Row, OnSortParam } from '@/components/shared/DataTable'
@@ -59,15 +59,29 @@ export interface Outlet {
     outletSequence: string
     isApproved: boolean
     isClose: boolean
+    isNew: boolean
+    uniqueCode?: string
+    routeName?: string
+    vatNum?: string
+    created?: string
+    imagePath?: string
+    imgList?: { id: string; name: string; img: string }[]
 }
 
 export type FormSchema = {
     area: string
     territory: string
     route: string
+    approvedStatus: string
 }
 
 // ---------- Constants ----------
+const approvalStatusOptions = [
+    { label: 'All', value: 'all' },
+    { label: 'Approved', value: 'approved' },
+    { label: 'Not Approved', value: 'not-approved' },
+]
+
 const STATUS_COLORS: Record<string, string> = {
     active: 'bg-emerald-200 text-gray-900',
     closed: 'bg-red-200 text-gray-900',
@@ -94,7 +108,7 @@ function DebouncedInput({
 
     return (
         <div className="flex justify-end">
-            <div className="flex items-center mb-4">
+            <div className="flex items-center">
                 <span className="mr-2">Search:</span>
                 <Input
                     {...props}
@@ -128,7 +142,9 @@ const OutletPage = () => {
         control,
         formState: { errors },
         setValue,
-    } = useForm<FormSchema>()
+    } = useForm<FormSchema>({
+        defaultValues: { approvedStatus: 'all' },
+    })
 
     const token = sessionStorage.getItem('accessToken')
     const selectedArea = useWatch({ control, name: 'area' })
@@ -186,13 +202,29 @@ const OutletPage = () => {
     const onSubmitData = async (data: FormSchema) => {
         setLoading(true)
         try {
-            const res = await fetchShopsbyRouteId(data.route)
-            setAllOutlets(res)
-            setTotalOutlets(res.length)
-            setOutlets(res)
-            if (res.length === 0) {
+            let res: Outlet[] = []
+            if (data.route) {
+                res = await fetchShopsbyRouteId(data.route)
+            } else if (data.territory) {
+                res = await fetchShopsbyTerritoryId(data.territory)
+            }
+
+            let filteredRes = res
+            if (data.approvedStatus && data.approvedStatus !== 'all') {
+                const isApproved = data.approvedStatus === 'approved'
+                filteredRes = res.filter(
+                    (outlet) => outlet.isApproved === isApproved,
+                )
+            }
+
+            setAllOutlets(filteredRes)
+            setTotalOutlets(filteredRes.length)
+            setOutlets(filteredRes)
+            if (filteredRes.length === 0) {
                 toast.push(
-                    <Alert type="info">No shops found for this route.</Alert>,
+                    <Alert type="info">
+                        No shops found for this selection.
+                    </Alert>,
                 )
             }
         } catch {
@@ -212,10 +244,10 @@ const OutletPage = () => {
             return
         }
         const lower = search.toLowerCase()
-        const filtered = allOutlets.filter((outlet) =>
-            Object.values(outlet).some((v) =>
-                String(v).toLowerCase().includes(lower),
-            ),
+        const filtered = allOutlets.filter(
+            (outlet) =>
+                outlet.outletName.toLowerCase().includes(lower) ||
+                outlet.outletCode.toLowerCase().includes(lower),
         )
         setOutlets(filtered)
         setTotalOutlets(filtered.length)
@@ -233,7 +265,8 @@ const OutletPage = () => {
     // ------------ Table Logic ------------
     const handleEdit = (outlet: Outlet) =>
         navigate(`/outlets/edit/${outlet.id}`, { state: { outlet } })
-    const handleView = (outlet: Outlet) => navigate(`/outlets/${outlet.id}`)
+
+    //const handleView = (outlet: Outlet) => navigate(`/outlets/${outlet.id}`)
 
     const handleRowSelect = (checked: boolean, outlet: Outlet) =>
         setSelectedOutlets((prev) =>
@@ -383,7 +416,7 @@ const OutletPage = () => {
                         <Controller
                             name="route"
                             control={control}
-                            rules={{ required: 'Route is required' }}
+                       
                             render={({ field }) => (
                                 <Select
                                     size="sm"
@@ -402,21 +435,42 @@ const OutletPage = () => {
                         />
                     </FormItem>
 
-                    <div className="flex items-end">
-                        <Button type="submit" variant="solid">
-                            Submit
-                        </Button>
-                    </div>
+                    <FormItem label="Approval Status">
+                        <Controller
+                            name="approvedStatus"
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    size="sm"
+                                    placeholder="Select Status"
+                                    options={approvalStatusOptions}
+                                    value={
+                                        approvalStatusOptions.find(
+                                            (opt) => opt.value === field.value,
+                                        ) || null
+                                    }
+                                    onChange={(opt) =>
+                                        field.onChange(opt?.value ?? 'all')
+                                    }
+                                />
+                            )}
+                        />
+                    </FormItem>
+
+                    <Button type="submit" variant="solid" className="mt-8">
+                        Submit
+                    </Button>
                 </div>
             </form>
 
-            {/* ---------- Search ---------- */}
-            <DebouncedInput
-                value={search}
-                onChange={(value) => setSearch(String(value))}
-                placeholder="Search outlets..."
-            />
-
+            <div className="flex justify-between items-center mb-4">
+                <h5 className="mb-0">Total Shops: {totalOutlets}</h5>
+                <DebouncedInput
+                    value={search}
+                    onChange={(value) => setSearch(String(value))}
+                    placeholder="Search outlets..."
+                />
+            </div>
             {/* ---------- DataTable ---------- */}
             <DataTable
                 selectable

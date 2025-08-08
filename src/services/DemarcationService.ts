@@ -2,6 +2,7 @@ import axios from 'axios';
 import { AuthService_URL } from '../configs/Config';
 import { channel } from 'diagnostics_channel';
 import { co } from '@fullcalendar/core/internal-common';
+import Territory from '@/views/MasterSettings/Demarcation/Components/Territory';
 
 
 //channel APIs
@@ -885,6 +886,8 @@ export const updateRoute = async (payload: UpdateRoutePayload, token: string) =>
 };
 
 //Shop APIs 
+
+//Route
 export const fetchShopsbyRouteId = async (route: number | string) => {
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -905,10 +908,38 @@ export const fetchShopsbyRouteId = async (route: number | string) => {
         return response.data.payload;
 
     } catch (error: any) {
-        console.error('Error fetching routes:', error);
-        throw new Error(error.response?.data?.message || 'Failed to load routes.');
+        console.error('Error fetching routes by shop:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load routes by shop.');
     }
 };
+
+//Territory
+
+export const fetchShopsbyTerritoryId = async (territory: number | string) => {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) throw new Error('No access token found.');
+
+        const response = await axios.get(
+            `${AuthService_URL}/api/v1/userDemarcation/outlet/getAllOutletsByTerritoryId/${territory}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000, // Set timeout to 10 seconds
+            }
+        );
+
+        console.log("Fetched shops by territory:", response.data.payload);
+        return response.data.payload;
+
+    } catch (error: any) {
+        console.error('Error fetching shops by territory:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load shops by territory.');
+    }
+};
+
 
 
 //agencies APIs 
