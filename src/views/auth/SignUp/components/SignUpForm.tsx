@@ -78,9 +78,9 @@ const validationSchema: ZodType<SignUpFormSchema> = z
         confirmPassword: z.string({
             required_error: 'Please confirm your password',
         }),
-        mobileNo: z.string({
-            required_error: 'Please enter your mobile number',
-        }),
+        mobileNo: z
+            .string({ required_error: 'Please enter your mobile number' })
+            .regex(/^\d{10}$/, 'Mobile number must be 10 digits'),
         role: z.number({ required_error: 'Please select your role' }),
         grade: z.number({ required_error: 'Please select your department' }),
         userLevel: z.number({ required_error: 'Please select your user type' }),
@@ -90,7 +90,7 @@ const validationSchema: ZodType<SignUpFormSchema> = z
         territory: z.number().optional(),
         range: z.number().optional(),
         agency: z.number().optional(),
-        area: z.number().optional(),
+        area: z.array(z.number()).optional(),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: 'Password not match',
@@ -756,7 +756,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             </FormItem>
                         )}
 
-                        {(isSales || isASM || isASE || isRep || isAgent) && (
+                        {isASE && (
                             <FormItem
                                 label="Multi Select Area"
                                 invalid={Boolean(errors.area)}
@@ -785,11 +785,41 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     }
                                 />
                             </FormItem>
-                        )} 
+                        )}
 
-                        
+                        {(isSales || isASM || isRep || isAgent) && (
+                            <FormItem
+                                label="Select Area"
+                                invalid={Boolean(errors.area)}
+                                errorMessage={errors.area?.message}
+                                style={{ flex: 1, marginLeft: '10px' }}
+                            >
+                                <Controller
+                                    name="area"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            isMulti
+                                            componentAs={CreatableSelect}
+                                            options={area}
+                                            value={area.filter(
+                                                (option: { value: number }) =>
+                                                    Array.isArray(field.value)
+                                                        ? field.value.includes(option.value)
+                                                        : false
+                                            )}
+                                            onChange={(selected) => {
+                                                const ids = Array.isArray(selected) ? selected.map((opt) => opt.value) : [];
+                                                field.onChange(ids);
+                                                setSelectedAreas(ids);
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </FormItem>
+                        )}
+
                         {(isSales || isRep || isAgent) && (
-
                             <FormItem
                                 label="Select Range "
                                 invalid={Boolean(errors.range)}

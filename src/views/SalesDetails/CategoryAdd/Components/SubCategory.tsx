@@ -60,7 +60,7 @@ const pageSizeOptions = [
 
 interface SubCategoryData {
     id: string
-    SubCategoryCode: string
+    SubCategorySeq: string
     SubCategoryName: string
     isActive?: boolean
     CategoryType?: string
@@ -157,7 +157,7 @@ const SubCategory = (props: SubCategoryProps) => {
                 id: String(item.id),
                 CategoryType: item.categoryType, // This may be undefined if not in API response
                 MainCategoryType: item.mainCatName,
-                SubCategoryCode: String(item.subCatSeq),
+                SubCategorySeq: String(item.subCatSeq),
                 SubCategoryName: item.subCatOneName,
                 isActive: item.isActive,
                 catTypeId: item.catTypeId,
@@ -185,7 +185,7 @@ const SubCategory = (props: SubCategoryProps) => {
                 accessorKey: 'MainCategoryType',
                 cell: ({ row }) => <span>{row.original.MainCategoryType || '-'}</span>,
             },
-            { header: 'Sub Category Code', accessorKey: 'SubCategoryCode' },
+            { header: 'Sub Category Sequence', accessorKey: 'SubCategorySeq' },
             { header: 'Sub Category Name', accessorKey: 'SubCategoryName' },
           
             {
@@ -276,20 +276,67 @@ const SubCategory = (props: SubCategoryProps) => {
                 subCatOneName: values.subCatOneName,
                 isActive: values.isActive,
             }
-            await addNewSubCategory(payload)
-            toast.success('Sub Category created successfully!')
-            reset()
-            await loadSubCategories()
-        } catch (err) {
-            console.error(err)
-            toast.error('Failed to create sub category')
+            const result = await addNewSubCategory(payload)
+
+            if (result?.status === 'failed') {
+                setMessage?.(result.message)
+                toast.push(
+                    <Alert showIcon type="danger">
+                        {result.message || 'Failed to create sub category.'}
+                    </Alert>,
+                )
+            } else {
+                toast.push(
+                    <Alert showIcon type="success">
+                        Sub Category created successfully!
+                    </Alert>,
+                )
+                reset()
+                await loadSubCategories()
+            }
+        } catch (err: any) {
+            let backendMessage =
+                'An error occurred while creating the sub category. Please try again.'
+
+            const response = err?.response
+            const data = response?.data
+
+            if (data) {
+                if (typeof data.payload === 'string') {
+                    backendMessage = data.payload
+                } else if (typeof data.message === 'string') {
+                    backendMessage = data.message
+                }
+            } else if (typeof err.message === 'string') {
+                backendMessage = err.message
+            }
+
+            toast.push(
+                <Alert showIcon type="danger">
+                    {backendMessage}
+                </Alert>,
+            )
         } finally {
             setIsSubmitting(false)
         }
     }
 
-    const handleEdit = (subCat: SubCategoryData) => {
-        navigate('/Salesmenu/SubCategoryEdit', { state: subCat })
+    const handleEdit = (SubCategory: SubCategoryData) => {
+        navigate('/Salesmenu/SubCategoryEdit', { 
+            
+           state: {
+          
+                MainCategoryName: SubCategory.MainCategoryType,
+                id: SubCategory.id,
+                SubcatTypeId: SubCategory.SubCategorySeq,
+                subCatOneName: SubCategory.SubCategoryName,
+                isActive: SubCategory.isActive,
+                   MainCatId: SubCategory.mainCatId,
+              // Assuming MainCategoryCode is used for
+            },
+        
+        
+        })
     }
 
     const handleDeleteClick = (subCat: SubCategoryData) => {

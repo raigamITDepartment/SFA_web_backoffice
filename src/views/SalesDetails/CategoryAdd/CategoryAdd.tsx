@@ -2,7 +2,7 @@
 import Tabs from '@/components/ui/Tabs'
 import MainCategory from './Components/MainCategory'
 import SubCategory from './Components/SubCategory'
-import Category from './Components/Category'
+import Category from './Components/SubSubCategory'
 import CategoryType from './Components/CategoryType'
 
 

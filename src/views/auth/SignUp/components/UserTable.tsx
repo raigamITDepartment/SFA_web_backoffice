@@ -166,6 +166,8 @@ const UserTable = ({ users }: UserTableProps) => {
 
     const columns = useMemo<ColumnDef<Person>[]>(() => [
         { header: 'Username', accessorKey: 'userName' },
+        { header: 'Role Name', accessorKey: 'roleName' },
+        { header: 'Sub Role Name', accessorKey: 'subRoleName' },
         { header: 'First Name', accessorKey: 'firstName' },
         { header: 'Last Name', accessorKey: 'lastName' },
         { header: 'Email', accessorKey: 'email' },

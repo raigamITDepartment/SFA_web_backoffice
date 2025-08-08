@@ -32,7 +32,8 @@ import { useNavigate } from 'react-router-dom'
 import {
     fetchCategories,
     fetchMainCategoriesAll,
-    addNewMainCategory,deleteMainCategory
+    addNewMainCategory,
+    deleteMainCategory,
 } from '@/services/CategoryServices'
 
 type MainCategoryFormSchema = {
@@ -58,7 +59,7 @@ const pageSizeOptions = [
 
 interface MainCategoryData {
     id: string
-    MainCategoryCode: string
+    MainCategorySeq: string
     MainCategoryName: string
     isActive?: boolean
     CategoryType?: string
@@ -123,17 +124,18 @@ const MainCategory = (props: MainCategoryProps) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [pageSize, setPageSize] = useState(10)
-   // const [error, setError] = useState<string | null>(null)
-   
+    // const [error, setError] = useState<string | null>(null)
+
     const navigate = useNavigate()
     const [categoryType, setCategoryType] = useState<any>([])
     const [selectedMainCategory, setSelectedMainCategory] = useState<
         MainCategoryData[]
     >([])
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    
-    const [MainSelectCategory, setMainSelectCategory] = useState<MainCategoryData | null>(null)
-     const [dialogIsOpen, setDialogIsOpen] = useState(false)
+
+    const [MainSelectCategory, setMainSelectCategory] =
+        useState<MainCategoryData | null>(null)
+    const [dialogIsOpen, setDialogIsOpen] = useState(false)
 
     useEffect(() => {
         const loadCategoryTypes = async () => {
@@ -156,7 +158,7 @@ const MainCategory = (props: MainCategoryProps) => {
             const response = await fetchMainCategoriesAll() // Original API response
             const mapped: MainCategoryData[] = response.map((item: any) => ({
                 id: String(item.id),
-                MainCategoryCode: String(item.mainCatSeq),
+                MainCategorySeq: String(item.mainCatSeq),
                 MainCategoryName: item.itemMainCat,
                 CategoryType: item.categoryType,
                 isActive: item.isActive,
@@ -174,8 +176,6 @@ const MainCategory = (props: MainCategoryProps) => {
 
     const columns = useMemo<ColumnDef<MainCategoryData>[]>(
         () => [
-            { header: 'Main Category Code', accessorKey: 'MainCategoryCode' },
-            { header: 'Main Category Name', accessorKey: 'MainCategoryName' },
             {
                 header: 'Category Type',
                 accessorKey: 'CategoryType',
@@ -183,6 +183,9 @@ const MainCategory = (props: MainCategoryProps) => {
                     <span>{row.original.CategoryType || '-'}</span>
                 ),
             },
+            { header: 'Main Category Sequence', accessorKey: 'MainCategorySeq' },
+            { header: 'Main Category Name', accessorKey: 'MainCategoryName' },
+
             {
                 header: 'Is Active',
                 accessorKey: 'isActive',
@@ -215,13 +218,17 @@ const MainCategory = (props: MainCategoryProps) => {
                                 <MdBlock
                                     className="text-red-500 text-lg cursor-pointer"
                                     title="Deactivate main category"
-                                    onClick={() => handleDeleteClick(MainCatCode)}
+                                    onClick={() =>
+                                        handleDeleteClick(MainCatCode)
+                                    }
                                 />
                             ) : (
                                 <MdCheckCircleOutline
                                     className="text-green-500 text-lg cursor-pointer"
                                     title="Activate Main Category"
-                                    onClick={() => handleDeleteClick(MainCatCode)}
+                                    onClick={() =>
+                                        handleDeleteClick(MainCatCode)
+                                    }
                                 />
                             )}
                         </div>
@@ -262,34 +269,37 @@ const MainCategory = (props: MainCategoryProps) => {
     // const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
     //     console.log(value, e);
     // };
-  const handleDialogConfirm = async () => {
-    setDialogIsOpen(false)
-    if (MainSelectCategory) {
-        const isDeactivating = MainSelectCategory?.isActive
-        const actionText = isDeactivating ? 'Deactivated' : 'Activated'
+    const handleDialogConfirm = async () => {
+        setDialogIsOpen(false)
+        if (MainSelectCategory) {
+            const isDeactivating = MainSelectCategory?.isActive
+            const actionText = isDeactivating ? 'Deactivated' : 'Activated'
 
-        try {
-            await deleteMainCategory(MainSelectCategory.id)
-            await loadMainCategory() // This will refresh the table with the latest data
+            try {
+                await deleteMainCategory(MainSelectCategory.id)
+                await loadMainCategory() // This will refresh the table with the latest data
 
-            toast.push(
-                <Alert showIcon type="success">
-                    Main Category {actionText} successfully!
-                </Alert>,
-            )
-        } catch (error) {
-            console.error(`Failed to ${actionText.toLowerCase()} main category:`, error)
-            toast.push(
-                <Alert showIcon type="danger">
-                    {`Failed to ${actionText.toLowerCase()} main category.`}
-                </Alert>,
-            )
-        } finally {
-            setMainSelectCategory(null)
+                toast.push(
+                    <Alert showIcon type="success">
+                        Main Category {actionText} successfully!
+                    </Alert>,
+                )
+            } catch (error) {
+                console.error(
+                    `Failed to ${actionText.toLowerCase()} main category:`,
+                    error,
+                )
+                toast.push(
+                    <Alert showIcon type="danger">
+                        {`Failed to ${actionText.toLowerCase()} main category.`}
+                    </Alert>,
+                )
+            } finally {
+                setMainSelectCategory(null)
+            }
         }
     }
-}
-const handleEdit = (MainCategory: MainCategoryData) => {
+    const handleEdit = (MainCategory: MainCategoryData) => {
         // Pass the id to MainCategoryEdit page
         navigate('/Salesmenu/MainCategoryEdit', {
             state: {
@@ -298,7 +308,7 @@ const handleEdit = (MainCategory: MainCategoryData) => {
                 CategoryType: MainCategory.CategoryType,
                 catTypeId: MainCategory.catTypeId,
                 isActive: MainCategory.isActive,
-                mainCatSeq: MainCategory.MainCategoryCode, // Assuming MainCategoryCode is used for
+                mainCatSeq: MainCategory.MainCategorySeq, // Assuming MainCategorySeq is used for
             },
         })
     }
@@ -313,8 +323,7 @@ const handleEdit = (MainCategory: MainCategoryData) => {
         setDialogIsOpen(true)
     }
 
-
-       const handleDialogClose = () => {
+    const handleDialogClose = () => {
         setDialogIsOpen(false)
         setMainSelectCategory(null)
     }
@@ -594,33 +603,38 @@ const handleEdit = (MainCategory: MainCategoryData) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">{MainSelectCategory?.isActive ? 'Deactivate' : 'Activate'} Main Category?</h5>
-                            <p>
-                                Are you sure you want to {MainSelectCategory?.isActive ? 'Deactivate' : 'Activate'} <b>{MainSelectCategory?.MainCategoryName}</b>?
-                            </p>
-                            <div className="text-right mt-6">
-                                <Button
-                                    className="mr-2"
-                                    clickFeedback={false}
-                                    customColorClass={({ active, unclickable }) =>
-                                        [
-                                            'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
-            
-                                            unclickable && 'opacity-50 cursor-not-allowed',
-                                            !active && !unclickable,
-                                        ]
-                                            .filter(Boolean)
-                                            .join(' ')
-                                    }
-                                    onClick={handleDialogClose}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button variant="solid" onClick={handleDialogConfirm}>
-                                    Confirm
-                                </Button>
-                            </div>
-                        </Dialog>
+                <h5 className="mb-4">
+                    {MainSelectCategory?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    Main Category?
+                </h5>
+                <p>
+                    Are you sure you want to{' '}
+                    {MainSelectCategory?.isActive ? 'Deactivate' : 'Activate'}{' '}
+                    <b>{MainSelectCategory?.MainCategoryName}</b>?
+                </p>
+                <div className="text-right mt-6">
+                    <Button
+                        className="mr-2"
+                        clickFeedback={false}
+                        customColorClass={({ active, unclickable }) =>
+                            [
+                                'hover:text-red-600 border-red-600 border-2 hover:border-red-800 hover:ring-0 text-red-600 ',
+
+                                unclickable && 'opacity-50 cursor-not-allowed',
+                                !active && !unclickable,
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+                        }
+                        onClick={handleDialogClose}
+                    >
+                        Cancel
+                    </Button>
+                    <Button variant="solid" onClick={handleDialogConfirm}>
+                        Confirm
+                    </Button>
+                </div>
+            </Dialog>
         </div>
     )
 }

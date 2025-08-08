@@ -31,6 +31,12 @@ type AddCategoryTypeFormSchema = {
    isActive: boolean;
 };
 
+interface CategoryTypeProps {
+    disableSubmit?: boolean
+    className?: string
+    setMessage?: (message: string) => void
+}
+
 interface CategoryTypeData {
   id: string;
   categoryTypeName: string;
@@ -76,9 +82,9 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-const CategoryType = (props : AddCategoryTypeFormSchema) => {
+const CategoryType = (props: CategoryTypeProps) => {
 
-      const { disableSubmit = false, className, setMessage } = props
+    const { disableSubmit = false, className, setMessage } = props
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);

@@ -219,20 +219,20 @@ export const fetchSubCategoriesAll = async () => {
 }
 
 export interface UpdateSubCategoryPayload {
-    id: string
-    userId: number
-    itemMainCat: string
-    mainCatSeq: string
-    isActive?: boolean
-    catTypeId?: number | null
+    id: string;
+    userId: number;
+    mainCatId: number;
+    subCatSeq: number;
+    subCatOneName: string;
+    isActive: boolean;
 }
 export const updateSubCategory = async (
-    payload: UpdateMainCategoryPayload,
+    payload: UpdateSubCategoryPayload,
     token: string,
 ) => {
     try {
         const response = await axios.put(
-            `${AuthService_URL}/api/v1/sales/itemMainCategory`,
+            `${AuthService_URL}/api/v1/sales/itemSubCategoryOne`,
             payload,
             {
                 headers: {
@@ -241,6 +241,8 @@ export const updateSubCategory = async (
                 timeout: 10000,
             },
         )
+
+        console.log('succ paylod.............. ', payload)
         return response.data
     } catch (error: any) {
         console.error('Error during sub category update:', error, payload)
@@ -251,10 +253,10 @@ export const updateSubCategory = async (
 }
 
 export interface AddSubCategoryPayload {
-    userId: number;
-    catTypeId: number | null;
-    itemMainCat: string;
-    isActive: boolean;
+    userId: number
+    mainCatId: number | null
+    subCatOneName: string
+    isActive: boolean
 }
 export const addNewSubCategory = async (payload: AddSubCategoryPayload) => {
     try {
@@ -262,7 +264,7 @@ export const addNewSubCategory = async (payload: AddSubCategoryPayload) => {
 
         if (!token) throw new Error('No access token found.')
         const response = await axios.post(
-            `${AuthService_URL}/api/v1/sales/itemMainCategory`,
+            `${AuthService_URL}/api/v1/sales/itemSubCategoryOne`,
             payload,
             {
                 headers: {
@@ -304,5 +306,3 @@ export const deleteSubCategory = async (id: number | string) => {
         throw new Error(error.response?.data?.message || 'Failed to delete subcategory.');
     }
 };
-
-
